@@ -1,0 +1,14 @@
+<div class="container">
+    <h1 class="mt-4">Admin Dashboard</h1>
+    <p class="lead mb-3">Welcome <%= user.name %></p>
+        <% for (const obj in sessions) { %>
+        <div>
+            <p>SessionID: <%= obj %></p>
+            
+            <p>UserID: <%= sessions[obj] %></p>
+            <a href="/admin/revoke/<%= obj %>">Revoke Session</a>
+        </div>
+        <% } %>
+
+    <a href="/logout" class="btn btn-secondary">Logout</a>
+</div>

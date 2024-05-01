@@ -1,4 +1,5 @@
 let database = require("../database");
+const multer = require('multer');
 
 async function keywordToImage(keyword) {
   // Make sure to register for a token at https://unsplash.com/developers
@@ -9,6 +10,42 @@ async function keywordToImage(keyword) {
   const imageUrl = data.results[0].urls.regular;
   return imageUrl;
 }
+
+
+
+
+let postsController = {
+  new: (req, res) => {
+    res.render("create_post.ejs");
+  },
+  create: async (req, res) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        return res.status(400).send('No files were uploaded.');
+      }
+      
+      // Process other form fields (e.g., title, description)
+      const title = req.body.title;
+      const description = req.body.description;
+      const keyword = req.body.keyword;
+
+      // Fetch image URL based on keyword
+      const banner = await keywordToImage(keyword);
+
+      // Save post details to the database or perform other operations
+      // For example, you can access the file path via file.path
+
+      // Redirect to /reminders after successful upload
+      res.redirect("/reminders");
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+};
+
+
 let remindersController = {
   list: (req, res) => {
     let user = req.user
@@ -98,4 +135,4 @@ let remindersController = {
   }
 };
 
-module.exports = remindersController;
+module.exports = {remindersController, postsController};

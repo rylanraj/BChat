@@ -9,6 +9,7 @@ const interactionController = require("./controller/interaction_controller");
 const authController = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
+const fs = require('fs');
 
 app.use(express.static("public"))
 
@@ -61,6 +62,7 @@ app.post("/register", authController.registerSubmit);
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+      fs.mkdir('uploads/', { recursive: true }, (err) => {});
     cb(null, 'uploads/'); // Directory where uploaded files will be stored
   },
   filename: function (req, file, cb) {

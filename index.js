@@ -5,7 +5,7 @@ const session = require("express-session");
 const app = express();
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
-const reminderController = require("./controller/reminder_controller");
+const interactionController = require("./controller/interaction_controller");
 const authController = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 
@@ -39,15 +39,15 @@ app.set("view engine", "ejs");
 app.get("/", function(req, res){
     res.render("index", { isAuthenticated: req.isAuthenticated() });
 })
-app.get("/reminders", ensureAuthenticated, reminderController.list);
-app.get("/reminder/new", ensureAuthenticated, reminderController.new);
-app.get("/reminder/:id", ensureAuthenticated, reminderController.listOne);
-app.get("/reminder/:id/edit", ensureAuthenticated, reminderController.edit);
-app.post("/reminder/", ensureAuthenticated, reminderController.create);
+app.get("/reminders", ensureAuthenticated, interactionController.list);
+app.get("/reminder/new", ensureAuthenticated, interactionController.new);
+app.get("/reminder/:id", ensureAuthenticated, interactionController.listOne);
+app.get("/reminder/:id/edit", ensureAuthenticated, interactionController.edit);
+app.post("/reminder/", ensureAuthenticated, interactionController.create);
 
 // ⭐ Implement these two routes below!
-app.post("/reminder/update/:id", reminderController.update);
-app.post("/reminder/delete/:id", reminderController.delete);
+app.post("/reminder/update/:id", interactionController.update);
+app.post("/reminder/delete/:id", interactionController.delete);
 
 // 👌 Ignore for now
 app.get("/register", authController.register);

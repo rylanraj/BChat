@@ -9,7 +9,6 @@ async function keywordToImage(keyword) {
   const imageUrl = data.results[0].urls.regular;
   return imageUrl;
 }
-
 let remindersController = {
   list: (req, res) => {
     let user = req.user

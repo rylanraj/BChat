@@ -23,9 +23,9 @@ let remindersController = {
     let reminderToFind = req.params.id;
     let user = req.user
     let searchResult = user.reminders.find(function (reminder) {
-      return reminder.id == reminderToFind;
+      return reminder.id === reminderToFind;
     });
-    if (searchResult != undefined) {
+    if (searchResult !== undefined) {
       res.render("reminder/single-reminder", { reminderItem: searchResult });
     } else {
       res.render("reminder/index", { reminders: user.reminders });
@@ -51,7 +51,7 @@ let remindersController = {
     let reminderToFind = req.params.id;
     let user = req.user
     let searchResult = user.reminders.find(function (reminder) {
-      return reminder.id == reminderToFind;
+      return reminder.id === reminderToFind;
     });
     res.render("reminder/edit", { reminderItem: searchResult });
   },
@@ -62,7 +62,7 @@ let remindersController = {
     let user = req.user
     // Find the reminder in the array
     let index = user.reminders.findIndex(function (reminder) {
-      return reminder.id == reminderToUpdate;
+      return reminder.id === reminderToUpdate;
     });
 
     // If the reminder was found, update it
@@ -85,11 +85,11 @@ let remindersController = {
     let user = req.user
 
     let index = user.reminders.findIndex(function (reminder) {
-      return reminder.id == reminderToDelete;
+      return reminder.id === reminderToDelete;
     });
 
 
-    if (index != -1) {
+    if (index !== -1) {
       user.reminders.splice(index, 1);
     }
 

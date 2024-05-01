@@ -61,7 +61,7 @@ app.get('/github',
 
 app.get('/github/callback',
     passport.authenticate('github', {
-        successRedirect: '/reminders',
+        successRedirect: '/',
         failureRedirect: '/login',
         failureMessage: true }),
     function(req, res) {

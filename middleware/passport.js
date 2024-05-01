@@ -3,11 +3,12 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 let userController = require("../controller/user_controller");
 const { userModel } = require("../database");
+require('dotenv').config()
 // GitHub Authentication
 const GithubStrategy = require("passport-github2").Strategy;
-var GITHUB_CLIENT_ID = "ebe33967d8d7a3288f7b";
-var GITHUB_CLIENT_SECRET = "9907bda3a0199ff0c6b786302d997504ef328a1f";
-var GITHUB_CALLBACK_URL = "http://localhost:3001/github/callback";
+var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+var GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
 
 const localLogin = new LocalStrategy(
   {

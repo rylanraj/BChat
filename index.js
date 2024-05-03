@@ -1,4 +1,3 @@
-// Hey guys can you see this? It's from Rylan
 const passport = require("./middleware/passport")
 const express = require("express");
 const session = require("express-session");

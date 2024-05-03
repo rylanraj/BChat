@@ -21,23 +21,21 @@ let authController = {
 
 
       function test() {
-
-        // Extract IDs from keys and find the maximum
         let maxId = -Infinity;
-        let maxUser = null;
-      
+
         for (const key in process.env) {
           if (key.includes("USER_") && key.endsWith("_INFO")) {
-            const id = parseInt(key.match(/\d+/)[0]);
-            if (!isNaN(id) && id > maxId) {
-              maxId = id;
-              maxUser = JSON.parse(process.env[key]);
+            const match = key.match(/\d+/);
+            if (match) {
+              const id = parseInt(match[0]);
+              if (!isNaN(id) && id > maxId) {
+                maxId = id;
+              }
             }
           }
         }
-      
-        console.log("User with highest ID:", maxId);
-        return maxId + 1
+
+        return maxId === -Infinity ? 1 : maxId + 1;
       }
       
       

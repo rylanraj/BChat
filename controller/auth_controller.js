@@ -1,7 +1,7 @@
 let database = require("../database");
 let passport = require("../middleware/passport")
 require('dotenv').config()
-const fs = require('fs');
+const fs = require('fs/promises');
 
 let authController = {
   login: (req, res) => {
@@ -59,23 +59,23 @@ let authController = {
         HashedPassword: password
       };
 
-      function addUserToEnv(newUser) {
+      async function addUserToEnv(newUser) {
         try {
           // Read the content of the .env file
-          let envContent = fs.readFileSync('.env', 'utf8');
+          let envContent = await fs.readFile('.env', 'utf8');
           
           // Append the new user entry to the content
           envContent += `\nUSER_${newUser.id}_INFO=${JSON.stringify(newUser)}\n`;
       
           // Write the updated content back to the .env file
-          fs.writeFileSync('.env', envContent);
+          await fs.writeFile('.env', envContent);
       
           console.log('New user added to the .env file successfully.');
         } catch (error) {
           console.error('Error adding new user to .env file:', error);
         }
       }
-    addUserToEnv(newUser)
+    await addUserToEnv(newUser)
 
 
     } catch (error) {

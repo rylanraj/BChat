@@ -9,6 +9,9 @@ const authController = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
 const fs = require('fs');
+require('dotenv').config()
+
+
 
 app.use(express.static("public"))
 
@@ -58,6 +61,7 @@ app.get("/login", forwardAuthenticated, authController.login);
 app.post("/login", authController.loginSubmit);
 app.post("/register", authController.registerSubmit);
 
+
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -100,6 +104,11 @@ app.get("/logout", authController.logout);
 // Admin
 app.get("/admin", isAdmin, authController.adminPanel);
 app.get("/admin/revoke/:SessionID", isAdmin, authController.revokeSession);
+
+
+
+
+
 
 app.listen(3001, function () {
   console.log(

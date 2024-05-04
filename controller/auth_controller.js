@@ -1,7 +1,21 @@
 let database = require("../database");
 let passport = require("../middleware/passport")
-require('dotenv').config()
-const fs = require('fs/promises');
+
+// Import bcrypt for password hashing
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+// Setup MySQL connection from .env
+const mysql = require('mysql2');
+require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
+}).promise();
 
 let authController = {
   login: (req, res) => {
@@ -18,65 +32,23 @@ let authController = {
   }),
   registerSubmit: async (req, res) => {
     try {
-
-
-      function test() {
-        let maxId = -Infinity;
-
-        for (const key in process.env) {
-          if (key.includes("USER_") && key.endsWith("_INFO")) {
-            const match = key.match(/\d+/);
-            if (match) {
-              const id = parseInt(match[0]);
-              if (!isNaN(id) && id > maxId) {
-                maxId = id;
-              }
-            }
-          }
-        }
-
-        return maxId === -Infinity ? 1 : maxId + 1;
-      }
-      
-      
-      
-
       let { name, email, password } = req.body;
   
-      // Check if user already exists
-      let user = await database.userModel.findOne({ email });
-  
-      if (user) {
-        // User already exists
-        return res.render("auth/register", { message: "Account already exists with email" });
+      // Check if user with the email already exists
+      const user = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
+      if (user[0].length > 0) {
+        return res.status(400).send("User with that email already exists");
       }
-  
-      // Create new user
-      const newUser = {
-        id: test(),
-        UserName: name,
-        Email: email,
-        HashedPassword: password
-      };
 
-      async function addUserToEnv(newUser) {
-        try {
-          // Read the content of the .env file
-          let envContent = await fs.readFile('.env', 'utf8');
-          
-          // Append the new user entry to the content
-          envContent += `\nUSER_${newUser.id}_INFO=${JSON.stringify(newUser)}\n`;
-      
-          // Write the updated content back to the .env file
-          await fs.writeFile('.env', envContent);
-      
-          console.log('New user added to the .env file successfully.');
-        } catch (error) {
-          console.error('Error adding new user to .env file:', error);
-        }
-      }
-    await addUserToEnv(newUser)
+      // Hash the password before inserting into the database
+      const hashedPassword = await hashPassword(password);
 
+      // Insert the user into the database
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password) VALUES (?, ?, ?);", [name, email,
+        hashedPassword]);
+
+      // Redirect to login page upon successful registration
+      res.redirect("/login");
 
     } catch (error) {
       console.error("Error registering user:", error);
@@ -113,8 +85,17 @@ let authController = {
       }
     })
   },
-  // Haven't tested yet
-
 };
+
+// Function to hash a password
+async function hashPassword(password) {
+  try {
+    const salt = await bcrypt.genSalt(saltRounds);
+    return await bcrypt.hash(password, salt);
+  } catch (error) {
+    throw new Error('Error hashing password');
+  }
+}
+
 
 module.exports = authController;

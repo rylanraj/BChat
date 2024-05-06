@@ -1064,7 +1064,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </schema>
     <schema id="305" parent="1" name="bchat_users">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-05-06.00:36:20</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-05-06.18:14:41</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="306" parent="1" name="springuser">
@@ -1175,12 +1175,20 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <index id="329" parent="312" name="PRIMARY">
+    <column id="329" parent="312" name="Biography">
+      <DasType>varchar(150)|0s</DasType>
+      <Position>6</Position>
+    </column>
+    <column id="330" parent="312" name="ProfilePicture">
+      <DasType>varchar(200)|0s</DasType>
+      <Position>7</Position>
+    </column>
+    <index id="331" parent="312" name="PRIMARY">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="330" parent="312" name="PRIMARY">
+    <key id="332" parent="312" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>

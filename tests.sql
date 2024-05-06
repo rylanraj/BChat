@@ -1,0 +1,3 @@
+ALTER TABLE USER
+    ADD COLUMN ProfilePicture VARCHAR(200);
+

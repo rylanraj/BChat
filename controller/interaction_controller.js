@@ -58,6 +58,25 @@ let postsController = {
   }
 };
 
+let chatsController = {
+    list: async (req, res) => {},
+    new: (req, res) => {},
+    create: async (req, res) => {},
+    delete: async (req, res) => {}
+}
+
+let profilesController = {
+    show: async (req, res) => {
+      let userToFind = req.params.id;
+      if (req.params.id !== req.user.UserID){
+        const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
+        res.render("profile.ejs", {otherUser: rows[0]});
+      } else {
+        res.render("profile.ejs", {otherUser: req.user});
+      }
+
+    }
+}
 
 let remindersController = {
   list: async (req, res) => {
@@ -149,4 +168,4 @@ let remindersController = {
   }
 };
 
-module.exports = {remindersController, postsController};
+module.exports = {remindersController, postsController, profilesController, chatsController};

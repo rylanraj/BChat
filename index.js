@@ -37,6 +37,12 @@ app.use(ejsLayouts);
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Middleware to pass user data to all routes
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+});
+
 app.set("view engine", "ejs");
 
 // Routes start here
@@ -60,6 +66,9 @@ app.get("/register", authController.register);
 app.get("/login", forwardAuthenticated, authController.login);
 app.post("/login", authController.loginSubmit);
 app.post("/register", authController.registerSubmit);
+
+// Profiles
+app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
 
 
 // Multer configuration

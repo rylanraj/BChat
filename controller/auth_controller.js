@@ -44,8 +44,8 @@ let authController = {
       const hashedPassword = await hashPassword(password);
 
       // Insert the user into the database
-      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password) VALUES (?, ?, ?);", [name, email,
-        hashedPassword]);
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role) VALUES (?, ?, ?, ?);", [name, email,
+        hashedPassword, "user"]);
 
       // Redirect to login page upon successful registration
       res.redirect("/login");

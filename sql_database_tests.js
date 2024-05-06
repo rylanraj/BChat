@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 
 async function main(){
     try{
-        const result = await pool.query("SELECT * FROM bchat_users.user;");
+        const result = await pool.query("SELECT * FROM REMINDER WHERE UserID = 1;");
         console.log(result[0]);
     }catch(err){
         console.log(err);

@@ -39,6 +39,7 @@ app.set("view engine", "ejs");
 
 // Routes start here
 app.get("/", function(req, res){
+    res.locals.user = req.user;
     res.render("index", { isAuthenticated: req.isAuthenticated() });
 })
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)

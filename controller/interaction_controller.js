@@ -74,7 +74,34 @@ let profilesController = {
       } else {
         res.render("profile.ejs", {otherUser: req.user});
       }
+    },
+    update: async (req, res) => {
+      let userToUpdate = req.params.id;
+      let newBiography = req.body.biography;
 
+      // Access the uploaded file
+      const profilePicture = req.file;
+
+      // Save the file path to your database
+      // Note: You might need to adjust this code to match your database schema and SQL client library
+      let filePath = profilePicture ? profilePicture.path : null;
+
+      // Replace backslashes with forward slashes
+      if (filePath) {
+        filePath = filePath.replace(/\\/g, '/');
+      }
+
+      const sql = "UPDATE USER SET Biography = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newBiography, filePath, userToUpdate];
+
+      try {
+        const result = await pool.query(sql, params);
+        // Handle result here
+      } catch (err) {
+        console.log(err);
+        // Handle error here
+      }
+      res.redirect(`/profile/${userToUpdate}`)
     }
 }
 

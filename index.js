@@ -13,7 +13,8 @@ require('dotenv').config()
 
 
 
-app.use(express.static("public"))
+app.use(express.static("public"));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session
 app.use(
@@ -70,19 +71,21 @@ app.post("/register", authController.registerSubmit);
 // Profiles
 app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
 
-
 // Multer configuration
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      fs.mkdir('uploads/', { recursive: true }, (err) => {});
-    cb(null, 'uploads/'); // Directory where uploaded files will be stored
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename
-  }
+    destination: function (req, file, cb) {
+        fs.mkdir('uploads/', { recursive: true }, (err) => {});
+        cb(null, 'uploads/'); // Directory where uploaded files will be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+    }
 });
 
 const upload = multer({ storage: storage });
+
+// Now you can use 'upload' in your routes
+app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
 
 // Define route for handling file uploads
 app.post('/upload', upload.single('photo'), (req, res) => {

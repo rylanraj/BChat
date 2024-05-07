@@ -201,6 +201,8 @@ footer.footer {
 
 /* Responsive Image */
 img {
+  border-radius: 10px;
+  background-color: #f8f9fa;
   position: absolute;
   top :5px;
   left: 5%;

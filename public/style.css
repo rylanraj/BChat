@@ -143,7 +143,7 @@ footer.footer {
 .dropbtn {
   display: inline-block;
   cursor: pointer;
-  padding: 5px 10px; /* Adjust padding as needed */
+  padding: 5px 5px; /* Adjust padding as needed */
   border: none;
   background-color: transparent;
 }
@@ -162,7 +162,7 @@ footer.footer {
 .dropdown {
   position: absolute;
   top :10px;
-  right: 5%;
+  right: 7%;
   display: inline-block;
 }
 
@@ -210,13 +210,14 @@ img {
 }
 
 .user_login {
+  margin-right: 25px;
   border-style: solid;
   padding: 5px 20px; /* Increase padding for a larger, more clickable area */
   border-width: 2px; /* Make the border more noticeable */
   border-color: #f9f9f9;
   position: absolute;
   top: 15px;
-  right: 8%;
+  right: 10%;
   display: inline-block;
   border-radius: 20px; /* Increase border radius for a more rounded button */
   background-color: #003c71; /* Add a background color */
@@ -227,13 +228,14 @@ img {
 }
 
 .user_login_display{
+  margin-right: 30px;
   border-style: solid;
   padding: 5px 20px; /* Increase padding for a larger, more clickable area */
   border-width: 2px; /* Make the border more noticeable */
   border-color: #f9f9f9;
   position: absolute;
   top: 15px;
-  right: 8%;
+  right: 10%;
   display: inline-block;
   border-radius: 20px; /* Increase border radius for a more rounded button */
   background-color: #003c71; /* Add a background color */

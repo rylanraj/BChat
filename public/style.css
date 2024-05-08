@@ -141,6 +141,143 @@ footer.footer {
   text-align: center;
 }
 
+
+/* Style the dropdown button */
+.dropbtn {
+  border-radius: 10px;
+  margin-top: 5px;
+  display: inline-block;
+  cursor: pointer;
+  padding: 5px 5px; /* Adjust padding as needed */
+  border: none;
+  background-color: transparent;
+}
+
+/* Create the hamburger icon lines */
+.dropbtn span {
+  display: block;
+  width: 25px; /* Width of the lines */
+  height: 3px; /* Thickness of the lines */
+  background-color: #f8f9fa; /* Color of the lines */
+  margin: 5px 0; /* Spacing between the lines */
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: absolute;
+  top :10px;
+  right: 7%;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  border-radius: 10px;
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.8);
+  z-index: 1;
+  position: absolute;
+  top :50px;
+  right: -186%;
+  
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  border-radius: 10px;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  background-color: #d3dcdc;
+}
+
+/* Responsive Image */
+img {
+  
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  position: absolute;
+  top :16px;
+  left: 5%;
+}
+
+.user_login {
+  max-height: 50px;
+  margin-right: 25px;
+  border-style: solid;
+  padding: 10px 20px; /* Increase padding for a larger, more clickable area */
+  border-width: 2px; /* Make the border more noticeable */
+  border-color: #f9f9f9;
+  position: absolute;
+  top: 16px;
+  right: 10%;
+  display: inline-block;
+  border-radius: 20px; /* Increase border radius for a more rounded button */
+  background-color: #003c71; /* Add a background color */
+  color: #ffffff; /* Change the text color for better contrast */
+  text-decoration: none; /* Remove underline from the text */
+  font-weight: bold; /* Make the text bold */
+  transition: background-color 0.3s ease; /* Add a transition effect for when the button is hovered over */
+}
+
+.user_login_display{
+  max-height: 50px;
+  margin-right: 30px;
+  border-style: solid;
+  padding: 10px 20px; /* Increase padding for a larger, more clickable area */
+  border-width: 2px; /* Make the border more noticeable */
+  border-color: #f9f9f9;
+  position: absolute;
+  top: 16px;
+  right: 10%;
+  display: inline-block;
+  border-radius: 20px; /* Increase border radius for a more rounded button */
+  background-color: #003c71; /* Add a background color */
+  color: #ffffff; /* Change the text color for better contrast */
+  text-decoration: none; /* Remove underline from the text */
+  font-weight: bold; /* Make the text bold */
+  transition: background-color 0.3s ease; /* Add a transition effect for when the button is hovered over */
+}
+
+.user_login:hover {
+  background-color: #005399; /* Change the background color when hovered over */
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+.user_login:focus {
+
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+
+
+.navbar_custom {
+  background-color: #003c71;
+  width: 150%;
+  height: 83px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 .main{
   height: 92%;
   align-self: center;

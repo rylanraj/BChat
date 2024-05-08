@@ -1,4 +1,3 @@
-// Hey guys can you see this? It's from Rylan
 const passport = require("./middleware/passport")
 const express = require("express");
 const session = require("express-session");
@@ -40,12 +39,16 @@ app.use((req, res, next) => {
 // Initializes passport
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
 app.set("view engine", "ejs");
 
 // Routes start here
 app.get("/", function(req, res){
     res.render("index", { isAuthenticated: req.isAuthenticated()});
+
 })
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new)

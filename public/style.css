@@ -209,7 +209,7 @@ footer.footer {
 }
 
 /* Responsive Image */
-img {
+.ProductLogo {
   
   border-radius: 10px;
   background-color: #f8f9fa;

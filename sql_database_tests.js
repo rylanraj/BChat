@@ -11,8 +11,9 @@ const pool = mysql.createPool({
 
 async function main(){
     try{
-        const result = await pool.query("SELECT * FROM USER");
+        const result = await pool.query("SELECT * FROM POST WHERE UserID = 1;");
         console.log(result[0]);
+        await pool.end();
     }catch(err){
         console.log(err);
     }

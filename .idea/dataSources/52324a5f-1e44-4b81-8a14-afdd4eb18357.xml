@@ -1064,7 +1064,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </schema>
     <schema id="305" parent="1" name="bchat_users">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-05-06.18:14:41</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-05-08.16:14:23</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="306" parent="1" name="springuser">
@@ -1089,54 +1089,53 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <table id="311" parent="305" name="reminder">
+    <table id="311" parent="305" name="post">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <table id="312" parent="305" name="user">
+    <table id="312" parent="305" name="reminder">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <column id="313" parent="311" name="ReminderID">
+    <table id="313" parent="305" name="user">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <column id="314" parent="311" name="PostID">
       <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="314" parent="311" name="Title">
+    <column id="315" parent="311" name="Title">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="315" parent="311" name="Description">
-      <DasType>varchar(100)|0s</DasType>
-      <NotNull>1</NotNull>
+    <column id="316" parent="311" name="Description">
+      <DasType>varchar(150)|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="316" parent="311" name="Completed">
-      <DasType>tinyint(1)|0s</DasType>
-      <NotNull>1</NotNull>
+    <column id="317" parent="311" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="317" parent="311" name="Keyword">
-      <DasType>varchar(100)|0s</DasType>
+    <column id="318" parent="311" name="Picture">
+      <DasType>varchar(200)|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="318" parent="311" name="Banner">
-      <DasType>varchar(200)|0s</DasType>
+    <column id="319" parent="311" name="TimePosted">
+      <DasType>datetime|0s</DasType>
+      <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="319" parent="311" name="UserID">
-      <DasType>int|0s</DasType>
-      <Position>7</Position>
-    </column>
-    <foreign-key id="320" parent="311" name="reminder_ibfk_1">
+    <foreign-key id="320" parent="311" name="post_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
     <index id="321" parent="311" name="PRIMARY">
-      <ColNames>ReminderID</ColNames>
+      <ColNames>PostID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
@@ -1149,46 +1148,98 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="324" parent="312" name="UserID">
-      <AutoIncrement>2</AutoIncrement>
+    <column id="324" parent="312" name="ReminderID">
+      <AutoIncrement>7</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="325" parent="312" name="UserName">
+    <column id="325" parent="312" name="Title">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="326" parent="312" name="Email">
+    <column id="326" parent="312" name="Description">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="327" parent="312" name="Password">
+    <column id="327" parent="312" name="Completed">
+      <DasType>tinyint(1)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+    </column>
+    <column id="328" parent="312" name="Keyword">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>5</Position>
+    </column>
+    <column id="329" parent="312" name="Banner">
+      <DasType>varchar(200)|0s</DasType>
+      <Position>6</Position>
+    </column>
+    <column id="330" parent="312" name="UserID">
+      <DasType>int|0s</DasType>
+      <Position>7</Position>
+    </column>
+    <foreign-key id="331" parent="312" name="reminder_ibfk_1">
+      <ColNames>UserID</ColNames>
+      <RefColNames>UserID</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="332" parent="312" name="PRIMARY">
+      <ColNames>ReminderID</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="333" parent="312" name="UserID">
+      <ColNames>UserID</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="334" parent="312" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="335" parent="313" name="UserID">
+      <AutoIncrement>3</AutoIncrement>
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="336" parent="313" name="UserName">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="337" parent="313" name="Email">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+    </column>
+    <column id="338" parent="313" name="Password">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="328" parent="312" name="Role">
+    <column id="339" parent="313" name="Role">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="329" parent="312" name="Biography">
+    <column id="340" parent="313" name="Biography">
       <DasType>varchar(150)|0s</DasType>
       <Position>6</Position>
     </column>
-    <column id="330" parent="312" name="ProfilePicture">
+    <column id="341" parent="313" name="ProfilePicture">
       <DasType>varchar(200)|0s</DasType>
       <Position>7</Position>
     </column>
-    <index id="331" parent="312" name="PRIMARY">
+    <index id="342" parent="313" name="PRIMARY">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="332" parent="312" name="PRIMARY">
+    <key id="343" parent="313" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>

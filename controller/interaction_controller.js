@@ -37,20 +37,24 @@ let postsController = {
       if (!file) {
         return res.status(400).send('No files were uploaded.');
       }
-      
       // Process other form fields (e.g., title, description)
       const title = req.body.title;
       const description = req.body.description;
-      const keyword = req.body.keyword;
 
-      // Fetch image URL based on keyword
-      const banner = await keywordToImage(keyword);
+      let filePath = file ? file.path : null;
+
+      // Replace backslashes with forward slashes
+      if (filePath) {
+        filePath = filePath.replace(/\\/g, '/');
+      }
 
       // Save post details to the database or perform other operations
       // For example, you can access the file path via file.path
+      pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
+          [title, description, req.user.UserID, filePath]);
 
-      // Redirect to /reminders after successful upload
-      res.redirect("/reminders");
+      // Redirect to their profile so they can see their post
+      res.redirect("/profile/" + req.user.UserID);
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');
@@ -70,9 +74,12 @@ let profilesController = {
       let userToFind = req.params.id;
       if (req.params.id !== req.user.UserID){
         const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
-        res.render("profile.ejs", {otherUser: rows[0]});
+        const [rows_2, fields_2] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
+        res.render("profile.ejs", {otherUser: rows[0], posts: rows_2});
       } else {
-        res.render("profile.ejs", {otherUser: req.user});
+        // Get the posts made by the currently logged in user
+        const [rows, fields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
+        res.render("profile.ejs", {otherUser: req.user, posts: rows});
       }
     },
     update: async (req, res) => {

@@ -88,12 +88,7 @@ const upload = multer({ storage: storage });
 app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
 
 // Define route for handling file uploads
-app.post('/upload', upload.single('photo'), (req, res) => {
-  // Handle file upload here
-  // You can access the uploaded file using req.file
-  // For example, you can save the file to a database or perform other operations
-  res.send('File uploaded successfully');
-});
+app.post('/upload', ensureAuthenticated, upload.single('photo'), interactionController.postsController.create);
 
 // Github login
 app.get('/github',

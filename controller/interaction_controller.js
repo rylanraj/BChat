@@ -98,17 +98,28 @@ let profilesController = {
         filePath = filePath.replace(/\\/g, '/');
       }
 
-      const sql = "UPDATE USER SET Biography = ?, ProfilePicture = ? WHERE UserID = ?";
-      const params = [newBiography, filePath, userToUpdate];
+      if(!profilePicture){
+        const sql = "UPDATE USER SET Biography = ? WHERE UserID = ?";
+        const params = [newBiography, userToUpdate];
+        try {
+          const result = await pool.query(sql, params);
+          // Handle result here
+        } catch (err) {
+          console.log(err);
+          // Handle error here
+        }
+        res.redirect(`/profile/${userToUpdate}`)
+      } else {
+        const sql = "UPDATE USER SET Biography = ?, ProfilePicture = ? WHERE UserID = ?";
+        const params = [newBiography, filePath, userToUpdate];
 
-      try {
-        const result = await pool.query(sql, params);
-        // Handle result here
-      } catch (err) {
-        console.log(err);
-        // Handle error here
+        try {
+          const result = await pool.query(sql, params);
+        } catch (err) {
+          console.log(err);
+        }
+        res.redirect(`/profile/${userToUpdate}`)
       }
-      res.redirect(`/profile/${userToUpdate}`)
     }
 }
 

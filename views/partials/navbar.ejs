@@ -3,7 +3,7 @@
   <% if (!isAuthenticated) { %>
     <a href="/login"  class="user_login">Sign In</a>
   <% } else { %>
-    <p class="user_login_display"><%= user.UserName %></p>
+    <a href="/profile/<%=user.UserID%>" class="user_login_display"><%= user.UserNickName %></a>
   <% } %>
   
 

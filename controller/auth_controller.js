@@ -32,7 +32,7 @@ let authController = {
   }),
   registerSubmit: async (req, res) => {
     try {
-      let { name, email, password } = req.body;
+      let { name, email, password, username } = req.body;
   
       // Check if user with the email already exists
       const user = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
@@ -44,8 +44,8 @@ let authController = {
       const hashedPassword = await hashPassword(password);
 
       // Insert the user into the database
-      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role) VALUES (?, ?, ?, ?);", [name, email,
-        hashedPassword, "user"]);
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName) VALUES (?, ?, ?, ?, ?);", [name, email,
+        hashedPassword, "user", username]);
 
       // Redirect to login page upon successful registration
       res.redirect("/login");

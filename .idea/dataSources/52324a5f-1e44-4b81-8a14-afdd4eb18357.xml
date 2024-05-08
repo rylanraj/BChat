@@ -1064,7 +1064,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </schema>
     <schema id="305" parent="1" name="bchat_users">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-05-08.16:14:23</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-05-08.18:05:50</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="306" parent="1" name="springuser">
@@ -1089,53 +1089,52 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <table id="311" parent="305" name="post">
+    <table id="311" parent="305" name="comment">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <table id="312" parent="305" name="reminder">
+    <table id="312" parent="305" name="friend">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <table id="313" parent="305" name="user">
+    <table id="313" parent="305" name="post">
       <Engine>InnoDB</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <column id="314" parent="311" name="PostID">
+    <table id="314" parent="305" name="reminder">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="315" parent="305" name="user">
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <column id="316" parent="311" name="CommentID">
       <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="315" parent="311" name="Title">
-      <DasType>varchar(100)|0s</DasType>
-      <NotNull>1</NotNull>
-      <Position>2</Position>
-    </column>
-    <column id="316" parent="311" name="Description">
-      <DasType>varchar(150)|0s</DasType>
-      <Position>3</Position>
-    </column>
     <column id="317" parent="311" name="UserID">
       <DasType>int|0s</DasType>
-      <Position>4</Position>
+      <Position>2</Position>
     </column>
-    <column id="318" parent="311" name="Picture">
-      <DasType>varchar(200)|0s</DasType>
-      <Position>5</Position>
+    <column id="318" parent="311" name="PostID">
+      <DasType>int|0s</DasType>
+      <Position>3</Position>
     </column>
-    <column id="319" parent="311" name="TimePosted">
-      <DasType>datetime|0s</DasType>
-      <NotNull>1</NotNull>
-      <Position>6</Position>
-    </column>
-    <foreign-key id="320" parent="311" name="post_ibfk_1">
+    <foreign-key id="319" parent="311" name="comment_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="321" parent="311" name="PRIMARY">
+    <foreign-key id="320" parent="311" name="comment_ibfk_2">
       <ColNames>PostID</ColNames>
+      <RefColNames>PostID</RefColNames>
+      <RefTableName>post</RefTableName>
+    </foreign-key>
+    <index id="321" parent="311" name="PRIMARY">
+      <ColNames>CommentID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
@@ -1143,56 +1142,54 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="323" parent="311" name="PRIMARY">
+    <index id="323" parent="311" name="PostID">
+      <ColNames>PostID</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="324" parent="311" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="324" parent="312" name="ReminderID">
-      <AutoIncrement>7</AutoIncrement>
+    <column id="325" parent="312" name="FriendID">
+      <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="325" parent="312" name="Title">
-      <DasType>varchar(100)|0s</DasType>
-      <NotNull>1</NotNull>
+    <column id="326" parent="312" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="326" parent="312" name="Description">
-      <DasType>varchar(100)|0s</DasType>
-      <NotNull>1</NotNull>
+    <column id="327" parent="312" name="FriendUserID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="327" parent="312" name="Completed">
+    <column id="328" parent="312" name="FriendAccepted">
       <DasType>tinyint(1)|0s</DasType>
-      <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="328" parent="312" name="Keyword">
-      <DasType>varchar(100)|0s</DasType>
-      <Position>5</Position>
-    </column>
-    <column id="329" parent="312" name="Banner">
-      <DasType>varchar(200)|0s</DasType>
-      <Position>6</Position>
-    </column>
-    <column id="330" parent="312" name="UserID">
-      <DasType>int|0s</DasType>
-      <Position>7</Position>
-    </column>
-    <foreign-key id="331" parent="312" name="reminder_ibfk_1">
+    <foreign-key id="329" parent="312" name="friend_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="332" parent="312" name="PRIMARY">
-      <ColNames>ReminderID</ColNames>
+    <foreign-key id="330" parent="312" name="friend_ibfk_2">
+      <ColNames>FriendUserID</ColNames>
+      <RefColNames>UserID</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="331" parent="312" name="PRIMARY">
+      <ColNames>FriendID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="333" parent="312" name="UserID">
+    <index id="332" parent="312" name="UserID">
       <ColNames>UserID</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="333" parent="312" name="FriendUserID">
+      <ColNames>FriendUserID</ColNames>
       <Type>btree</Type>
     </index>
     <key id="334" parent="312" name="PRIMARY">
@@ -1200,46 +1197,149 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="335" parent="313" name="UserID">
-      <AutoIncrement>3</AutoIncrement>
+    <column id="335" parent="313" name="PostID">
+      <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="336" parent="313" name="UserName">
+    <column id="336" parent="313" name="Title">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="337" parent="313" name="Email">
+    <column id="337" parent="313" name="Description">
+      <DasType>varchar(150)|0s</DasType>
+      <Position>3</Position>
+    </column>
+    <column id="338" parent="313" name="UserID">
+      <DasType>int|0s</DasType>
+      <Position>4</Position>
+    </column>
+    <column id="339" parent="313" name="Picture">
+      <DasType>varchar(200)|0s</DasType>
+      <Position>5</Position>
+    </column>
+    <column id="340" parent="313" name="TimePosted">
+      <DasType>datetime|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+    </column>
+    <foreign-key id="341" parent="313" name="post_ibfk_1">
+      <ColNames>UserID</ColNames>
+      <RefColNames>UserID</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="342" parent="313" name="PRIMARY">
+      <ColNames>PostID</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="343" parent="313" name="UserID">
+      <ColNames>UserID</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="344" parent="313" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="345" parent="314" name="ReminderID">
+      <AutoIncrement>7</AutoIncrement>
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="346" parent="314" name="Title">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="347" parent="314" name="Description">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="338" parent="313" name="Password">
+    <column id="348" parent="314" name="Completed">
+      <DasType>tinyint(1)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+    </column>
+    <column id="349" parent="314" name="Keyword">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>5</Position>
+    </column>
+    <column id="350" parent="314" name="Banner">
+      <DasType>varchar(200)|0s</DasType>
+      <Position>6</Position>
+    </column>
+    <column id="351" parent="314" name="UserID">
+      <DasType>int|0s</DasType>
+      <Position>7</Position>
+    </column>
+    <foreign-key id="352" parent="314" name="reminder_ibfk_1">
+      <ColNames>UserID</ColNames>
+      <RefColNames>UserID</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="353" parent="314" name="PRIMARY">
+      <ColNames>ReminderID</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="354" parent="314" name="UserID">
+      <ColNames>UserID</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="355" parent="314" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="356" parent="315" name="UserID">
+      <AutoIncrement>1</AutoIncrement>
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="357" parent="315" name="UserName">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="358" parent="315" name="Email">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+    </column>
+    <column id="359" parent="315" name="Password">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="339" parent="313" name="Role">
+    <column id="360" parent="315" name="Role">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="340" parent="313" name="Biography">
+    <column id="361" parent="315" name="Biography">
       <DasType>varchar(150)|0s</DasType>
       <Position>6</Position>
     </column>
-    <column id="341" parent="313" name="ProfilePicture">
+    <column id="362" parent="315" name="ProfilePicture">
       <DasType>varchar(200)|0s</DasType>
       <Position>7</Position>
     </column>
-    <index id="342" parent="313" name="PRIMARY">
+    <column id="363" parent="315" name="UserNickName">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>8</Position>
+    </column>
+    <index id="364" parent="315" name="PRIMARY">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="343" parent="313" name="PRIMARY">
+    <key id="365" parent="315" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>

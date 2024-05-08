@@ -8,7 +8,8 @@ CREATE TABLE USER (
     Password VARCHAR(100) NOT NULL,
     Role VARCHAR(100) NOT NULL,
     Biography VARCHAR(150),
-    ProfilePicture VARCHAR(200)
+    ProfilePicture VARCHAR(200),
+    UserNickName VARCHAR(100)
 );
 CREATE TABLE REMINDER (
     ReminderID INT AUTO_INCREMENT PRIMARY KEY,

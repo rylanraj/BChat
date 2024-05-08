@@ -256,13 +256,28 @@ footer.footer {
   transition: background-color 0.3s ease; /* Add a transition effect for when the button is hovered over */
 }
 
-.user_login:hover {
+.user_login:hover  {
   background-color: #005399; /* Change the background color when hovered over */
   text-decoration: none;
   color: inherit;
   outline: none;
 }
-.user_login:focus {
+
+.user_login_display:hover {
+
+  background-color: #005399; /* Change the background color when hovered over */
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+
+
+.user_login_display:focus {
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+.user_login:focus  {
 
   text-decoration: none;
   color: inherit;

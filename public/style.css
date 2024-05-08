@@ -3,8 +3,10 @@
 }
 
 
+html,
 body {
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  height: 100%;
 }
 
 h1,
@@ -138,6 +140,7 @@ footer.footer {
 .home-header{
   text-align: center;
 }
+
 
 /* Style the dropdown button */
 .dropbtn {
@@ -274,4 +277,33 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
+
+.main{
+  height: 92%;
+  align-self: center;
+}
+
+.second{
+  display: flex;
+  height: 90%;
+  align-self: center;
+  text-align: center;
+}
+
+.bot{
+  bottom: 0;
+}
+
+.line-with-text {
+  display: flex;
+  align-items: center;
+}
+
+.line {
+  flex: 1;
+  border-top: 1px solid #000; /* Adjust line color, width, and style as needed */
+}
+
+.text {
+  padding: 0 10px; /* Adjust padding as needed */
 }

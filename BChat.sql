@@ -17,7 +17,7 @@ CREATE TABLE REMINDER (
     Description VARCHAR(100) NOT NULL,
     Completed BOOLEAN NOT NULL,
     Keyword VARCHAR(100),
-    Banner VARCHAR(200),
+    Banner VARCHAR(300),
     UserID INT,
     FOREIGN KEY (UserID) REFERENCES USER(UserID)
 );

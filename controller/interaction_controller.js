@@ -1,6 +1,3 @@
-let database = require("../database");
-const multer = require('multer');
-
 // Setup MySQL connection from .env
 const mysql = require('mysql2');
 const {data} = require("express-session/session/cookie");
@@ -15,17 +12,12 @@ const pool = mysql.createPool({
 }).promise();
 
 async function keywordToImage(keyword) {
-  // Make sure to register for a token at https://unsplash.com/developers
-  // Notion uses unsplash for their banner images, so we'll use that too
   const url = `https:api.unsplash.com/search/photos?query=${keyword}&client_id=0-m3L1XIVg9tJ5bs_a_uFAlkWvlmR0l5P-PSG7n8BZU&per_page=1`
   const response = await fetch(url);
   const data = await response.json();
   const imageUrl = data.results[0].urls.regular;
   return imageUrl;
 }
-
-
-
 
 let postsController = {
   new: (req, res) => {
@@ -48,8 +40,7 @@ let postsController = {
         filePath = filePath.replace(/\\/g, '/');
       }
 
-      // Save post details to the database or perform other operations
-      // For example, you can access the file path via file.path
+      // Save post-details to the database 
       pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 
@@ -89,8 +80,7 @@ let profilesController = {
       // Access the uploaded file
       const profilePicture = req.file;
 
-      // Save the file path to your database
-      // Note: You might need to adjust this code to match your database schema and SQL client library
+      // Save the file path to the database
       let filePath = profilePicture ? profilePicture.path : null;
 
       // Replace backslashes with forward slashes
@@ -197,7 +187,6 @@ let remindersController = {
       pool.query("UPDATE REMINDER SET Title = ?, Description = ?, Completed = ? WHERE ReminderID = ?;",
           [reminder.title, reminder.description, reminder.completed, reminderToUpdate]);
     }
-    // Redirect the user back to the reminders list
     res.redirect("/reminders");
   },
 
@@ -207,8 +196,7 @@ let remindersController = {
     let user = req.user
 
     await pool.query("DELETE FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToDelete, user.UserID]);
-
-
+    
     res.redirect("/reminders");
   }
 };

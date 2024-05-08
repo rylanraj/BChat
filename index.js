@@ -34,6 +34,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(ejsLayouts);
 
+app.use((req, res, next) => {
+  // Path to the logo
+  res.locals.logo = '/images/logo.png';
+  next();
+});
+
 // Initializes passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -48,7 +54,8 @@ app.set("view engine", "ejs");
 
 // Routes start here
 app.get("/", function(req, res){
-    res.render("index", { isAuthenticated: req.isAuthenticated() });
+    res.render("index", { isAuthenticated: req.isAuthenticated()});
+
 })
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new)

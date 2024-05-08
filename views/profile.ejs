@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <p class="lead mb-3">Welcome to <%= otherUser.UserName %>'s profile</p>
+
+    <% if (user.UserID === otherUser.UserID) { %>
+        <form action=<%="/profile/" + otherUser.UserID%> method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="biography">Edit your biography:</label>
+                <textarea class="form-control" id="biography" name="biography" rows="3"><%=otherUser.Biography%></textarea>
+            </div>
+            <div class="form-group">
+                <label for="profilePicture">Your Current Profile Picture:</label>
+                <% if (otherUser.ProfilePicture === null) { %>
+                    <img src="/images/default.jpg" alt="missing_profile_picture">
+                <% } else { %>
+                <img src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="200px" height="200px">
+                <% } %>
+                <input type="file" class="form-control" id="profilePicture" name="profilePicture">
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <h2>Your Posts:</h2>
+            <% posts.forEach(function(post) { %>
+                <div class="post">
+                    <h3><%= post.Title %>, <%=post.TimePosted%></h3>
+                    <% if (post.Picture) { %>
+                    <img src="<%="/" + post.Picture %>" alt="post_picture" width="200" height="200">
+                    <% } %>
+                </div>
+            <% }); %>
+        </form>
+
+    <% } else { %>
+        <p><%= otherUser.Biography %></p>
+        <% if (otherUser.ProfilePicture === null) { %>
+            <img src="/images/default.jpg" alt="missing_profile_picture">
+        <% } else { %>
+            <img src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="200px" height="200px">
+        <% } %>
+    <% } %>
+</body>
+
+
+</html>

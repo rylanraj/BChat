@@ -19,14 +19,14 @@ module.exports = {
     isAdmin: function (req, res, next) {
       console.log(req.user)
       try {
-        if (req.user.role == "admin" && req.isAuthenticated()) {
+        if (req.user.role === "admin" && req.isAuthenticated()) {
           return next(); 
         } 
         if (req.isAuthenticated()) {
           res.redirect("/reminders")
         } else {
           res.redirect("/login");
-        };
+        }
       } catch (err) {
         console.log(`${__filename}: Line 28`, err)
         res.redirect("/login");

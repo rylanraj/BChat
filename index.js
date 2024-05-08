@@ -9,8 +9,12 @@ const authController = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
 const fs = require('fs');
+require('dotenv').config()
 
-app.use(express.static("public"))
+
+
+app.use(express.static("public"));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session
 app.use(
@@ -39,10 +43,13 @@ app.use((req, res, next) => {
 // Initializes passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Middleware to pass user data to all routes
 app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
+    res.locals.user = req.user;
+    next();
 });
+
 app.set("view engine", "ejs");
 
 // Routes start here
@@ -68,26 +75,27 @@ app.get("/login", forwardAuthenticated, authController.login);
 app.post("/login", authController.loginSubmit);
 app.post("/register", authController.registerSubmit);
 
+// Profiles
+app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
+
 // Multer configuration
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      fs.mkdir('uploads/', { recursive: true }, (err) => {});
-    cb(null, 'uploads/'); // Directory where uploaded files will be stored
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename
-  }
+    destination: function (req, file, cb) {
+        fs.mkdir('uploads/', { recursive: true }, (err) => {});
+        cb(null, 'uploads/'); // Directory where uploaded files will be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+    }
 });
 
 const upload = multer({ storage: storage });
 
+// Now you can use 'upload' in your routes
+app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
+
 // Define route for handling file uploads
-app.post('/upload', upload.single('photo'), (req, res) => {
-  // Handle file upload here
-  // You can access the uploaded file using req.file
-  // For example, you can save the file to a database or perform other operations
-  res.send('File uploaded successfully');
-});
+app.post('/upload', ensureAuthenticated, upload.single('photo'), interactionController.postsController.create);
 
 // Github login
 app.get('/github',
@@ -110,6 +118,11 @@ app.get("/logout", authController.logout);
 // Admin
 app.get("/admin", isAdmin, authController.adminPanel);
 app.get("/admin/revoke/:SessionID", isAdmin, authController.revokeSession);
+
+
+
+
+
 
 app.listen(3001, function () {
   console.log(

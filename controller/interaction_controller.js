@@ -1,6 +1,19 @@
 let database = require("../database");
 const multer = require('multer');
 
+// Setup MySQL connection from .env
+const mysql = require('mysql2');
+const {data} = require("express-session/session/cookie");
+require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
+}).promise();
+
 async function keywordToImage(keyword) {
   // Make sure to register for a token at https://unsplash.com/developers
   // Notion uses unsplash for their banner images, so we'll use that too
@@ -24,20 +37,24 @@ let postsController = {
       if (!file) {
         return res.status(400).send('No files were uploaded.');
       }
-      
       // Process other form fields (e.g., title, description)
       const title = req.body.title;
       const description = req.body.description;
-      const keyword = req.body.keyword;
 
-      // Fetch image URL based on keyword
-      const banner = await keywordToImage(keyword);
+      let filePath = file ? file.path : null;
+
+      // Replace backslashes with forward slashes
+      if (filePath) {
+        filePath = filePath.replace(/\\/g, '/');
+      }
 
       // Save post details to the database or perform other operations
       // For example, you can access the file path via file.path
+      pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
+          [title, description, req.user.UserID, filePath]);
 
-      // Redirect to /reminders after successful upload
-      res.redirect("/reminders");
+      // Redirect to their profile so they can see their post
+      res.redirect("/profile/" + req.user.UserID);
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');
@@ -45,27 +62,81 @@ let postsController = {
   }
 };
 
+let chatsController = {
+    list: async (req, res) => {},
+    new: (req, res) => {},
+    create: async (req, res) => {},
+    delete: async (req, res) => {}
+}
+
+let profilesController = {
+    show: async (req, res) => {
+      let userToFind = req.params.id;
+      if (req.params.id !== req.user.UserID){
+        const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
+        const [rows_2, fields_2] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
+        res.render("profile.ejs", {otherUser: rows[0], posts: rows_2});
+      } else {
+        // Get the posts made by the currently logged in user
+        const [rows, fields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
+        res.render("profile.ejs", {otherUser: req.user, posts: rows});
+      }
+    },
+    update: async (req, res) => {
+      let userToUpdate = req.params.id;
+      let newBiography = req.body.biography;
+
+      // Access the uploaded file
+      const profilePicture = req.file;
+
+      // Save the file path to your database
+      // Note: You might need to adjust this code to match your database schema and SQL client library
+      let filePath = profilePicture ? profilePicture.path : null;
+
+      // Replace backslashes with forward slashes
+      if (filePath) {
+        filePath = filePath.replace(/\\/g, '/');
+      }
+
+      const sql = "UPDATE USER SET Biography = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newBiography, filePath, userToUpdate];
+
+      try {
+        const result = await pool.query(sql, params);
+        // Handle result here
+      } catch (err) {
+        console.log(err);
+        // Handle error here
+      }
+      res.redirect(`/profile/${userToUpdate}`)
+    }
+}
 
 let remindersController = {
-  list: (req, res) => {
+  list: async (req, res) => {
     let user = req.user
-    res.render("reminder/index", { reminders: user.reminders, user: user });
+    try{
+      const [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE UserID = ?;", [user.UserID]);
+      res.render("reminder/index", {
+        reminders: rows, user: user
+      });
+    } catch (error) {
+      console.error("Error fetching reminders:", error);
+    }
   },
 
   new: (req, res) => {
     res.render("reminder/create");
   },
 
-  listOne: (req, res) => {
+  listOne: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let searchResult = user.reminders.find(function (reminder) {
-      return reminder.id === reminderToFind;
-    });
-    if (searchResult !== undefined) {
-      res.render("reminder/single-reminder", { reminderItem: searchResult });
+    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    if (rows.length > 0) {
+      res.render("reminder/single-reminder", {reminderItem: rows[0]});
     } else {
-      res.render("reminder/index", { reminders: user.reminders });
+      res.render("reminder/index", {reminders: user.reminders, user: user});
     }
   },
 
@@ -73,66 +144,62 @@ let remindersController = {
     let user = req.user
     // Change this for later
     let reminder = {
-      id: user.reminders.length + 1,
       title: req.body.title,
       description: req.body.description,
       completed: false,
       keyword: req.body.keyword,
       banner: await keywordToImage(req.body.keyword)
     };
-    user.reminders.push(reminder);
+    pool.query("INSERT INTO REMINDER (Title, Description, Completed, UserID, Keyword, Banner) VALUES (?, ?, ?, ?,?,?);",
+        [reminder.title, reminder.description, reminder.completed, req.user.UserID, reminder.keyword, reminder.banner]);
     res.redirect("/reminders");
   },
 
-  edit: (req, res) => {
+  edit: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let searchResult = user.reminders.find(function (reminder) {
-      return reminder.id === reminderToFind;
-    });
-    res.render("reminder/edit", { reminderItem: searchResult });
+    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    if (rows.length > 0) {
+      res.render("reminder/edit", {reminderItem: rows[0]});
+    } else {
+      res.render("reminder/index", {reminders: user.reminders, user: user});
+    }
   },
 
-  update: (req, res) => {
+  update: async (req, res) => {
     // Get the id of the reminder to update
     let reminderToUpdate = req.params.id;
     let user = req.user
-    // Find the reminder in the array
-    let index = user.reminders.findIndex(function (reminder) {
-      return reminder.id === reminderToUpdate;
-    });
-
-    // If the reminder was found, update it
-    if (index != -1) {
-      user.reminders[index] = {
-        id: req.params.id,
-        title: req.body.title,
-        description: req.body.description,
-        completed: req.body.completed === 'true',  // convert string to boolean
-      };
+    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToUpdate, user.UserID]);
+    // If the reminder exists, update it
+    if (rows.length > 0) {
+      let reminder = rows[0];
+      reminder.title = req.body.title;
+      reminder.description = req.body.description;
+      if (Boolean(req.body.completed) == true) {
+        reminder.completed = 1;
+      } else {
+        reminder.completed = 0;
+      }
+      reminder.keyword = req.body.keyword;
+      reminder.banner = await keywordToImage(req.body.keyword);
+      pool.query("UPDATE REMINDER SET Title = ?, Description = ?, Completed = ? WHERE ReminderID = ?;",
+          [reminder.title, reminder.description, reminder.completed, reminderToUpdate]);
     }
-
     // Redirect the user back to the reminders list
     res.redirect("/reminders");
   },
 
-  delete: (req, res) => {
+  delete: async (req, res) => {
 
     let reminderToDelete = req.params.id;
     let user = req.user
 
-    let index = user.reminders.findIndex(function (reminder) {
-      return reminder.id === reminderToDelete;
-    });
-
-
-    if (index !== -1) {
-      user.reminders.splice(index, 1);
-    }
+    await pool.query("DELETE FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToDelete, user.UserID]);
 
 
     res.redirect("/reminders");
   }
 };
 
-module.exports = {remindersController, postsController};
+module.exports = {remindersController, postsController, profilesController, chatsController};

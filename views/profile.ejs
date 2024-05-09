@@ -12,7 +12,7 @@
             <div class="form-group">
                 <label for="profilePicture">Your Current Profile Picture:</label>
                 <% if (otherUser.ProfilePicture === null) { %>
-                    <img src="/images/default.jpg" alt="missing_profile_picture">
+                    <img style="width: 250px;height: auto; border-radius: 90%; border-style: solid;" src="/images/default.jpg" alt="missing_profile_picture">
                 <% } else { %>
                 <img src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="200px" height="200px">
                 <% } %>

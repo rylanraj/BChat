@@ -210,7 +210,7 @@ footer.footer {
 
 /* Responsive Image */
 .ProductLogo {
-  
+  padding: 2px;
   border-radius: 10px;
   background-color: #f8f9fa;
   position: absolute;
@@ -323,3 +323,4 @@ footer.footer {
 .text {
   padding: 0 10px; /* Adjust padding as needed */
 }
+

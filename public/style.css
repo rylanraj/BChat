@@ -337,3 +337,22 @@ footer.footer {
   padding: 10px 50px 10px 50px;
   min-width: 334px;
 }
+
+.side {
+  width: 25%;
+}
+
+.side2 {
+  width: 80%;
+}
+
+.hd {
+  width: 200%;
+  text-align: center;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

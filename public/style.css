@@ -297,11 +297,13 @@ footer.footer {
 .main{
   height: 87.5%;
   align-self: center;
+  justify-content: center;
 }
 
 .second{
+  position: relative;
   display: flex;
-  height: 90%;
+  height: 100%;
   align-self: center;
   text-align: center;
 }
@@ -324,3 +326,14 @@ footer.footer {
   padding: 0 10px; /* Adjust padding as needed */
 }
 
+.index{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content{
+  position: absolute;
+  padding: 10px 50px 10px 50px;
+  min-width: 334px;
+}

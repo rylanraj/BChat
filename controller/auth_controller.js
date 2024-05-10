@@ -39,6 +39,10 @@ let authController = {
       if (user[0].length > 0) {
         return res.status(400).send("User with that email already exists");
       }
+      if (password.length < 8) {
+        return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated:
+              req.isAuthenticated() });
+      }
 
       // Hash the password before inserting into the database
       const hashedPassword = await hashPassword(password);

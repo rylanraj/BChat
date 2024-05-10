@@ -3,11 +3,12 @@
 
 <body>
    
+
+    <% if (user.UserID === otherUser.UserID) { %>
     <div class="user_profile_section">
         <div class="section_name">
             <h2>My Profile</h2>
         </div>
-    <% if (user.UserID === otherUser.UserID) { %>
         <form id="profile-form" action=<%="/profile/" + otherUser.UserID%> method="POST" enctype="multipart/form-data">
             
             <div style="text-align: center; margin-top: 10%;" class="form-group">
@@ -24,6 +25,10 @@
                     <p id="username-text"><%=otherUser.UserName%></p>
                     
                     <input class="form-control" id="username" name="username" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserName%>">
+                </div>
+                <div class="form-group">
+                    <label for="biography">Edit your biography:</label>
+                    <textarea class="form-control" id="biography" name="biography" rows="3"><%=otherUser.Biography%></textarea>
                 </div>
 
             </div>
@@ -47,13 +52,22 @@
     
 
     <% } else { %>
-        <p><%= otherUser.Biography %></p>
+    <div class="user_profile_section">
+        <div class="section_name">
+            <h2><%=otherUser.UserName%></h2>
+        </div>
+        <div style="text-align: center; margin-top: 10%;" class="form-group">
         <% if (otherUser.ProfilePicture === null) { %>
-            <img src="/images/default.jpg" alt="missing_profile_picture">
+            <img style="width: 50%;height: auto; border-radius: 90%; border-style: solid;" src="/images/default.jpg" alt="missing_profile_picture">
         <% } else { %>
             <img src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="50%" height="50%">
         <% } %>
+            <div>
+                <p style="padding-top: 5%"><%= otherUser.Biography %></p>
+            </div>
+
     <% } %>
+    </div>
 
 <script>
     document.getElementById('profile-form').addEventListener('submit', function(e) {

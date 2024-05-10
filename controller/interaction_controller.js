@@ -77,7 +77,6 @@ let profilesController = {
       let userToUpdate = req.params.id;
       let newBiography = req.body.biography;
       let newUsername = req.body.username; // New field for username
-      let newUserNickname = req.body.nickname; // New field for nickname
 
       // Access the uploaded file
       const profilePicture = req.file;
@@ -91,8 +90,8 @@ let profilesController = {
       }
 
       // Update the user with the new fields
-      const sql = "UPDATE USER SET Biography = ?, UserName = ?, UserNickName = ?, ProfilePicture = ? WHERE UserID = ?";
-      const params = [newBiography, newUsername, newUserNickname, filePath || req.user.ProfilePicture, userToUpdate];
+      const sql = "UPDATE USER SET Biography = ?, UserName = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newBiography, newUsername, filePath || req.user.ProfilePicture, userToUpdate];
 
       try {
         const result = await pool.query(sql, params);

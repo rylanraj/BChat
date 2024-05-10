@@ -356,3 +356,22 @@ footer.footer {
   justify-content: center;
   align-items: center;
 }
+.section_name{
+  color: #003c71;
+  text-align: center;
+  height: 44px;
+  background-color: #C1C6C6;
+}
+.user_profile_section {
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 30%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
+.editable {
+  cursor: pointer;
+}

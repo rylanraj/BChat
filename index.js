@@ -53,7 +53,7 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 
 // Routes start here
-app.get("/", function(req, res){
+app.get("/",ensureAuthenticated, function(req, res){
     res.render("index", { isAuthenticated: req.isAuthenticated()});
 
 })

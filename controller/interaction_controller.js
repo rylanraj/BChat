@@ -76,6 +76,8 @@ let profilesController = {
     update: async (req, res) => {
       let userToUpdate = req.params.id;
       let newBiography = req.body.biography;
+      let newUsername = req.body.username; // New field for username
+      let newUserNickname = req.body.nickname; // New field for nickname
 
       // Access the uploaded file
       const profilePicture = req.file;
@@ -88,30 +90,21 @@ let profilesController = {
         filePath = filePath.replace(/\\/g, '/');
       }
 
-      if(!profilePicture){
-        const sql = "UPDATE USER SET Biography = ? WHERE UserID = ?";
-        const params = [newBiography, userToUpdate];
-        try {
-          const result = await pool.query(sql, params);
-          // Handle result here
-        } catch (err) {
-          console.log(err);
-          // Handle error here
-        }
-        res.redirect(`/profile/${userToUpdate}`)
-      } else {
-        const sql = "UPDATE USER SET Biography = ?, ProfilePicture = ? WHERE UserID = ?";
-        const params = [newBiography, filePath, userToUpdate];
+      // Update the user with the new fields
+      const sql = "UPDATE USER SET Biography = ?, UserName = ?, UserNickName = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newBiography, newUsername, newUserNickname, filePath || req.user.ProfilePicture, userToUpdate];
 
-        try {
-          const result = await pool.query(sql, params);
-        } catch (err) {
-          console.log(err);
-        }
-        res.redirect(`/profile/${userToUpdate}`)
+      try {
+        const result = await pool.query(sql, params);
+        // Handle result here
+      } catch (err) {
+        console.log(err);
+        // Handle error here
       }
+      res.redirect(`/profile/${userToUpdate}`)
     }
 }
+
 
 let remindersController = {
   list: async (req, res) => {

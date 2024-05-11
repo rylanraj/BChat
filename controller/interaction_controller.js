@@ -104,6 +104,70 @@ let profilesController = {
     }
 }
 
+let friendsController = {
+  search: async (req, res) => {
+    // Grabs all FriendRequests where the user is the sender and the receiver accepted the request
+    const [friends] = await pool.query
+    ("SELECT * FROM FRIEND WHERE UserID = ? AND FriendAccepted = 1", [req.user.UserID]);
+
+    // Get the user object for each friend
+    for (let i = 0; i < friends.length; i++) {
+      const [friend] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [friends[i].FriendUserID]);
+      friends[i].Friend = friend[0];
+    }
+
+    // Grab all friend requests where the user is the receiver and accepted the request
+    const[friends_2] = await pool.query
+    ("SELECT * FROM FRIEND WHERE FriendUserID = ? AND FriendAccepted = 1", [req.user.UserID]);
+
+    // Grab the user object for each friend
+    for (let i = 0; i < friends_2.length; i++) {
+      const [friend] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [friends_2[i].UserID]);
+      friends_2[i].Friend = friend[0];
+    }
+
+
+    const [receivedFriendRequests] = await pool.query
+    ("SELECT * FROM FRIEND WHERE FriendUserID = ? AND FriendAccepted = 0", [req.user.UserID]);
+
+    // Get the user object for each friend request
+    for (let i = 0; i < receivedFriendRequests.length; i++) {
+      const [friendRequest] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [receivedFriendRequests[i].UserID]);
+      receivedFriendRequests[i].User = friendRequest[0];
+    }
+
+    res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2});
+  },
+  displayResults: async (req, res) => {
+    const searchQuery = req.query.query;
+    // This query will return all users that match the search query except the user who is currently logged in
+    const [results] = await pool.query
+    ("SELECT * FROM User WHERE UserNickName LIKE ? AND UserID != ?", [`%${searchQuery}%`, req.user.UserID]);
+
+    // This query will return all friend requests that the user has sent
+    const [existingFriendRequests] = await pool.query("SELECT * FROM FRIEND WHERE UserID = ?", [req.user.UserID]);
+
+    // This query will return all friend requests that the user has received
+    const [existingFriendRequests_2] = await pool.query("SELECT * FROM FRIEND WHERE FriendUserID = ?", [req.user.UserID]);
+
+    res.render('searchResults', { results: results, existingFriendRequests: existingFriendRequests,
+      existingFriendRequests_2: existingFriendRequests_2});
+  },
+  addFriend: async (req, res) => {
+    const friendID = req.params.id;
+    const userID = req.user.UserID;
+
+    await pool.query("INSERT INTO FRIEND (UserID, FriendUserID, FriendAccepted) VALUES (?, ?, 0)", [userID, friendID]);
+    res.redirect('/friends');
+  },
+  acceptFriend: async (req, res) => {
+    const friendID = req.params.id;
+    const userID = req.user.UserID;
+    await pool.query("UPDATE FRIEND SET FriendAccepted = 1 WHERE UserID = ? AND FriendUserID = ?", [friendID, userID]);
+    res.redirect('/friends');
+
+  }
+}
 
 let remindersController = {
   list: async (req, res) => {
@@ -193,4 +257,4 @@ let remindersController = {
   }
 };
 
-module.exports = {remindersController, postsController, profilesController, chatsController};
+module.exports = {remindersController, postsController, profilesController, chatsController, friendsController};

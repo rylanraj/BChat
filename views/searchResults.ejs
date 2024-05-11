@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<h2>Search Results</h2>
+<% results.forEach(function(user) { %>
+    <div class="user">
+        <h3><a href=<%="/profile/" + user.UserID%>><%= user.UserName %>  (<%=user.UserNickName%>)</a></h3>
+    </div>
+    <% if (!existingFriendRequests.some(request => request.FriendUserID === user.UserID) && !existingFriendRequests_2.some(request => request.UserID === user.UserID)) { %>
+        <form action=<%= "/addFriend/" + user.UserID %> method="POST">
+            <button type="submit" name="friend_id" value="<%= user.UserID %>">Add Friend</button>
+        </form>
+    <% } else { %>
+        <p>You have already sent a friend request to this User or you are already friends with them.</p>
+    <% } %>
+<% }); %>
+</body>
+</html>

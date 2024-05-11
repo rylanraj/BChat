@@ -78,6 +78,12 @@ app.post("/register", authController.registerSubmit);
 // Profiles
 app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
 
+// Adding friends
+app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);
+app.get('/search', ensureAuthenticated, interactionController.friendsController.displayResults);
+app.post('/addFriend/:id', ensureAuthenticated, interactionController.friendsController.addFriend);
+app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friendsController.acceptFriend);
+
 // Multer configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

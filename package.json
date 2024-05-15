@@ -15,8 +15,8 @@
   "license": "ISC",
   "homepage": "http",
   "dependencies": {
-    "bootstrap-icons": "^1.11.3",
     "bcrypt": "^5.1.1",
+    "bootstrap-icons": "^1.11.3",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
@@ -29,6 +29,7 @@
     "nodemon": "^3.1.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "socket.io": "^4.7.5"
   }
 }

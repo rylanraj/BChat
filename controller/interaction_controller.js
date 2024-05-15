@@ -53,12 +53,51 @@ let postsController = {
   }
 };
 
-let chatsController = {
-    list: async (req, res) => {},
-    new: (req, res) => {},
-    create: async (req, res) => {},
-    delete: async (req, res) => {}
-}
+let chatController = {
+  chat: async (req, res) => {
+    const user = req.user.UserID
+    
+    let inboxID = req.params.id;
+
+    let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
+
+    if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
+      res.redirect("/friends");
+    }else{
+      let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    
+      res.render("chats/index.ejs", {chatMessages: rows, userID: user, inboxID:inboxID});
+    }
+    
+  },
+  chatUpdate: async (inboxID, userID, message) => {
+    // console.log(inboxID, userID, message, searchUser);
+    await pool.query("INSERT INTO CHAT (Inbox_ID, SenderID, Message, DateSent) VALUES (?,?,?,NOW());", [inboxID, userID, message]);
+  },
+  chatGet: async (inboxID) => {
+    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    return rows;
+  },
+  chatDelete: async (MessageID) => {
+    await pool.query("DELETE FROM CHAT WHERE MessageID = ?;", [MessageID]);
+  },
+  chatCheck: async (req, res) => {
+    let user = req.user.UserID;
+    let otherUserID = req.params.id; 
+    let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+    console.log(rows);
+    
+    if (rows.length > 0) {
+      let inboxID = rows[0].InboxID;
+      res.redirect(`/chat/${inboxID}`);
+    } else {
+      await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID) VALUES (null, null);");
+      let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE SenderID IN (?, ?)", [user, otherUserID]);
+      let inboxID = rows[0].Inbox_ID;
+      res.redirect(`/chat/${inboxID}`);
+    }
+  }
+};
 
 let profilesController = {
     show: async (req, res) => {
@@ -257,4 +296,4 @@ let remindersController = {
   }
 };
 
-module.exports = {remindersController, postsController, profilesController, chatsController, friendsController};
+module.exports = {remindersController, postsController, profilesController, chatController, friendsController};

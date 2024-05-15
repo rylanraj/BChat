@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<% if (typeof error !== 'undefined') { %>
+    <div class="alert alert-danger" role="alert">
+        <%= error %>
+    </div>
+<% } %>
+<p>Hello, you're being brought to this page either because your myBCIT email and GitHub email are different or
+    because you haven't activated your account with your myBCIT email. You also need to define a password if you
+haven't done so already. (But you won't need to use it with GitHub login)</p>
+<br>
+<p>Please link your accounts here, and then check your myBCIT email to activate your account</p>
+<form action="/confirm_email" method="POST">
+    <input type="email" name="GitHubEmail" placeholder="GitHub Email">
+    <input type="email" name="BCITEmail" placeholder="myBCIT Email">
+    <input type="password" name="Password" placeholder="Password">
+    <button type="submit">Confirm</button>
+</form>
+</body>
+</html>

@@ -5,13 +5,22 @@ const app = express();
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const interactionController = require("./controller/interaction_controller");
-const authController = require("./controller/auth_controller");
+const {authController} = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
 const fs = require('fs');
+const mysql = require("mysql2");
+const flash = require('connect-flash');
+
 require('dotenv').config()
 
-
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
+}).promise();
 
 app.use(express.static("public"));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -50,6 +59,9 @@ app.use((req, res, next) => {
     next();
 });
 
+// Flash messages
+app.use(flash());
+
 app.set("view engine", "ejs");
 
 // Routes start here
@@ -74,9 +86,33 @@ app.get("/register", authController.register);
 app.get("/login", forwardAuthenticated, authController.login);
 app.post("/login", authController.loginSubmit);
 app.post("/register", authController.registerSubmit);
+app.get("/confirm-email", authController.confirmEmail);
+app.post("/confirm_email", authController.confirmEmailSubmit);
 
 // Profiles
 app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
+
+// Account confirmation
+app.get('/confirm/:token', async (req, res) => {
+    const token = req.params.token;
+
+    try {
+        // Validate the token against the database
+        const [users] = await pool.query("SELECT * FROM bchat_users.user WHERE ConfirmationToken = ?;", [token]);
+
+        if (users.length > 0) {
+            // If a user with the token exists, mark them as confirmed
+            await pool.query("UPDATE bchat_users.user SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
+
+            res.send('Your account has been confirmed!');
+        } else {
+            res.send('Invalid confirmation token.');
+        }
+    } catch (error) {
+        console.error("Error confirming user:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 // Adding friends
 app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);
@@ -97,7 +133,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Now you can use 'upload' in your routes
 app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
 
 // Define route for handling file uploads
@@ -109,12 +144,24 @@ app.get('/github',
 
 app.get('/github/callback',
     passport.authenticate('github', {
-        successRedirect: '/',
         failureRedirect: '/login',
         failureMessage: true }),
-    function(req, res) {
+    async function (req, res) {
         // Successful authentication, redirect home.
-        res.redirect('/');
+        // Check if the user's email is confirmed
+        if (!req.user.Confirmed == true) {
+            // If the email is not confirmed, destroy the session and redirect to a specific page
+            req.session.destroy(function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.redirect('/confirm-email');
+                }
+            });
+        } else {
+            // If the email is confirmed, redirect to the home page
+            res.redirect('/');
+        }
     }
 );
 

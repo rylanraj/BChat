@@ -5,11 +5,14 @@ CREATE TABLE USER (
 	UserID INT AUTO_INCREMENT PRIMARY KEY,
     UserName VARCHAR(100) NOT NULL,
     Email VARCHAR(100) NOT NULL,
+    GitHubEmail VARCHAR(100),
     Password VARCHAR(100) NOT NULL,
     Role VARCHAR(100) NOT NULL,
     Biography VARCHAR(150),
     ProfilePicture VARCHAR(200),
-    UserNickName VARCHAR(100)
+    UserNickName VARCHAR(100),
+    Confirmed BOOLEAN,
+    ConfirmationToken VARCHAR(100)
 );
 CREATE TABLE REMINDER (
     ReminderID INT AUTO_INCREMENT PRIMARY KEY,

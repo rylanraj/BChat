@@ -375,3 +375,67 @@ footer.footer {
 .editable {
   cursor: pointer;
 }
+
+/* Message Format */
+#discussion {
+	width: 100%;
+	margin: 0 auto;
+	list-style: none;
+	display: flex;
+	flex-flow: column wrap;
+}
+
+.area {
+  display: flex;
+  flex-flow: row;
+  max-width: 50%;
+  padding: 0.50em ;
+}
+.area.send {
+  align-self: flex-end;
+  justify-content: end;
+
+}
+.area.recep {
+  align-self: flex-start;
+  align-content: start;
+}
+
+.delete{
+  max-width: 20px;
+  align-items: center;
+  display: none
+}
+
+.area:hover .delete{
+  display: flex;
+}
+
+.area.send.bubble {
+  align-items: end;
+	border-radius: 1em;
+	padding: 0.50em 0.75em;
+	margin: 0.0625em;
+	max-width: 80%;
+  text-align: end;
+  background-color: cornflowerblue;
+  color: white;
+  border-bottom-right-radius: 0.1em;
+	border-top-right-radius: 0.1em;
+  text-align: end;
+}
+
+.area.recep.bubble {
+  align-self: flex-start;
+	border-radius: 1em;
+	padding: 0.50em 0.75em;
+	margin: 0.0625em;
+	max-width: 80%;
+  text-align: start;
+  background-color:  rgb(206, 206, 206);
+	color: black;
+  border-bottom-left-radius: 0.1em;
+ 	border-top-left-radius: 0.1em;
+}
+
+

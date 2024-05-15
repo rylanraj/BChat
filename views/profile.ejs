@@ -65,9 +65,13 @@
             <div>
                 <p style="padding-top: 5%"><%= otherUser.Biography %></p>
             </div>
-
-    <% } %>
+        </div>
+        <div>
+            <a href="/chat/check/<%= otherUser.UserID %>">Send a message</a>
+        </div>
     </div>
+    <% } %>
+
 
 <script>
     document.getElementById('profile-form').addEventListener('submit', function(e) {

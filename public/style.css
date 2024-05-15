@@ -404,7 +404,8 @@ footer.footer {
 .delete{
   max-width: 20px;
   align-items: center;
-  display: none
+  display: none;
+  cursor: pointer;
 }
 
 .area:hover .delete{

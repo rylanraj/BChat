@@ -6,24 +6,49 @@ const { userModel } = require("../database");
 require('dotenv').config()
 // GitHub Authentication
 const GithubStrategy = require("passport-github2").Strategy;
-var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-var GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
+
+// Import bcrypt for password hashing
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+// Setup MySQL connection from .env
+const mysql = require('mysql2');
+require('dotenv').config();
+
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
+}).promise();
 
 const localLogin = new LocalStrategy(
-  {
-    usernameField: "email",
-    passwordField: "password",
-  },
-  (email, password, done) => {
-    console.log(email, password)
-    const user = userController.getUserByEmailIdAndPassword(email, password);
-    return user
-      ? done(null, user)
-      : done(null, false, {
-          message: "Your login details are not valid. Please try again",
-      });
-  }
+    {
+        usernameField: "email",
+        passwordField: "password",
+    },
+    async (email, password, done) => {
+        try {
+            const [rows, fields] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
+            const user = rows[0];
+            if (user) {
+                const match = await bcrypt.compare(password, user.Password);
+                if (match) {
+                    return done(null, user);
+                } else {
+                    return done(null, false, { message: 'Incorrect Password.' });
+                }
+            } else {
+                return done(null, false, { message: 'Incorrect Email.' });
+            }
+        } catch (err) {
+            return done(err);
+        }
+    }
 );
 
 // This works
@@ -43,16 +68,17 @@ const githubLogin = new GithubStrategy({
 
 );
 
-passport.serializeUser(function (user, done) {
-  done(null, user);
+passport.serializeUser((user, done) => {
+  done(null, user.UserID);
 });
 
-passport.deserializeUser(function (user, done) {
-  if (user) {
-    done(null, user);
-  } else {
-    done({ message: "User not found" }, null);
-  }
+passport.deserializeUser(async (id, done) => {
+    try {
+        const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [id]);
+        done(null, rows[0]);
+    } catch (err) {
+        done(err);
+    }
 });
 
 // Added the githubLogin to the exports

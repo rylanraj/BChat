@@ -1,4 +1,3 @@
-// Hey guys can you see this? It's from Rylan
 const passport = require("./middleware/passport")
 const express = require("express");
 const session = require("express-session");
@@ -10,8 +9,14 @@ const authController = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
 const fs = require('fs');
+require('dotenv').config()
+const socketIO = require('socket.io');
+const http = require('http');
+const server=http.createServer(app);
+const io = socketIO(server);
 
-app.use(express.static("public"))
+app.use(express.static("public"));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session
 app.use(
@@ -31,15 +36,28 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(ejsLayouts);
 
+app.use((req, res, next) => {
+  // Path to the logo
+  res.locals.logo = '/images/logo.png';
+  next();
+});
+
 // Initializes passport
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Middleware to pass user data to all routes
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+});
+
 app.set("view engine", "ejs");
 
 // Routes start here
-app.get("/", function(req, res){
-    res.render("index", { isAuthenticated: req.isAuthenticated() });
+app.get("/",ensureAuthenticated, function(req, res){
+    res.render("index", { isAuthenticated: req.isAuthenticated()});
+
 })
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new)
@@ -59,26 +77,37 @@ app.get("/login", forwardAuthenticated, authController.login);
 app.post("/login", authController.loginSubmit);
 app.post("/register", authController.registerSubmit);
 
+// Profiles
+app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
+
+// Adding friends
+app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);
+app.get('/search', ensureAuthenticated, interactionController.friendsController.displayResults);
+app.post('/addFriend/:id', ensureAuthenticated, interactionController.friendsController.addFriend);
+app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friendsController.acceptFriend);
+
+// Chat
+app.get("/chat/:id", ensureAuthenticated, interactionController.chatController.chat)
+app.get("/chat/check/:id", ensureAuthenticated, interactionController.chatController.chatCheck)
+
 // Multer configuration
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      fs.mkdir('uploads/', { recursive: true }, (err) => {});
-    cb(null, 'uploads/'); // Directory where uploaded files will be stored
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename
-  }
+    destination: function (req, file, cb) {
+        fs.mkdir('uploads/', { recursive: true }, (err) => {});
+        cb(null, 'uploads/'); // Directory where uploaded files will be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+    }
 });
 
 const upload = multer({ storage: storage });
 
+// Now you can use 'upload' in your routes
+app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
+
 // Define route for handling file uploads
-app.post('/upload', upload.single('photo'), (req, res) => {
-  // Handle file upload here
-  // You can access the uploaded file using req.file
-  // For example, you can save the file to a database or perform other operations
-  res.send('File uploaded successfully');
-});
+app.post('/upload', ensureAuthenticated, upload.single('photo'), interactionController.postsController.create);
 
 // Github login
 app.get('/github',
@@ -102,7 +131,32 @@ app.get("/logout", authController.logout);
 app.get("/admin", isAdmin, authController.adminPanel);
 app.get("/admin/revoke/:SessionID", isAdmin, authController.revokeSession);
 
-app.listen(3001, function () {
+
+
+io.on('connection', (socket) => {
+  socket.on('chat message', async (data) => {
+    let {inboxID, userID, message} = data;
+    
+    await interactionController.chatController.chatUpdate(inboxID, userID, message);
+
+    const chatMessages = await interactionController.chatController.chatGet(inboxID);
+    
+    await io.emit('new message', chatMessages)
+  });
+  socket.on('delete message', async (data) => {
+    let {MessageID, inboxID} = data;
+    
+    await interactionController.chatController.chatDelete(MessageID);
+    
+    const chatMessages = await interactionController.chatController.chatGet(inboxID);
+  
+    await io.emit('new message', chatMessages)
+
+  });
+});
+
+
+server.listen(3001, function () {
   console.log(
     "Server running. Visit: http://localhost:3001/reminders in your browser 🚀"
   );

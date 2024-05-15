@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Socket.IO chat</title>
+    <style>
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      
+    </style>
+  </head>
+  <body>
+    <ul id="discussion">
+      <% chatMessages.forEach(chat => { %>
+        <% if (userID==chat.SenderID) { %>
+          <div class="area send">
+            <div class="delete">
+              <a onclick="deleteMessage('<%= chat.MessageID %>')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>
+              </a>
+              <div id="popup<%= chat.MessageID %>" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to delete this message?</p>
+                  <button onclick="Delete('<%= chat.MessageID %>')">Yes</button>
+                  <button onclick="Close()">No</button>
+                </div>
+              </div>
+            </div>
+            <div class="area send bubble">
+              <li ><%= chat.Message %></li>
+            </div>
+          </div>
+          
+        <% } else { %>
+          <div class="area recep" >
+            <div class="area recep bubble">
+              <li ><%= chat.Message %></li>
+            </div>
+          </div>
+        <% } %>
+      <% }) %>
+    </ul>
+    
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+    
+    <script>
+    const socket = io();
+    const inboxID = '<%= inboxID %>';
+    const userID = '<%= userID %>';
+
+    const form = document.getElementById('form');
+    const messages = document.getElementById('discussion');
+
+    function deleteMessage(messageID) {
+      document.getElementById('popup'+messageID).style.display = 'block';
+    }
+    function Delete(messageID) {
+      socket.emit('delete message', {
+        MessageID: messageID,
+        inboxID: inboxID});
+
+      document.getElementById('popup'+messageID).style.display = 'none';
+    }
+    function Close() {
+      document.getElementById('popup'+messageID).style.display = 'none';
+    }
+
+    form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (input.value) {
+      socket.emit('chat message', {
+        inboxID: inboxID,
+        userID: userID,
+        message: input.value
+       });
+      input.value = '';
+    }
+
+    socket.on('new message', async (data) => {
+        const chatMessages  = await data;
+        messages.innerHTML='';
+        await chatMessages.forEach(chat => {
+          if (userID==chat.SenderID) {
+            messages.innerHTML+=`<div class="area send">
+            <div class="delete">
+              <a onclick="deleteMessage(${chat.MessageID})">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>
+              </a>
+              <div id="popup${chat.MessageID}" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to delete this message?</p>
+                  <button onclick="Delete(${chat.MessageID})">Yes</button>
+                  <button onclick="Close()">No</button>
+                </div>
+              </div>
+            </div>
+            <div class="area send bubble">
+              <li >${chat.Message}</li>
+            </div>
+          </div>`;
+          }else {
+            messages.innerHTML+=`<div class="area recep" >
+            <div class="area recep bubble">
+              <li >${chat.Message}</li>
+            </div>
+          </div>`;
+          }
+        });
+        
+    });
+
+    });
+    </script>
+  </body>
+</html>

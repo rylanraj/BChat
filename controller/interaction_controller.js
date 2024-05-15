@@ -73,6 +73,8 @@ let chatController = {
   chatUpdate: async (inboxID, userID, message) => {
     // console.log(inboxID, userID, message, searchUser);
     await pool.query("INSERT INTO CHAT (Inbox_ID, SenderID, Message, DateSent) VALUES (?,?,?,NOW());", [inboxID, userID, message]);
+
+    await pool.query("UPDATE INBOX SET Last_Message = ?, Last_UserID = ? WHERE InboxID = ?;", [message, userID, inboxID]);
   },
   chatGet: async (inboxID) => {
     let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
@@ -91,9 +93,12 @@ let chatController = {
       let inboxID = rows[0].InboxID;
       res.redirect(`/chat/${inboxID}`);
     } else {
-      await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID) VALUES (null, null);");
-      let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE SenderID IN (?, ?)", [user, otherUserID]);
-      let inboxID = rows[0].Inbox_ID;
+      await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID, User1_ID, User2_ID) VALUES (null, null, ?, ?);", [user, otherUserID]);
+
+      let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+      
+      let inboxID = rows_2[0].InboxID;
+
       res.redirect(`/chat/${inboxID}`);
     }
   }

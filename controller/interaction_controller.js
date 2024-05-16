@@ -100,38 +100,51 @@ let chatController = {
 };
 
 let profilesController = {
-    show: async (req, res) => {
-      let userToFind = req.params.id;
-      if (req.params.id !== req.user.UserID){
-        const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
-        const [rows_2, fields_2] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
-        res.render("profile.ejs", {otherUser: rows[0], posts: rows_2});
-      } else {
-        // Get the posts made by the currently logged in user
-        const [rows, fields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
-        res.render("profile.ejs", {otherUser: req.user, posts: rows});
+  show: async (req, res) => {
+    let userToFind = req.params.id;
+    if (req.params.id !== req.user.UserID) {
+      try {
+        const [userRows, userFields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
+        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Handle error here
       }
-    },
-    update: async (req, res) => {
-      let userToUpdate = req.params.id;
-      let newBiography = req.body.biography;
-      let newUsername = req.body.username; // New field for username
-
-      // Access the uploaded file
-      const profilePicture = req.file;
-
-      // Save the file path to the database
-      let filePath = profilePicture ? profilePicture.path : null;
-
-      // Replace backslashes with forward slashes
-      if (filePath) {
-        filePath = filePath.replace(/\\/g, '/');
+    } else {
+      try {
+        // Get the posts made by the currently logged-in user
+        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
+        res.render("profile.ejs", { otherUser: req.user, posts: postRows });
+      } catch (error) {
+        console.error("Error fetching user posts:", error);
+        // Handle error here
       }
-
-      // Update the user with the new fields
-      const sql = "UPDATE USER SET Biography = ?, UserName = ?, ProfilePicture = ? WHERE UserID = ?";
-      const params = [newBiography, newUsername, filePath || req.user.ProfilePicture, userToUpdate];
-
+    }
+  },
+  update: async (req, res) => {
+    let userToUpdate = req.params.id;
+    let newUsername = req.body.username;
+    let newNickname = req.body.nickname;
+    let newProgram = req.body.program;
+    let newStudentSet = req.body.studentSet;
+    let newEmail = req.body.email;
+    console.log(newStudentSet)
+    // Access the uploaded profile picture
+    const profilePicture = req.file;
+  
+    // Save the file path to the database
+    let filePath = profilePicture ? profilePicture.path : null;
+  
+    // Replace backslashes with forward slashes
+    if (filePath) {
+      filePath = filePath.replace(/\\/g, '/');
+    }
+    
+    // Update the user with the new fields only if the "Set" field is not empty
+    if (newStudentSet !== undefined) {
+      const sql = "UPDATE USER SET StudentSet = ?";
+      const params = [newStudentSet]
       try {
         const result = await pool.query(sql, params);
         // Handle result here
@@ -139,9 +152,25 @@ let profilesController = {
         console.log(err);
         // Handle error here
       }
-      res.redirect(`/profile/${userToUpdate}`)
     }
-}
+      const sql = "UPDATE USER SET UserName = ?, UserNickName = ?, Program = ?,  Email = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newUsername, newNickname, newProgram, newEmail, filePath || req.user.ProfilePicture, userToUpdate];
+  
+      try {
+        const result = await pool.query(sql, params);
+        // Handle result here
+      } catch (err) {
+        console.log(err);
+        // Handle error here
+      }
+    
+  
+    // Redirect the user to the profile page
+    res.redirect(`/profile/${userToUpdate}`);
+  }
+  
+};
+
 
 let friendsController = {
   search: async (req, res) => {

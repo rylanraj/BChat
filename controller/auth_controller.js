@@ -40,25 +40,32 @@ let authController = {
         return res.status(400).send("User with that email already exists");
       }
       if (password.length < 8) {
-        return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated:
-              req.isAuthenticated() });
+        return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: req.isAuthenticated() });
       }
-
+  
       // Hash the password before inserting into the database
       const hashedPassword = await hashPassword(password);
-
-      // Insert the user into the database
-      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName) VALUES (?, ?, ?, ?, ?);", [name, email,
-        hashedPassword, "user", username]);
-
+  
+      // Get the current date
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+  
+      // Insert the user into the database with the current date as DateJoined
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined) VALUES (?, ?, ?, ?, ?, ?);", [name, email,
+        hashedPassword, "user", username, formattedDate]);
+  
       // Redirect to login page upon successful registration
       res.redirect("/login");
-
+  
     } catch (error) {
       console.error("Error registering user:", error);
       res.status(500).send("Internal Server Error"); // Handle error appropriately
     }
-  },
+  }
+  ,
   
   
   

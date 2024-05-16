@@ -357,9 +357,11 @@ footer.footer {
   align-items: center;
 }
 .section_name{
+ 
   color: #003c71;
   text-align: center;
   height: 44px;
+  font-size: 2vw !important;
   background-color: #C1C6C6;
 }
 .user_profile_section {
@@ -367,6 +369,18 @@ footer.footer {
   top: 83px;
   left: 0;
   width: 30%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
+.user_feed_section {
+  overflow-y: auto;
+  margin-left: 35%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
   height: calc(100% - 83px);
   background: #f8f9fa; /* or any other color or image */
   /* Add other styles as needed based on the design in the photo */
@@ -466,3 +480,66 @@ footer.footer {
   cursor: pointer;
 }
 
+.bio-text{
+  font-style: inter;
+  font-size: 1vw;
+  color:#000;
+  
+  text-align: center;
+}
+.form-control{
+  font-size: 1vw;
+}
+.post{
+  margin-top: 15px;
+  margin-left: 20%;
+  text-align:center;
+  width: 60%;
+  
+}
+.post-footer {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
+
+.user-info {
+
+  display: flex; /* Use flexbox */
+  
+}
+.user-info p {
+  align-self:flex-end;
+}
+
+.user-info img {
+  object-fit: cover;
+  background-color: #d3dcdc;
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.post-info{
+  font-size: 1vw;
+}
+
+.profilePicture{
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  border-style: solid;
+}
+
+.post-img {
+  background-color: #d3dcdc;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 24px;
+  width: 533px;
+  height: 300px;
+  object-fit: contain;
+}

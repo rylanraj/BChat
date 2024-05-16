@@ -1,7 +1,7 @@
 
 <div class="user_feed_section">
     <div style="position: fixed; width: 59.3%;" class="section_name">
-        <h2>Your Posts</h2>
+        <h2>Student Feed</h2>
     </div>
     <div style="margin-top: 50px;">
         <%
@@ -34,9 +34,9 @@
                 
             </div>
             
-            <h3><%= post.Title %>, </h3>
+            <h3><%= post.Title %> </h3>
             <% if (post.Picture) { %>
-                <img src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
             <% } %>
         </div>
     <% }); %>

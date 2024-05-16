@@ -55,10 +55,7 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 
 // Routes start here
-app.get("/",ensureAuthenticated, interactionController.profilesController.show, function(req, res){
-    res.render("index", { isAuthenticated: req.isAuthenticated()});
-
-});
+app.get("/",ensureAuthenticated, interactionController.mainFeedController.index);
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.get("/reminders", ensureAuthenticated, interactionController.remindersController.list);

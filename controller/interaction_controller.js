@@ -19,6 +19,43 @@ async function keywordToImage(keyword) {
   return imageUrl;
 }
 
+
+// Function to fetch posts from the database
+const fetchPosts = async () => {
+  try {
+      // Get a database connection from the pool and execute the query
+      const [rows, fields] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
+      // You may need to fetch additional data related to each post, such as user information
+      return rows;
+  } catch (error) {
+      console.error("Error fetching posts:", error);
+      throw error; // Rethrow the error to be handled by the caller
+  }
+};
+
+let mainFeedController = {
+  index: async (req, res) => {
+    try {
+      // Fetch posts from the database
+      const posts = await fetchPosts();
+
+      // Fetch usernames and profile pictures associated with user IDs of the posts
+      const userIds = posts.map(post => post.UserID);
+      const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+      const userDataMap = {};
+      usernames.forEach(user => {
+        userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+      });
+
+      res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+    } catch (error) {
+      console.error("Error fetching main feed data:", error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+};
+
+
 let postsController = {
   new: (req, res) => {
     res.render("create_post.ejs");
@@ -111,16 +148,21 @@ let profilesController = {
       try {
         const [userRows, userFields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
         const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
-
-        // Fetch usernames and profile pictures associated with user IDs of the posts
+  
+        // Fetch usernames associated with user IDs of the posts
         const userIds = postRows.map(post => post.UserID);
-        const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
-        const userDataMap = {};
-        usernames.forEach(user => {
-          userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
-        });
-
-        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
+        if (userIds.length > 0) {
+          const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+          const userDataMap = {};
+          usernames.forEach(user => {
+            userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+          });
+  
+          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
+        } else {
+          // Handle the case where userIds is empty, perhaps by providing a default value or returning early
+          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         // Handle error here
@@ -129,14 +171,15 @@ let profilesController = {
       try {
         // Get the posts made by the currently logged-in user
         const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
-        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
-
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+  
       } catch (error) {
         console.error("Error fetching user posts:", error);
         // Handle error here
       }
     }
   },
+  
   update: async (req, res) => {
     let userToUpdate = req.params.id;
     let newUsername = req.body.username;
@@ -340,4 +383,4 @@ let remindersController = {
   }
 };
 
-module.exports = {remindersController, postsController, profilesController, chatController, friendsController};
+module.exports = {remindersController, postsController, profilesController, chatController, friendsController, mainFeedController};

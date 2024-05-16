@@ -7,7 +7,9 @@ CREATE TABLE USER (
     Email VARCHAR(100) NOT NULL,
     Password VARCHAR(100) NOT NULL,
     Role VARCHAR(100) NOT NULL,
-    Biography VARCHAR(150),
+    StudentSet CHAR(1),
+    Program VARCHAR(100),
+    DateJoined DATE,
     ProfilePicture VARCHAR(200),
     UserNickName VARCHAR(100)
 );

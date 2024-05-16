@@ -41,13 +41,16 @@ let mainFeedController = {
 
       // Fetch usernames and profile pictures associated with user IDs of the posts
       const userIds = posts.map(post => post.UserID);
-      const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
-      const userDataMap = {};
-      usernames.forEach(user => {
-        userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
-      });
-
-      res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+      if(userIds.length > 0) {
+        const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+        const userDataMap = {};
+        usernames.forEach(user => {
+          userDataMap[user.UserID] = {username: user.UserName, profilePicture: user.ProfilePicture};
+        });
+        res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+      }else {
+        res.render("index", {posts: posts,isAuthenticated: req.isAuthenticated()});
+      }
     } catch (error) {
       console.error("Error fetching main feed data:", error);
       res.status(500).send('Internal Server Error');

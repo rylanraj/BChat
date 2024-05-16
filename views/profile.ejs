@@ -68,10 +68,7 @@
                    
                 </div>
             </div>
-        </div>
-        
-            
-        </form>
+    </form>
         <p id="error-message" style="color: red; display: none;"></p> <!-- Error message will be inserted here -->
     
     </div>
@@ -108,9 +105,7 @@
                         <%= userData.username %> <br>
                         <%= formatDate(post.TimePosted) %>
                     </p>
-                    
                 </div>
-                
                 <h3><%= post.Title %> </h3>
                 <% if (post.Picture) { %>
                     <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">

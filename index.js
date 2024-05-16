@@ -113,6 +113,7 @@ app.get('/confirm/:token', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+app.get('/confirm_github/:token', authController.confirmGitHubEmail);
 
 // Adding friends
 app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);

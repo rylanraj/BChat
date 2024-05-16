@@ -55,12 +55,12 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 
 // Routes start here
-app.get("/",ensureAuthenticated, function(req, res){
+app.get("/",ensureAuthenticated, interactionController.profilesController.show, function(req, res){
     res.render("index", { isAuthenticated: req.isAuthenticated()});
 
-})
-app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)
-app.post("/post/new", ensureAuthenticated, interactionController.postsController.new)
+});
+app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
+app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.get("/reminders", ensureAuthenticated, interactionController.remindersController.list);
 app.get("/reminder/new", ensureAuthenticated, interactionController.remindersController.new);
 app.get("/reminder/:id", ensureAuthenticated, interactionController.remindersController.listOne);
@@ -79,6 +79,7 @@ app.post("/register", authController.registerSubmit);
 
 // Profiles
 app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
+
 
 // Adding friends
 app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);

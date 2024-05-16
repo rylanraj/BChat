@@ -111,7 +111,16 @@ let profilesController = {
       try {
         const [userRows, userFields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
         const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
-        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+
+        // Fetch usernames and profile pictures associated with user IDs of the posts
+        const userIds = postRows.map(post => post.UserID);
+        const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+        const userDataMap = {};
+        usernames.forEach(user => {
+          userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+        });
+
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
       } catch (error) {
         console.error("Error fetching user data:", error);
         // Handle error here
@@ -120,7 +129,8 @@ let profilesController = {
       try {
         // Get the posts made by the currently logged-in user
         const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
-        res.render("profile.ejs", { otherUser: req.user, posts: postRows });
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
+
       } catch (error) {
         console.error("Error fetching user posts:", error);
         // Handle error here

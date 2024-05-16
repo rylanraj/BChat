@@ -149,7 +149,7 @@ app.get('/github/callback',
     async function (req, res) {
         // Successful authentication, redirect home.
         // Check if the user's email is confirmed
-        if (!req.user.Confirmed == true) {
+        if (!req.user.Confirmed == true || req.user.Password === "tempPassword") {
             // If the email is not confirmed, destroy the session and redirect to a specific page
             req.session.destroy(function (err) {
                 if (err) {

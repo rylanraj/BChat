@@ -160,6 +160,15 @@ let authController = {
       // Delete any other users with the same GitHub email
       await pool.query("DELETE FROM bchat_users.user WHERE GitHubEmail = ? AND Email != ?;", [githubEmail, BCITemail]);
 
+      if (user[0].Password === "tempPassword") {
+        if (password.length < 8) {
+          return res.render("auth/confirm_email", { error: "Password must be at least 8 characters long", isAuthenticated:
+                req.isAuthenticated() });
+        }
+        const hashedPassword = await hashPassword(password);
+        await pool.query("UPDATE bchat_users.user SET Password = ? WHERE Email = ?;", [hashedPassword, BCITemail]);
+      }
+
       return res.redirect("/login");
     }
     else {

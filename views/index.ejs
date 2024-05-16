@@ -1,17 +1,51 @@
-<div class="main d-flex flex-row bg-light">
-    <div class="d-flex flex-column bd-highlight mb-3 side">
-        <div class="bg-secondary center" style="height: 7%;">
-            Messages
-        </div>
-        <div class="bg-white" style="flex-grow: 1;">
-        </div>
+
+<div class="user_feed_section">
+    <div style="position: fixed; width: 59.3%;" class="section_name">
+        <h2>Student Feed</h2>
     </div>
-    <div class="d-flex justify-content-center  "style="flex-grow: 1;">
-        <div class="d-flex flex-column side2">
-            <div class="bg-secondary center" style="height: 7%; width: 100%;"> Student Feed
+    <div style="margin-top: 50px;">
+        <%
+        function formatDate(timeString) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const date = new Date(timeString);
+            const month = months[date.getMonth()];
+            const day = date.getDate();
+            const year = date.getFullYear();
+            
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if minutes is less than 10
+            
+            return `${month} ${day}, ${year} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+        }
+        %>
+        <% posts.slice().reverse().forEach(function(post) { %>
+        <div class="post">
+            <% const userData = userDataMap[post.UserID]; %>
+            <div class="user-info">
+                <img src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <p id="post" class="post-info">
+                    <%= userData.username %> <br>
+                    <%= formatDate(post.TimePosted) %>
+                </p>
+                
             </div>
-            <div class="bg-white" style="flex-grow: 1;">
-            </div>
+            
+            <h3><%= post.Title %> </h3>
+            <% if (post.Picture) { %>
+                <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+            <% } %>
         </div>
-    </div> 
+    <% }); %>
+    <div >
+        <hr>
+        <p id="post-footer" style="text-align: center;">
+            *Cricket noises.*<br>
+            No older posts found.
+        </p> 
+    </div>
+    </div>
 </div>

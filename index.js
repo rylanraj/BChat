@@ -11,7 +11,6 @@ const multer = require('multer');
 const fs = require('fs');
 const mysql = require("mysql2");
 const flash = require('connect-flash');
-
 require('dotenv').config()
 
 const pool = mysql.createPool({
@@ -21,6 +20,12 @@ const pool = mysql.createPool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME
 }).promise();
+
+const socketIO = require('socket.io');
+const http = require('http');
+const server=http.createServer(app);
+const io = socketIO(server);
+
 
 app.use(express.static("public"));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -65,12 +70,9 @@ app.use(flash());
 app.set("view engine", "ejs");
 
 // Routes start here
-app.get("/",ensureAuthenticated, function(req, res){
-    res.render("index", { isAuthenticated: req.isAuthenticated()});
-
-})
-app.get("/post/new", ensureAuthenticated, interactionController.postsController.new)
-app.post("/post/new", ensureAuthenticated, interactionController.postsController.new)
+app.get("/",ensureAuthenticated, interactionController.mainFeedController.index);
+app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
+app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.get("/reminders", ensureAuthenticated, interactionController.remindersController.list);
 app.get("/reminder/new", ensureAuthenticated, interactionController.remindersController.new);
 app.get("/reminder/:id", ensureAuthenticated, interactionController.remindersController.listOne);
@@ -120,6 +122,10 @@ app.get("/friends", ensureAuthenticated, interactionController.friendsController
 app.get('/search', ensureAuthenticated, interactionController.friendsController.displayResults);
 app.post('/addFriend/:id', ensureAuthenticated, interactionController.friendsController.addFriend);
 app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friendsController.acceptFriend);
+
+// Chat
+app.get("/chat/:id", ensureAuthenticated, interactionController.chatController.chat)
+app.get("/chat/check/:id", ensureAuthenticated, interactionController.chatController.chatCheck)
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -174,10 +180,30 @@ app.get("/admin/revoke/:SessionID", isAdmin, authController.revokeSession);
 
 
 
+io.on('connection', (socket) => {
+  socket.on('chat message', async (data) => {
+    let {inboxID, userID, message} = data;
+    
+    await interactionController.chatController.chatUpdate(inboxID, userID, message);
+
+    const chatMessages = await interactionController.chatController.chatGet(inboxID);
+    
+    await io.emit('new message', chatMessages)
+  });
+  socket.on('delete message', async (data) => {
+    let {MessageID, inboxID} = data;
+    
+    await interactionController.chatController.chatDelete(MessageID);
+    
+    const chatMessages = await interactionController.chatController.chatGet(inboxID);
+  
+    await io.emit('new message', chatMessages)
+
+  });
+});
 
 
-
-app.listen(3001, function () {
+server.listen(3001, function () {
   console.log(
     "Server running. Visit: http://localhost:3001/reminders in your browser 🚀"
   );

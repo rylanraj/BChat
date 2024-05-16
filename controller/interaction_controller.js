@@ -19,6 +19,43 @@ async function keywordToImage(keyword) {
   return imageUrl;
 }
 
+
+// Function to fetch posts from the database
+const fetchPosts = async () => {
+  try {
+      // Get a database connection from the pool and execute the query
+      const [rows, fields] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
+      // You may need to fetch additional data related to each post, such as user information
+      return rows;
+  } catch (error) {
+      console.error("Error fetching posts:", error);
+      throw error; // Rethrow the error to be handled by the caller
+  }
+};
+
+let mainFeedController = {
+  index: async (req, res) => {
+    try {
+      // Fetch posts from the database
+      const posts = await fetchPosts();
+
+      // Fetch usernames and profile pictures associated with user IDs of the posts
+      const userIds = posts.map(post => post.UserID);
+      const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+      const userDataMap = {};
+      usernames.forEach(user => {
+        userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+      });
+
+      res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+    } catch (error) {
+      console.error("Error fetching main feed data:", error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+};
+
+
 let postsController = {
   new: (req, res) => {
     res.render("create_post.ejs");
@@ -53,46 +90,119 @@ let postsController = {
   }
 };
 
-let chatsController = {
-    list: async (req, res) => {},
-    new: (req, res) => {},
-    create: async (req, res) => {},
-    delete: async (req, res) => {}
-}
+let chatController = {
+  chat: async (req, res) => {
+    const user = req.user.UserID
+    
+    let inboxID = req.params.id;
+
+    let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
+
+    if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
+      res.redirect("/friends");
+    }else{
+      let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    
+      res.render("chats/index.ejs", {chatMessages: rows, userID: user, inboxID:inboxID});
+    }
+    
+  },
+  chatUpdate: async (inboxID, userID, message) => {
+    // console.log(inboxID, userID, message, searchUser);
+    await pool.query("INSERT INTO CHAT (Inbox_ID, SenderID, Message, DateSent) VALUES (?,?,?,NOW());", [inboxID, userID, message]);
+
+    await pool.query("UPDATE INBOX SET Last_Message = ?, Last_UserID = ? WHERE InboxID = ?;", [message, userID, inboxID]);
+  },
+  chatGet: async (inboxID) => {
+    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    return rows;
+  },
+  chatDelete: async (MessageID) => {
+    await pool.query("DELETE FROM CHAT WHERE MessageID = ?;", [MessageID]);
+  },
+  chatCheck: async (req, res) => {
+    let user = req.user.UserID;
+    let otherUserID = req.params.id; 
+    let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+    console.log(rows);
+    
+    if (rows.length > 0) {
+      let inboxID = rows[0].InboxID;
+      res.redirect(`/chat/${inboxID}`);
+    } else {
+      await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID, User1_ID, User2_ID) VALUES (null, null, ?, ?);", [user, otherUserID]);
+
+      let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+      
+      let inboxID = rows_2[0].InboxID;
+
+      res.redirect(`/chat/${inboxID}`);
+    }
+  }
+};
 
 let profilesController = {
-    show: async (req, res) => {
-      let userToFind = req.params.id;
-      if (req.params.id !== req.user.UserID){
-        const [rows, fields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
-        const [rows_2, fields_2] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
-        res.render("profile.ejs", {otherUser: rows[0], posts: rows_2});
-      } else {
-        // Get the posts made by the currently logged in user
-        const [rows, fields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
-        res.render("profile.ejs", {otherUser: req.user, posts: rows});
+  show: async (req, res) => {
+    let userToFind = req.params.id;
+    if (req.params.id !== req.user.UserID) {
+      try {
+        const [userRows, userFields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
+        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
+  
+        // Fetch usernames associated with user IDs of the posts
+        const userIds = postRows.map(post => post.UserID);
+        if (userIds.length > 0) {
+          const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+          const userDataMap = {};
+          usernames.forEach(user => {
+            userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+          });
+  
+          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
+        } else {
+          // Handle the case where userIds is empty, perhaps by providing a default value or returning early
+          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Handle error here
       }
-    },
-    update: async (req, res) => {
-      let userToUpdate = req.params.id;
-      let newBiography = req.body.biography;
-      let newUsername = req.body.username; // New field for username
-
-      // Access the uploaded file
-      const profilePicture = req.file;
-
-      // Save the file path to the database
-      let filePath = profilePicture ? profilePicture.path : null;
-
-      // Replace backslashes with forward slashes
-      if (filePath) {
-        filePath = filePath.replace(/\\/g, '/');
+    } else {
+      try {
+        // Get the posts made by the currently logged-in user
+        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+  
+      } catch (error) {
+        console.error("Error fetching user posts:", error);
+        // Handle error here
       }
-
-      // Update the user with the new fields
-      const sql = "UPDATE USER SET Biography = ?, UserName = ?, ProfilePicture = ? WHERE UserID = ?";
-      const params = [newBiography, newUsername, filePath || req.user.ProfilePicture, userToUpdate];
-
+    }
+  },
+  
+  update: async (req, res) => {
+    let userToUpdate = req.params.id;
+    let newUsername = req.body.username;
+    let newNickname = req.body.nickname;
+    let newProgram = req.body.program;
+    let newStudentSet = req.body.studentSet;
+    let newEmail = req.body.email;
+    console.log(newStudentSet)
+    // Access the uploaded profile picture
+    const profilePicture = req.file;
+  
+    // Save the file path to the database
+    let filePath = profilePicture ? profilePicture.path : null;
+  
+    // Replace backslashes with forward slashes
+    if (filePath) {
+      filePath = filePath.replace(/\\/g, '/');
+    }
+    
+    // Update the user with the new fields only if the "Set" field is not empty
+    if (newStudentSet !== undefined) {
+      const sql = "UPDATE USER SET StudentSet = ?";
+      const params = [newStudentSet]
       try {
         const result = await pool.query(sql, params);
         // Handle result here
@@ -100,9 +210,25 @@ let profilesController = {
         console.log(err);
         // Handle error here
       }
-      res.redirect(`/profile/${userToUpdate}`)
     }
-}
+      const sql = "UPDATE USER SET UserName = ?, UserNickName = ?, Program = ?,  Email = ?, ProfilePicture = ? WHERE UserID = ?";
+      const params = [newUsername, newNickname, newProgram, newEmail, filePath || req.user.ProfilePicture, userToUpdate];
+  
+      try {
+        const result = await pool.query(sql, params);
+        // Handle result here
+      } catch (err) {
+        console.log(err);
+        // Handle error here
+      }
+    
+  
+    // Redirect the user to the profile page
+    res.redirect(`/profile/${userToUpdate}`);
+  }
+  
+};
+
 
 let friendsController = {
   search: async (req, res) => {
@@ -257,4 +383,4 @@ let remindersController = {
   }
 };
 
-module.exports = {remindersController, postsController, profilesController, chatsController, friendsController};
+module.exports = {remindersController, postsController, profilesController, chatController, friendsController, mainFeedController};

@@ -13,84 +13,342 @@
             
             <div style="text-align: center; margin-top: 10%;" class="form-group">
                 <label for="profilePicture">
-                <% if (otherUser.ProfilePicture === null) { %>
-                    <img style="width: 50%;height: auto; border-radius: 90%; border-style: solid;" src="/images/default.jpg" alt="missing_profile_picture">
-                <% } else { %>
-                <img style="width: 50%;height: 50%; border-radius: 90%; border-style: solid;" src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="50%" height="50%">
-                <% } %></label>
+                    <% if (otherUser.ProfilePicture === null) { %>
+                        <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="/images/default.jpg" alt="missing_profile_picture">
+                    <% } else { %>
+                        <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture">
+                    <% } %>
+                </label>
+                
                 
                 <input style="display: none;" type="file" class="" id="profilePicture" name="profilePicture">
                 
-                <div style="margin-top: 5%; color: #003c71;font-size: larger; font-weight: bold;">
+                <div style="margin-top: 5%; font-size: 2vw; color: #003c71;font-size: larger; font-weight: bold;">
                     <p id="username-text"><%=otherUser.UserName%></p>
                     
                     <input class="form-control" id="username" name="username" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserName%>">
                 </div>
+            <div style="border-style: solid;width: 90% !important; margin-left: 5%;margin-top: 5%; border-width: 1px;border-color: #d3dcdc;">
                 <div class="form-group">
-                    <label for="biography">Edit your biography:</label>
-                    <textarea class="form-control" id="biography" name="biography" rows="3"><%=otherUser.Biography%></textarea>
+                    <div style="margin-top: 5%;" class="bio-text">
+                        
+                        <p id="nickname-text"><%=otherUser.UserNickName%></p>
+                        
+                        <input class="form-control" id="nickname" name="nickname" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserNickName%>">
+                    </div>
+                    <div style="margin-top: 5%; " class="bio-text">
+                        <p id="program-text">Program: <%= otherUser.Program ? otherUser.Program : 'Empty' %></p>
+                        
+                        <input class="form-control" id="program" name="program" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.Program || 'Set program'%>">
+                    </div>
+                    <div style="margin-top: 5%; " class="bio-text">
+                        <p id="studentSet-text">Set: <%= otherUser.StudentSet ? otherUser.StudentSet : 'Empty' %></p>
+                    </div>
                 </div>
+                <%
+                // Get the DateJoined value from otherUser
+                const dateJoined = new Date(otherUser.DateJoined);
 
+                // Extract year, month, and day
+                const year = dateJoined.getFullYear();
+                const month = String(dateJoined.getMonth() + 1).padStart(2, '0');
+                const day = String(dateJoined.getDate()).padStart(2, '0');
+
+                // Formatted date in YYYY-MM-DD format
+                const formattedDate = `${year}-${month}-${day}`;
+                %>
+                <div style="margin-top: 5%; " class="bio-text">
+                    <p id="dateJoined-text"><%= formattedDate %></p>
+                </div>
+                    <div style="margin-top: 5%; " class="bio-text">
+                        <p id="email-text"><%=otherUser.Email%></p>
+                        
+                        <input class="form-control" id="email" name="email" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.Email%>">
+                    </div>
+                   
+                </div>
             </div>
-            <button type="submit" class="btn btn-secondary">Save</button>
+        </div>
+        
             
         </form>
         <p id="error-message" style="color: red; display: none;"></p> <!-- Error message will be inserted here -->
-        
+    
     </div>
-    <div style="margin-left: 32%;">
-        <h2>Your Posts:</h2>
-    <% posts.forEach(function(post) { %>
-        <div class="post">
-            <h3><%= post.Title %>, <%=post.TimePosted%></h3>
-            <% if (post.Picture) { %>
-            <img src="<%="/" + post.Picture %>" alt="post_picture" width="200" height="200">
-            <% } %>
+
+    <div class="user_feed_section">
+        <div style="position: fixed; width: 59.3%;" class="section_name">
+            <h2>Your Posts</h2>
         </div>
-    <% }); %>
+        <div style="margin-top: 50px;">
+            <%
+            function formatDate(timeString) {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const date = new Date(timeString);
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM format
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if minutes is less than 10
+                
+                return `${month} ${day}, ${year} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+            }
+            %>
+            <% posts.slice().reverse().forEach(function(post) { %>
+            <div class="post">
+                <% const userData = userDataMap[post.UserID]; %>
+                <div class="user-info">
+                    <img src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                    <p id="post" class="post-info">
+                        <%= userData.username %> <br>
+                        <%= formatDate(post.TimePosted) %>
+                    </p>
+                    
+                </div>
+                
+                <h3><%= post.Title %> </h3>
+                <% if (post.Picture) { %>
+                    <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                <% } %>
+            </div>
+        <% }); %>
+        <div >
+            <hr>
+            <p id="post-footer" style="text-align: center;">
+                *Cricket noises.*<br>
+                No older posts found.
+            </p> 
+        </div>
+        </div>
     </div>
+    
+    
+    
+   
     
 
     <% } else { %>
     <div class="user_profile_section">
         <div class="section_name">
-            <h2><%=otherUser.UserName%></h2>
+            <h2>User Profile</h2>
         </div>
+        
         <div style="text-align: center; margin-top: 10%;" class="form-group">
-        <% if (otherUser.ProfilePicture === null) { %>
-            <img style="width: 50%;height: auto; border-radius: 90%; border-style: solid;" src="/images/default.jpg" alt="missing_profile_picture">
-        <% } else { %>
-            <img src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture" width="50%" height="50%">
-        <% } %>
-            <div>
-                <p style="padding-top: 5%"><%= otherUser.Biography %></p>
+            <label for="profilePicture">
+                <% if (otherUser.ProfilePicture === null) { %>
+                    <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="/images/default.jpg" alt="missing_profile_picture">
+                <% } else { %>
+                    <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture">
+                <% } %>
+            </label>
+            
+            
+            
+            <div style="margin-top: 5%; font-size: 2vw; color: #003c71;font-size: larger; font-weight: bold;">
+                <p id="other-user"><%=otherUser.UserName%></p>
             </div>
+        <div style="border-style: solid;width: 90% !important; margin-left: 5%;margin-top: 5%; border-width: 1px;border-color: #d3dcdc;">
+            <div class="form-group">
+                <div style="margin-top: 5%;" class="bio-text">
+                    
+                    <p id="other-user"><%=otherUser.UserNickName%></p>
+                </div>
+                <div style="margin-top: 5%; " class="bio-text">
+                    <p id="other-user">Program: <%= otherUser.Program ? otherUser.Program : 'Empty' %></p>
+                </div>
+                <div style="margin-top: 5%; " class="bio-text">
+                    <p id="other-user">Set: <%= otherUser.StudentSet ? otherUser.StudentSet : 'Empty' %></p>
+                </div>
+            </div>
+            <%
+            // Get the DateJoined value from otherUser
+            const dateJoined = new Date(otherUser.DateJoined);
 
-    <% } %>
+            // Extract year, month, and day
+            const year = dateJoined.getFullYear();
+            const month = String(dateJoined.getMonth() + 1).padStart(2, '0');
+            const day = String(dateJoined.getDate()).padStart(2, '0');
+
+            // Formatted date in YYYY-MM-DD format
+            const formattedDate = `${year}-${month}-${day}`;
+            %>
+            <div style="margin-top: 5%; " class="bio-text">
+                <p id="other-user"><%= formattedDate %></p>
+            </div>
+                <div style="margin-top: 5%; " class="bio-text">
+                    <p id="other-user"><%=otherUser.Email%></p>
+                    
+                </div>
+               
+            </div>
+        </div>
     </div>
+    </div>
+    <div class="user_feed_section">
+        <div style="position: fixed; width: 59.3%;" class="section_name">
+            <h2>Your Posts</h2>
+        </div>
+        <div style="margin-top: 50px;">
+            <%
+            function formatDate(timeString) {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const date = new Date(timeString);
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM format
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if minutes is less than 10
+                
+                return `${month} ${day}, ${year} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+            }
+            %>
+            <% posts.slice().reverse().forEach(function(post) { %>
+            <div class="post">
+                <% const userData = userDataMap[post.UserID]; %>
+                <div class="user-info">
+                    <img src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                    <p id="post" class="post-info">
+                        <%= userData.username %> <br>
+                        <%= formatDate(post.TimePosted) %>
+                    </p>
+                    
+                </div>
+                
+                <h3><%= post.Title %> </h3>
+                <% if (post.Picture) { %>
+                    <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                <% } %>
+            </div>
+        <% }); %>
+        <div >
+            <hr>
+            <p id="post-footer" style="text-align: center;">
+                *Cricket noises.*<br>
+                No older posts found.
+            </p> 
+        </div>
+        </div>
+    </div>
+    <% } %>
 
-<script>
-    document.getElementById('profile-form').addEventListener('submit', function(e) {
-    var username = document.getElementById('username');
 
-    var errorMessage = document.getElementById('error-message');
-    errorMessage.style.display = 'none';
-
-    if (!username.value.trim()) {
-        e.preventDefault();
-        errorMessage.textContent = 'The username field cannot be empty';
-        errorMessage.style.display = 'block';
-    }
-
-});
-    document.querySelectorAll('p').forEach(function(p) {
-        p.addEventListener('click', function() {
-            this.style.display = 'none';
-            var form = this.nextElementSibling;
-            form.style.display = 'block';
-            form.nextElementSibling.style.display = 'block';
+    <script>
+        // Initialize a boolean variable to track form changes
+        var formChanged = false;
+    
+        // Event listener for clicks on input fields
+        document.querySelectorAll('input').forEach(function(input) {
+            input.addEventListener('click', function() {
+                formChanged = true; // Set formChanged to true when clicking on an input field
+            });
         });
-    });
-</script>
+    
+        // Event listener for clicks on select elements
+        document.querySelectorAll('select').forEach(function(select) {
+            select.addEventListener('click', function() {
+                formChanged = true; // Set formChanged to true when clicking on a select element
+            });
+        });
+        
+    
+        // Event listener for clicks on <p> tags within the form
+        document.querySelectorAll('p:not(#email-text):not(#dateJoined-text):not(#post-footer):not(#post):not(#other-user)').forEach(function(p) {
+            p.addEventListener('click', function() {
+                formChanged = true;
+                this.style.display = 'none';
+                var form = this.nextElementSibling;
+                form.style.display = 'block';
+                form.nextElementSibling.style.display = 'block';
+                 // Set formChanged to true when interacting with the input
+            });
+        });
+    
+        // Event listener for input changes
+        document.querySelectorAll('input, select, textarea').forEach(function(element) {
+            element.addEventListener('change', function() {
+                formChanged = true;
+            });
+        });
+    
+        // Event listener for focus out
+        document.querySelectorAll('input, textarea').forEach(function(input) {
+            input.addEventListener('blur', function() {
+                if (formChanged) {
+                    document.getElementById('profile-form').submit();
+                }
+            });
+        });
+    
+        // Event listener for Enter key
+        document.body.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && formChanged) {
+                e.preventDefault();
+                document.getElementById('profile-form').submit();
+            }
+        });
+    
+  // Event listener for form submission
+document.getElementById('profile-form').addEventListener('submit', function(e) {
+    // Prevent the default form submission behavior
+    e.preventDefault();
+
+    // Get the value of the "Set" field
+    var studentSet = document.getElementById('studentSet').value = "<%=otherUser.StudentSet%>"
+
+    // Check if the "Set" field is not empty
+    if (studentSet !== '') {
+        // Submit the form
+        this.submit();
+    }
+});
+    
+        // Event listener for clicks outside the form
+        document.body.addEventListener('click', function(event) {
+            var profileForm = document.getElementById('profile-form');
+            if (!profileForm.contains(event.target)) {
+                if (formChanged) {
+                    profileForm.submit();
+                }
+            }
+        });
+    
+        // Event listener for clicks on the student set text
+        document.querySelector('#studentSet-text').addEventListener('click', function() {
+            if (!document.querySelector('#studentSet')) {
+                this.style.display = 'none';
+                var select = document.createElement('select');
+                select.id = 'studentSet';
+                select.name ='studentSet';
+                var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                for (var i = 0; i < alphabet.length; i++) {
+                    var option = document.createElement('option');
+                    option.text = alphabet[i];
+                    select.add(option);
+                }
+                select.style.margin = '0 auto'; // Centering the select element
+                this.parentNode.insertBefore(select, this.nextElementSibling);
+                select.style.display = 'block';
+                select.nextElementSibling.style.display = 'block';
+                formChanged = true; // Set formChanged to true when interacting with the input
+    
+                // Add event listener to the select element
+                select.addEventListener('change', function() {
+                    document.getElementById('profile-form').submit();
+                });
+            }
+        });
+    </script>
+    
 </body>
 </html>
+  

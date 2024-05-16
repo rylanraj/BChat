@@ -357,9 +357,11 @@ footer.footer {
   align-items: center;
 }
 .section_name{
+ 
   color: #003c71;
   text-align: center;
   height: 44px;
+  font-size: 2vw !important;
   background-color: #C1C6C6;
 }
 .user_profile_section {
@@ -372,6 +374,172 @@ footer.footer {
   /* Add other styles as needed based on the design in the photo */
 }
 
+.user_feed_section {
+  overflow-y: auto;
+  margin-left: 35%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
 .editable {
   cursor: pointer;
+}
+
+/* Message Format */
+#discussion {
+	width: 100%;
+	margin: 0 auto;
+	list-style: none;
+	display: flex;
+	flex-flow: column wrap;
+}
+
+.area {
+  display: flex;
+  flex-flow: row;
+  max-width: 50%;
+  padding: 0.50em ;
+}
+.area.send {
+  align-self: flex-end;
+  justify-content: end;
+
+}
+.area.recep {
+  align-self: flex-start;
+  align-content: start;
+}
+
+.delete{
+  max-width: 20px;
+  align-items: center;
+  display: none;
+  cursor: pointer;
+}
+
+.area:hover .delete{
+  display: flex;
+}
+
+.area.send.bubble {
+  align-items: end;
+	border-radius: 1em;
+	padding: 0.50em 0.75em;
+	margin: 0.0625em;
+	max-width: 80%;
+  text-align: end;
+  background-color: cornflowerblue;
+  color: white;
+  border-bottom-right-radius: 0.1em;
+	border-top-right-radius: 0.1em;
+  text-align: end;
+}
+
+.area.recep.bubble {
+  align-self: flex-start;
+	border-radius: 1em;
+	padding: 0.50em 0.75em;
+	margin: 0.0625em;
+	max-width: 80%;
+  text-align: start;
+  background-color:  rgb(206, 206, 206);
+	color: black;
+  border-bottom-left-radius: 0.1em;
+ 	border-top-left-radius: 0.1em;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.popup-content {
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 300px;
+  height: 200px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+}
+
+.bio-text{
+  font-style: inter;
+  font-size: 1vw;
+  color:#000;
+  
+  text-align: center;
+}
+.form-control{
+  font-size: 1vw;
+}
+.post{
+  margin-top: 15px;
+  margin-left: 20%;
+  text-align:center;
+  width: 60%;
+  
+}
+.post-footer {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
+
+.user-info {
+
+  display: flex; /* Use flexbox */
+  
+}
+.user-info p {
+  align-self:flex-end;
+}
+
+.user-info img {
+  object-fit: cover;
+  background-color: #d3dcdc;
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.post-info{
+  font-size: 1vw;
+}
+
+.profilePicture{
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  border-style: solid;
+}
+
+.post-img {
+  background-color: #d3dcdc;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 24px;
+  width: 533px;
+  height: 300px;
+  object-fit: contain;
 }

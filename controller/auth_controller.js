@@ -60,9 +60,9 @@ let authController = {
               req.isAuthenticated() });
       }
       if (password.length < 8) {
-        return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated:
-              req.isAuthenticated() });
+        return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: req.isAuthenticated() });
       }
+
       // If the password does not end with bcit.ca, return an error
       if (!email.endsWith("@my.bcit.ca")) {
         return res.render("auth/register", { error: "Please use your myBCIT email", isAuthenticated:
@@ -75,14 +75,18 @@ let authController = {
 
       // Generate a confirmation token
       const confirmationToken = crypto.randomBytes(20).toString('hex');
-
-      // Insert the user into the database
-      await pool.query
-      ("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?);",
-          [name, email, hashedPassword, "user", username, 0, confirmationToken]);
-
-      let [newUser] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
-
+  
+      // Get the current date
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+  
+      // Insert the user into the database with the current date as DateJoined
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", [name, email,
+        hashedPassword, "user", username, formattedDate, 0, confirmationToken]);
+      
       // Send a confirmation email
       let mailOptions = {
         from: 'bchatbcit@gmail.com',
@@ -98,15 +102,16 @@ let authController = {
           console.log('Email sent: ' + info.response);
         }
       });
-
+      
       // Redirect to login page upon successful registration
       res.redirect("/login");
-
+  
     } catch (error) {
       console.error("Error registering user:", error);
       res.status(500).send("Internal Server Error"); // Handle error appropriately
     }
-  },
+  }
+  ,
   
   
   

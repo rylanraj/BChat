@@ -515,12 +515,20 @@ footer.footer {
 }
 
 .user-info img {
+  object-fit: cover;
+  background-color: #d3dcdc;
   align-self: flex-start;
   margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
+
 .post-info{
   font-size: 1vw;
 }
+
 
 .chat_display {
   flex-grow: 1; /* Grow to fill remaining space */
@@ -563,3 +571,21 @@ footer.footer {
   align-items: center; /* Center items vertically */
   
 }
+
+.profilePicture{
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  border-style: solid;
+}
+
+.post-img {
+  background-color: #d3dcdc;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 24px;
+  width: 533px;
+  height: 300px;
+  object-fit: contain;
+}
+

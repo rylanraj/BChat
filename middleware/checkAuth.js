@@ -1,6 +1,3 @@
-// New feature
-const { join } = require("path")
-
 module.exports = {
     ensureAuthenticated: function (req, res, next) {
       res.locals.isAuthenticated = req.isAuthenticated();

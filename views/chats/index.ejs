@@ -27,7 +27,7 @@
             
               <div class="message_content">
                 <h1><%= user.otherUserName %></h1>
-                <p><%= user.lastMessage %></p>
+                <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
               </div>
             </div>
           </div>
@@ -124,8 +124,12 @@
     }});
 
     socket.on('new message', async (data) => {
-        const chatMessages  = await data;
+        const chatMessages = data;
+        lastMessage = chatMessages[chatMessages.length-1];
+        document.getElementById('latest'+inboxID).innerHTML = lastMessage.Message;
+
         messages.innerHTML='';
+
         
         await chatMessages.forEach(chat => {
           if (userID==chat.SenderID) {

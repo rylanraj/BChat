@@ -26,12 +26,13 @@
         <div class="post">
             <% const userData = userDataMap[post.UserID]; %>
             <div class="user-info">
+                
                 <img src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
                 <p id="post" class="post-info">
                     <%= userData.username %> <br>
                     <%= formatDate(post.TimePosted) %>
                 </p>
-                
+               
             </div>
             
             <h3><%= post.Title %> </h3>

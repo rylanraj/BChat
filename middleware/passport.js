@@ -93,8 +93,15 @@ const findOrCreate = async (githubProfile, callback) => {
     if (rows.length > 0) {
         callback(null, rows[0]);
     } else {
-        await pool.query("INSERT INTO bchat_users.user (UserName, Email, GitHubEmail, Password, Role, UserNickName) VALUES (?,?,?,?,?,?);",
-            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username]);
+        // Get the current date
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
+        await pool.query("INSERT INTO bchat_users.user (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
+            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
         const [newRows] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [githubProfile._json.email]);
         callback(null, newRows[0]);
     }

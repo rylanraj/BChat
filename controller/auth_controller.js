@@ -84,8 +84,8 @@ let authController = {
       const formattedDate = `${year}-${month}-${day}`;
   
       // Insert the user into the database with the current date as DateJoined
-      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", [name, email,
-        hashedPassword, "user", username, formattedDate, 0, confirmationToken]);
+      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined, ProfilePicture, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [name, email,
+        hashedPassword, "user", username, formattedDate,"../images/default.jpg", 0, confirmationToken]);
       
       // Send a confirmation email
       let mailOptions = {

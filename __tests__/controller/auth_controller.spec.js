@@ -7,15 +7,11 @@ const nodemailer = require('nodemailer');
 const mockQuery = jest.fn();
 const mockSendMail = jest.fn();
 
-jest.mock('mysql2', () => {
-    const mPool = {
-        query: mockQuery,
-        promise: jest.fn().mockReturnThis(),
-    };
-    return {
-        createPool: jest.fn(() => mPool),
-    };
-});
+jest.mock('mysql2', () => ({
+    createPool: jest.fn().mockReturnThis(),
+    promise: jest.fn().mockReturnThis(),
+    query: jest.fn(),
+}));
 
 jest.mock('nodemailer', () => {
     return {
@@ -91,7 +87,88 @@ describe('authController', () => {
             expect(res.redirect).toHaveBeenCalledWith("/login");
         });
     });
+    describe('registerSubmit', () => {
+        it('should reload the page with an error if any fields are empty', async () => {
+            const req = {
+                body: {
+                    name: '',
+                    email: '',
+                    password: '',
+                    username: ''
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = { render: jest.fn() };
 
+            await authController.registerSubmit(req, res);
+
+            expect(res.render).toHaveBeenCalledWith("auth/register", { error: "All fields are required", isAuthenticated: false });
+        });
+        it('should make MySQL fetch a user with the email to make sure the email is not taken', async () => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rraj13@my.bcit.ca',
+                    password: 'GoodPassword',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = { render: jest.fn() };
+            await authController.registerSubmit(req, res);
+            expect(mysql.query).toHaveBeenCalledWith('SELECT * FROM bchat_users.user WHERE Email = ?;', [req.body.email]);
+        });
+        it('should reload the page with an error if the email is already taken', async () => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rraj13@my.bcit.ca',
+                    password: 'GoodPassword',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = { render: jest.fn() };
+            mysql.query.mockReturnValueOnce([[{ Email: 'rraj13@my.bcit.ca' }]]);
+            await authController.registerSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/register", { error: "User with this email already exists", isAuthenticated: false });
+        });
+        it('should reload the page with an error if the password is less than 8 characters', async () => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rraj13@my.bcit.ca',
+                    password: 'Tiny',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = { render: jest.fn() };
+            mysql.query.mockReturnValueOnce([[]]);
+            await authController.registerSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: false });
+        });
+        it('should reload the page with an error if the email is not a bcit email', async () => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rylan.raj@gmail.com',
+                    password: 'GoodPassword',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = { render: jest.fn() };
+            mysql.query.mockReturnValueOnce([[]]);
+            await authController.registerSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/register", { error: "Please use your myBCIT email", isAuthenticated: false });
+        });
+    });
 });
 
 

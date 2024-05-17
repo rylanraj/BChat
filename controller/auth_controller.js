@@ -63,7 +63,7 @@ let authController = {
         return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: req.isAuthenticated() });
       }
 
-      // If the password does not end with bcit.ca, return an error
+      // If the email does not end with bcit.ca, return an error
       if (!email.endsWith("@my.bcit.ca")) {
         return res.render("auth/register", { error: "Please use your myBCIT email", isAuthenticated:
               req.isAuthenticated()

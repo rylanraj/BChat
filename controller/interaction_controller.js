@@ -38,19 +38,22 @@ let mainFeedController = {
     try {
       // Fetch posts from the database
       const posts = await fetchPosts();
-
       // Fetch usernames and profile pictures associated with user IDs of the posts
       const userIds = posts.map(post => post.UserID);
-      if(userIds.length > 0) {
-        const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
-        const userDataMap = {};
-        usernames.forEach(user => {
-          userDataMap[user.UserID] = {username: user.UserName, profilePicture: user.ProfilePicture};
-        });
-        res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
-      }else {
-        res.render("index", {posts: posts,isAuthenticated: req.isAuthenticated()});
+
+
+      if (userIds.length === 0) {
+        return res.render("index", { posts: posts, isAuthenticated: req.isAuthenticated() });
       }
+      const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+      
+      const userDataMap = {};
+      usernames.forEach(user => {
+        userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+      });
+
+      res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+
     } catch (error) {
       console.error("Error fetching main feed data:", error);
       res.status(500).send('Internal Server Error');
@@ -99,14 +102,44 @@ let chatController = {
     
     let inboxID = req.params.id;
 
+    let [inboxs, fields_3] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+    const otherUser = await Promise.all(inboxs.map( async row => {
+      if (row.User1_ID == user) {
+        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User2_ID]);
+        let data={
+          otherUserID: row.User2_ID,
+          otherUserName: pp[0].UserName,
+          lastMessage: row.Last_Message,
+          profilePicture: pp[0].ProfilePicture,
+          inboxID: row.InboxID
+        }
+        return data;
+      } else {
+        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User1_ID]);
+        let data={
+          otherUserID: row.User1_ID,
+          otherUserName: pp[0].UserName,
+          lastMessage: row.Last_Message,
+          profilePicture: pp[0].ProfilePicture,
+          inboxID: row.InboxID
+        }
+        return data;
+      }
+    }));
+
+  
     let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
+    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+
+    const otherUserID = rows_2[0].User1_ID == user ? rows_2[0].User2_ID : rows_2[0].User1_ID;
+
+    const [userName, fields_4] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
 
     if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
       res.redirect("/friends");
     }else{
-      let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
-    
-      res.render("chats/index.ejs", {chatMessages: rows, userID: user, inboxID:inboxID});
+      res.render("chats/index.ejs", {chatMessages: rows, userID: user, inboxID:inboxID, otherUsers: otherUser, otherUserName: userName[0].UserName});
     }
     
   },
@@ -127,7 +160,6 @@ let chatController = {
     let user = req.user.UserID;
     let otherUserID = req.params.id; 
     let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
-    console.log(rows);
     
     if (rows.length > 0) {
       let inboxID = rows[0].InboxID;

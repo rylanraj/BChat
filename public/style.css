@@ -394,6 +394,7 @@ footer.footer {
 #discussion {
 	width: 100%;
 	margin: 0 auto;
+  padding: 0;
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
@@ -403,13 +404,14 @@ footer.footer {
   display: flex;
   flex-flow: row;
   max-width: 50%;
+  height: 10%;
   padding: 0.50em ;
 }
 .area.send {
   align-self: flex-end;
   justify-content: end;
-
 }
+
 .area.recep {
   align-self: flex-start;
   align-content: start;
@@ -527,6 +529,49 @@ footer.footer {
   font-size: 1vw;
 }
 
+
+.chat_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 80vh;
+}
+
+.inbox_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 90vh;
+}
+
+.inbox {
+  height: 10%;
+}
+
+.profile_picture {
+  width: 80px; 
+  height: 80px; /* Adjust size as needed */
+  border-radius: 50%; /* Creates a circular shape */
+  background-color: #ccc; /* Sample background color */
+  margin: 10px;
+}
+
+/* CSS to style the message content */
+.message_content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-align: left;
+  font-size: small;
+}
+
+/* CSS to style the chat message div */
+.chat_message {
+  height: 100%;
+  display: flex; /* Use flexbox for layout */
+  align-items: center; /* Center items vertically */
+  
+}
+
 .profilePicture{
   align-self: flex-start;
   margin-right: 10px; /* Add some spacing between the image and text */
@@ -543,3 +588,4 @@ footer.footer {
   height: 300px;
   object-fit: contain;
 }
+

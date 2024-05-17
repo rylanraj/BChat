@@ -1,8 +1,7 @@
 // New feature
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-let userController = require("../controller/user_controller");
-const { userModel } = require("../database");
+
 require('dotenv').config()
 // GitHub Authentication
 const GithubStrategy = require("passport-github2").Strategy;

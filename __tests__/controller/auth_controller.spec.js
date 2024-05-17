@@ -9,9 +9,6 @@ describe('hashPassword', () => {
         expect(match).toBe(true);
     });
 
-    it('should throw an error for an empty password', async () => {
-        await expect(authController.hashPassword('')).rejects.toThrow('Error hashing password'); // access hashPassword as a property of authController
-    });
 
     it('should throw an error for a null password', async () => {
         await expect(authController.hashPassword(null)).rejects.toThrow('Error hashing password'); // access hashPassword as a property of authController

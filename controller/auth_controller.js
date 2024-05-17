@@ -108,7 +108,6 @@ let authController = {
   
     } catch (error) {
       console.error("Error registering user:", error);
-      res.status(500).send("Internal Server Error"); // Handle error appropriately
     }
   }
   ,
@@ -281,4 +280,4 @@ async function sendConfirmationEmail(githubEmail, BCITemail, user, req, res){
 }
 
 
-module.exports = {authController,hashPassword};
+module.exports = {authController,hashPassword, sendConfirmationEmail};

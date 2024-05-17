@@ -124,7 +124,7 @@ app.post('/addFriend/:id', ensureAuthenticated, interactionController.friendsCon
 app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friendsController.acceptFriend);
 
 // Chat
-app.get("/chat/:id", ensureAuthenticated, interactionController.chatController.chat)
+app.get("/chat/:id", ensureAuthenticated, interactionController.chatController.chat);
 app.get("/chat/check/:id", ensureAuthenticated, interactionController.chatController.chatCheck)
 
 // Multer configuration

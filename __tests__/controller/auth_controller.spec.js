@@ -168,6 +168,23 @@ describe('authController', () => {
             await authController.registerSubmit(req, res);
             expect(res.render).toHaveBeenCalledWith("auth/register", { error: "Please use your myBCIT email", isAuthenticated: false });
         });
+        it('should hash the password before storing it in MySQL', async () => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rraj13@my.bcit.ca',
+                    password: 'GoodPassword',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn()};
+            mysql.query.mockReturnValueOnce([[]]);
+            bcrypt.hash = jest.fn(() => Promise.resolve('hashedPassword'));
+            await authController.registerSubmit(req, res);
+            expect(bcrypt.hash).toHaveBeenCalledWith(req.body.password, expect.any(String));
+        });
     });
 });
 

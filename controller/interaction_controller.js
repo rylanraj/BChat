@@ -33,26 +33,45 @@ const fetchPosts = async () => {
   }
 };
 
-let mainFeedController = {
+const mainFeedController = {
   index: async (req, res) => {
     try {
       // Fetch posts from the database
       const posts = await fetchPosts();
-      // Fetch usernames and profile pictures associated with user IDs of the posts
+      
+      // Extract user IDs from the posts
       const userIds = posts.map(post => post.UserID);
-
-
+      
       if (userIds.length === 0) {
-        return res.render("index", { posts: posts, isAuthenticated: req.isAuthenticated() });
+        return res.render("index", { posts: posts, userDataMap: {}, otherUsers: [], isAuthenticated: req.isAuthenticated() });
       }
-      const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+      
+      // Fetch usernames and profile pictures associated with user IDs
+      const [users] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
       
       const userDataMap = {};
-      usernames.forEach(user => {
+      users.forEach(user => {
         userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
       });
 
-      res.render("index", { posts: posts, userDataMap: userDataMap, isAuthenticated: req.isAuthenticated() });
+      // Fetch inbox data
+      const user = req.user.UserID;
+      const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+      const otherUsers = await Promise.all(inboxes.map(async row => {
+        const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
+        const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
+
+        return {
+          otherUserID: otherUserId,
+          otherUserName: otherUser.UserName,
+          lastMessage: row.Last_Message,
+          profilePicture: otherUser.ProfilePicture,
+          inboxID: row.InboxID
+        };
+      }));
+      
+      res.render("index", { posts: posts, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
       console.error("Error fetching main feed data:", error);
@@ -60,6 +79,9 @@ let mainFeedController = {
     }
   }
 };
+
+
+
 
 
 let postsController = {
@@ -94,6 +116,7 @@ let postsController = {
       res.status(500).send('Internal Server Error');
     }
   }
+  
 };
 
 let chatController = {

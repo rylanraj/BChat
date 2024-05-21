@@ -1,3 +1,21 @@
+<div class="user_profile_section">
+    <div class="section_name">
+      <h2>Chat</h2>
+      <div class="inbox_display" id="display">
+        <% otherUsers.forEach(user => { %>
+          <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
+            <div class="chat_message">
+              <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+              <div class="message_content">
+                <h1><%= user.otherUserName %></h1>
+                <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
 
 <div class="user_feed_section">
     <div style="position: fixed; width: 59.3%;" class="section_name">
@@ -50,3 +68,7 @@
     </div>
     </div>
 </div>
+<script>
+function Inbox(otherInboxID) {
+    window.location.href = '/chat/'+otherInboxID; 
+  }</script>

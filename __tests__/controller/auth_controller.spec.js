@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const { authController, hashPassword, sendConfirmationEmail } = require('../../controller/auth_controller');
 const mysql = require('mysql2');
 const nodemailer = require('nodemailer');
-
+const crypto = require('crypto');
 
 const mockQuery = jest.fn();
 const mockSendMail = jest.fn();
@@ -16,10 +16,11 @@ jest.mock('mysql2', () => ({
 jest.mock('nodemailer', () => {
     return {
         createTransport: jest.fn(() => ({
-            sendMail: mockSendMail,
+            sendMail: jest.fn(),
         })),
     };
 });
+
 
 describe('hashPassword', () => {
     it('should return a hashed password for a valid password', async () => {
@@ -185,6 +186,122 @@ describe('authController', () => {
             await authController.registerSubmit(req, res);
             expect(bcrypt.hash).toHaveBeenCalledWith(req.body.password, expect.any(String));
         });
+        it('should generate an email confirmation token', async() => {
+            const req = {
+                body: {
+                    name: 'Rylan Raj',
+                    email: 'rraj13@my.bcit.ca',
+                    password: 'GoodPassword',
+                    username: 'rylanraj'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn()};
+            mysql.query.mockReturnValueOnce([[]]);
+            const spy = jest.spyOn(crypto, 'randomBytes');
+            await authController.registerSubmit(req, res);
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+    describe('confirmEmailSubmit', () => {
+        it('should check if the BCIT email ends with my.bcit.ca', async () => {
+            const req = {
+                body: {
+                    GitHubEmail: 'rylan.raj@gmail.com',
+                    BCITEmail: 'rylan.raj@gmail.com'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn()};
+            await authController.confirmEmailSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/confirm_email", {
+                error: "Please use your myBCIT email",
+                isAuthenticated: false
+            });
+        });
+        it('should check if there is already a local account with the BCIT email', async () => {
+            const req = {
+                body: {
+                    GitHubEmail: 'rylan.raj@gmail.com',
+                    BCITEmail: 'rraj13@my.bcit.ca'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn()};
+            mysql.query.mockReturnValueOnce([[{ Email: 'rraj13@my.bcit.ca', GitHubEmail: 'rylan.raj@gmail.com' }]]);
+            crypto.randomBytes = jest.fn().mockReturnValue(Buffer.from('randomBytes'));
+            await authController.confirmEmailSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/confirm_email", {
+                error: "An email has been sent to your BCIT email to confirm the change to your GitHub email",
+                isAuthenticated: false
+            });
+        });
+        it('should reload the page with an error if a password is required and a short password is given', async () => {
+            const req = {
+                body: {
+                    GitHubEmail: 'rraj13@my.bcit.ca',
+                    BCITEmail: 'rraj13@my.bcit.ca',
+                    Password: 'BadPass'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn()};
+            mysql.query.mockReturnValueOnce([[{
+                Email: 'rraj13@my.bcit.ca',
+                GitHubEmail: 'rraj13@my.bcit.ca',
+                Password: 'tempPassword'
+            }]]);
+            await authController.confirmEmailSubmit(req, res);
+            expect(res.render).toHaveBeenCalledWith("auth/confirm_email", {
+                error: "Password must be at least 8 characters long",
+                isAuthenticated: false
+            });
+        });
+        it('should hash the password if a password is required and given', async () => {
+            const req = {
+                body: {
+                    GitHubEmail: 'rraj13@my.bcit.ca',
+                    BCITEmail: 'rraj13@my.bcit.ca',
+                    Password: 'GoodPassword'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn(), redirect: jest.fn()};
+            mysql.query.mockReturnValueOnce([[{
+                Email: 'rraj13@my.bcit.ca',
+                GitHubEmail: 'rraj13@my.bcit.ca',
+            }]]);
+            bcrypt.hash = jest.fn(() => Promise.resolve('GoodPassword'));
+            crypto.randomBytes = jest.fn().mockReturnValue(Buffer.from('randomBytes'));
+            await authController.confirmEmailSubmit(req, res);
+            expect(res.redirect).toHaveBeenCalledWith('/login');
+        });
+        it('should force users that registered with GitHub to link their BCIT email and provide a password', async () => {
+            const req = {
+                body: {
+                    GitHubEmail: 'rylan.raj@gmail.com',
+                    BCITEmail: 'rraj13@my.bcit.ca',
+                    Password: 'GoodPassword'
+                },
+                isAuthenticated: jest.fn().mockReturnValue(false),
+                flash: jest.fn().mockReturnValue([])
+            };
+            const res = {render: jest.fn(), redirect: jest.fn()};
+            mysql.query.mockReturnValueOnce([[{
+                Email: 'rylan.raj@gmail.com',
+                GitHubEmail: 'rylan.raj@gmail.com',
+            }]]);
+
+            crypto.randomBytes = jest.fn().mockReturnValue(Buffer.from('randomBytes'));
+            await authController.confirmEmailSubmit(req, res);
+            expect(mysql.query).toHaveBeenCalledTimes(2);
+            expect(res.redirect).toHaveBeenCalledWith('/login');
+        })
     });
 });
 

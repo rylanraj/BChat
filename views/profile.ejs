@@ -58,7 +58,7 @@
                 const formattedDate = `${year}-${month}-${day}`;
                 %>
                 <div style="margin-top: 5%; " class="bio-text">
-                    <p id="dateJoined-text"><%= formattedDate %></p>
+                    <p id="dateJoined-text"> From <%= formattedDate %></p>
                 </div>
                     <div style="margin-top: 5%; " class="bio-text">
                         <p id="email-text"><%=otherUser.Email%></p>
@@ -114,7 +114,7 @@
                         
                       </div>
                   </div>
-                  <h3><%= post.Title %> </h3>
+                  <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
                   <% if (post.Picture) { %>
                     <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
                   <% } %>
@@ -244,7 +244,7 @@
                         
                       </div>
                   </div>
-                  <h3><%= post.Title %> </h3>
+                  <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
                   <% if (post.Picture) { %>
                     <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
                   <% } %>

@@ -107,15 +107,35 @@ const mainFeedController = {
 
 
 let postsController = {
-  new: (req, res) => {
-    res.render("create_post.ejs");
+  new: async (req, res) => {
+    try {
+      // Fetch other users for display in the chat section
+      const user = req.user.UserID;
+      const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+      const otherUsers = await Promise.all(inboxes.map(async row => {
+        const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
+        const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
+        return {
+          otherUserID: otherUserId,
+          otherUserName: otherUser.UserName,
+          lastMessage: row.Last_Message,
+          profilePicture: otherUser.ProfilePicture,
+          inboxID: row.InboxID
+        };
+      }));
+
+      // Render the create_post view with otherUsers
+      res.render("create_post.ejs", { otherUsers: otherUsers });
+    } catch (error) {
+      console.error("Error rendering create_post view:", error);
+      res.status(500).send('Internal Server Error');
+    }
   },
   create: async (req, res) => {
     try {
       const file = req.file;
-      if (!file) {
-        return res.status(400).send('No files were uploaded.');
-      }
+      
       // Process other form fields (e.g., title, description)
       const title = req.body.title;
       const description = req.body.description;

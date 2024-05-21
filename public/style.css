@@ -514,7 +514,7 @@ footer.footer {
   align-self:flex-end;
 }
 
-.user-info img {
+.user-info-img {
   object-fit: cover;
   background-color: #d3dcdc;
   align-self: flex-start;

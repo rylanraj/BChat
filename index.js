@@ -71,6 +71,9 @@ app.set("view engine", "ejs");
 
 // Routes start here
 app.get("/",ensureAuthenticated, interactionController.mainFeedController.index);
+
+app.post('/like/:postId', interactionController.mainFeedController.likePost);
+
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.get("/reminders", ensureAuthenticated, interactionController.remindersController.list);

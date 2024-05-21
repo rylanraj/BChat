@@ -36,32 +36,25 @@ const fetchPosts = async () => {
 const mainFeedController = {
   index: async (req, res) => {
     try {
-      // Fetch posts from the database
-      const posts = await fetchPosts();
-      
-      // Extract user IDs from the posts
+      const [posts] = await pool.query("SELECT * FROM POST");
       const userIds = posts.map(post => post.UserID);
-      
+
       if (userIds.length === 0) {
-        return res.render("index", { posts: posts, userDataMap: {}, otherUsers: [], isAuthenticated: req.isAuthenticated() });
+        return res.render("index", { posts: [], userDataMap: {}, otherUsers: [], isAuthenticated: req.isAuthenticated() });
       }
-      
-      // Fetch usernames and profile pictures associated with user IDs
+
       const [users] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
-      
       const userDataMap = {};
       users.forEach(user => {
         userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
       });
 
-      // Fetch inbox data
       const user = req.user.UserID;
       const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
       const otherUsers = await Promise.all(inboxes.map(async row => {
         const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
         const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
-
         return {
           otherUserID: otherUserId,
           otherUserName: otherUser.UserName,
@@ -70,15 +63,44 @@ const mainFeedController = {
           inboxID: row.InboxID
         };
       }));
-      
-      res.render("index", { posts: posts, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
+
+      // Fetch likes count for each post
+      const postsWithLikes = await Promise.all(posts.map(async post => {
+        const [likeCount] = await pool.query("SELECT Likes FROM POST WHERE PostID = ?", [post.PostID]);
+        return { ...post, likeCount: likeCount[0]?.Likes || 0 };
+      }));
+
+      res.render("index", { posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
       console.error("Error fetching main feed data:", error);
       res.status(500).send('Internal Server Error');
     }
+  },
+  likePost: async (req, res) => {
+    try {
+      const userId = req.user.UserID;
+      const postId = req.params.postId;
+
+      const [existingLike] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+
+      if (existingLike.length > 0) {
+        await pool.query("DELETE FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+        await pool.query("UPDATE POST SET Likes = Likes - 1 WHERE PostID = ?", [postId]);
+        return res.json({ success: true, liked: false });
+      } else {
+        await pool.query("INSERT INTO COMMENT (PostID, UserID) VALUES (?, ?)", [postId, userId]);
+        await pool.query("UPDATE POST SET Likes = Likes + 1 WHERE PostID = ?", [postId]);
+        return res.json({ success: true, liked: true });
+      }
+    } catch (error) {
+      console.error("Error handling like action:", error);
+      res.status(500).send('Internal Server Error');
+    }
   }
 };
+
+
 
 
 
@@ -202,41 +224,41 @@ let chatController = {
 let profilesController = {
   show: async (req, res) => {
     let userToFind = req.params.id;
-    if (req.params.id !== req.user.UserID) {
-      try {
-        const [userRows, userFields] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
-        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
-  
-        // Fetch usernames associated with user IDs of the posts
-        const userIds = postRows.map(post => post.UserID);
-        if (userIds.length > 0) {
-          const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
-          const userDataMap = {};
-          usernames.forEach(user => {
-            userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
-          });
-  
-          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows, userDataMap: userDataMap });
-        } else {
-          // Handle the case where userIds is empty, perhaps by providing a default value or returning early
-          res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
+    let loggedInUserId = req.user.UserID;
+
+    try {
+        // Fetch the user's profile data
+        const [userRows] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
+        if (userRows.length === 0) {
+            // Handle case where user is not found
+            return res.status(404).send("User not found");
         }
-      } catch (error) {
+
+        // Fetch the posts made by the user
+        const [postRows] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
+
+        // Fetch usernames and profile pictures associated with user IDs of the posts
+        const userIds = postRows.map(post => post.UserID);
+        const userDataMap = {};
+        if (userIds.length > 0) {
+            const [usernames] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+            usernames.forEach(user => {
+                userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+            });
+        }
+
+        // Fetch likes count for each post
+        const postsWithLikes = await Promise.all(postRows.map(async post => {
+            const [likeCount] = await pool.query("SELECT Likes FROM POST WHERE PostID = ?", [post.PostID]);
+            return { ...post, likeCount: likeCount[0]?.Likes || 0 };
+        }));
+
+        res.render("profile.ejs", { otherUser: userRows[0], posts: postsWithLikes, userDataMap: userDataMap });
+    } catch (error) {
         console.error("Error fetching user data:", error);
-        // Handle error here
-      }
-    } else {
-      try {
-        // Get the posts made by the currently logged-in user
-        const [postRows, postFields] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [req.user.UserID]);
-        res.render("profile.ejs", { otherUser: userRows[0], posts: postRows });
-  
-      } catch (error) {
-        console.error("Error fetching user posts:", error);
-        // Handle error here
-      }
+        res.status(500).send("Internal Server Error");
     }
-  },
+},
   
   update: async (req, res) => {
     let userToUpdate = req.params.id;
@@ -283,9 +305,31 @@ let profilesController = {
   
     // Redirect the user to the profile page
     res.redirect(`/profile/${userToUpdate}`);
+  },
+  likePost: async (req, res) => {
+    try {
+      const userId = req.user.UserID;
+      const postId = req.params.postId;
+
+      const [existingLike] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+
+      if (existingLike.length > 0) {
+        await pool.query("DELETE FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+        await pool.query("UPDATE POST SET Likes = Likes - 1 WHERE PostID = ?", [postId]);
+        return res.json({ success: true, liked: false });
+      } else {
+        await pool.query("INSERT INTO COMMENT (PostID, UserID) VALUES (?, ?)", [postId, userId]);
+        await pool.query("UPDATE POST SET Likes = Likes + 1 WHERE PostID = ?", [postId]);
+        return res.json({ success: true, liked: true });
+      }
+    } catch (error) {
+      console.error("Error handling like action:", error);
+      res.status(500).send('Internal Server Error');
+    }
   }
-  
 };
+  
+
 
 
 let friendsController = {

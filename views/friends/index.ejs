@@ -51,7 +51,7 @@
                 </div>
                 <div class="search_input">
                     <form action="/search" method="GET" class="input">
-                        <input type="text" name="query" placeholder="Search Friends" class="input">
+                        <input type="text" name="query" placeholder="Search People" class="input">
                     </form>
                 </div>
             </div>
@@ -61,18 +61,18 @@
                 <div class="friend_list">
                     <div class="chat_message">
                         <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
                     </div>
-                    <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
                 </div>
             <% }); %>
         </div>
         <div class="friend_display" id="request" style="display: none;">
-            <% friends.forEach(function(friend) { %>
-                <div class="friend_list">
-                    <div class="chat_message">
-                        <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
-                    </div>
-                    <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
+            <% receivedFriendRequests.forEach(function(friendRequest) { %>
+                <div class="receivedFriendRequest">
+                    <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserNickName %></a></h3>
+                    <form action=<%= "/acceptFriend/" + friendRequest.User.UserID %> method="POST">
+                        <button type="submit" name="friend_id" value="<%= friendRequest.User.UserID %>">Accept</button>
+                    </form>
                 </div>
             <% }); %>
         </div>

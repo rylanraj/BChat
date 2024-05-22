@@ -398,6 +398,10 @@ footer.footer {
   width: 100%;
 }
 
+.name_area {
+  width: 80%;
+}
+
 .input {
   border: none;
   background-color: transparent;
@@ -627,7 +631,9 @@ footer.footer {
   height: 10%;
 }
 .friend_list {
+  display: flex;
   height: 13%;
+  flex-direction: row;
 }
 
 .profile_picture {

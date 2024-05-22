@@ -384,7 +384,23 @@ let friendsController = {
       receivedFriendRequests[i].User = friendRequest[0];
     }
 
-    res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2});
+    const user = req.user.UserID;
+      const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+    const otherUsers = await Promise.all(inboxes.map(async row => {
+      const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
+      const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
+      return {
+        otherUserID: otherUserId,
+        otherUserName: otherUser.UserName,
+        lastMessage: row.Last_Message,
+        profilePicture: otherUser.ProfilePicture,
+        inboxID: row.InboxID
+      };
+    }));
+    console.log(otherUsers);
+
+    res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
   },
   displayResults: async (req, res) => {
     const searchQuery = req.query.query;
@@ -398,8 +414,23 @@ let friendsController = {
     // This query will return all friend requests that the user has received
     const [existingFriendRequests_2] = await pool.query("SELECT * FROM FRIEND WHERE FriendUserID = ?", [req.user.UserID]);
 
+    const user = req.user.UserID;
+      const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+    const otherUsers = await Promise.all(inboxes.map(async row => {
+      const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
+      const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
+      return {
+        otherUserID: otherUserId,
+        otherUserName: otherUser.UserName,
+        lastMessage: row.Last_Message,
+        profilePicture: otherUser.ProfilePicture,
+        inboxID: row.InboxID
+      };
+    }));
+
     res.render('searchResults', { results: results, existingFriendRequests: existingFriendRequests,
-      existingFriendRequests_2: existingFriendRequests_2});
+      existingFriendRequests_2: existingFriendRequests_2, otherUsers: otherUsers});
   },
   addFriend: async (req, res) => {
     const friendID = req.params.id;

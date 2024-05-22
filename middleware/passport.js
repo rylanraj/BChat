@@ -1,8 +1,7 @@
 // New feature
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-let userController = require("../controller/user_controller");
-const { userModel } = require("../database");
+
 require('dotenv').config()
 // GitHub Authentication
 const GithubStrategy = require("passport-github2").Strategy;
@@ -30,20 +29,27 @@ const localLogin = new LocalStrategy(
     {
         usernameField: "email",
         passwordField: "password",
+        passReqToCallback: true
     },
-    async (email, password, done) => {
+    async (req, email, password, done) => {
         try {
             const [rows, fields] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
             const user = rows[0];
             if (user) {
                 const match = await bcrypt.compare(password, user.Password);
-                if (match) {
+                const activated = user.Confirmed;
+
+                if (match && activated == true) {
                     return done(null, user);
-                } else {
-                    return done(null, false, { message: 'Incorrect Password.' });
+                }
+                else if(match && !activated) {
+                    return done(null, false, req.flash('error', 'Please confirm your email first.'));
+                }
+                else {
+                    return done(null, false, req.flash('error', 'Incorrect Password.'));
                 }
             } else {
-                return done(null, false, { message: 'Incorrect Email.' });
+                return done(null, false, req.flash('error', 'User not found.'));
             }
         } catch (err) {
             return done(err);
@@ -51,7 +57,6 @@ const localLogin = new LocalStrategy(
     }
 );
 
-// This works
 const githubLogin = new GithubStrategy({
 
         clientID: GITHUB_CLIENT_ID,
@@ -60,7 +65,7 @@ const githubLogin = new GithubStrategy({
     },
     function(accessToken, refreshToken, profile, done) {
         // console.log("Passport.js profile: ", profile);
-        const userModelOutput = userModel.findOrCreate(profile, function (err, user) {
+        const userModelOutput = findOrCreate(profile, function (err, user) {
             return done(err, user);
         })
 
@@ -80,6 +85,26 @@ passport.deserializeUser(async (id, done) => {
         done(err);
     }
 });
+
+const findOrCreate = async (githubProfile, callback) => {
+    const [rows] = await pool.query("SELECT * FROM bchat_users.user WHERE GitHubEmail = ?;", [githubProfile._json.email]);
+
+    if (rows.length > 0) {
+        callback(null, rows[0]);
+    } else {
+        // Get the current date
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
+        await pool.query("INSERT INTO bchat_users.user (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
+            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
+        const [newRows] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [githubProfile._json.email]);
+        callback(null, newRows[0]);
+    }
+}
 
 // Added the githubLogin to the exports
 module.exports = passport.use(localLogin).use(githubLogin);

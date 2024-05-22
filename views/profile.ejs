@@ -26,7 +26,7 @@
                 <div style="margin-top: 5%; font-size: 2vw; color: #003c71;font-size: larger; font-weight: bold;">
                     <p id="username-text"><%=otherUser.UserName%></p>
                     
-                    <input class="form-control" id="username" name="username" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserName%>">
+                    <input class="form-control" id="username" name="username" maxlength="100" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserName%>">
                 </div>
             <div style="border-style: solid;width: 90% !important; margin-left: 5%;margin-top: 5%; border-width: 1px;border-color: #d3dcdc;">
                 <div class="form-group">
@@ -34,12 +34,12 @@
                         
                         <p id="nickname-text"><%=otherUser.UserNickName%></p>
                         
-                        <input class="form-control" id="nickname" name="nickname" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserNickName%>">
+                        <input class="form-control" id="nickname" name="nickname" maxlength="30" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.UserNickName%>">
                     </div>
                     <div style="margin-top: 5%; " class="bio-text">
                         <p id="program-text">Program: <%= otherUser.Program ? otherUser.Program : 'Empty' %></p>
                         
-                        <input class="form-control" id="program" name="program" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.Program || 'Empty'%>">
+                        <input class="form-control" id="program" name="program" maxlength="100" style="display: none; max-width: 60%; text-align: center; margin-left: 20%;" value="<%=otherUser.Program || 'Empty'%>">
                     </div>
                     <div style="margin-top: 5%; " class="bio-text">
                         <p id="studentSet-text">Set: <%= otherUser.StudentSet ? otherUser.StudentSet : 'Empty' %></p>

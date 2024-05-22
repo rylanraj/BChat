@@ -12,7 +12,7 @@ CREATE TABLE USER (
     Program VARCHAR(100),
     DateJoined DATE,
     ProfilePicture VARCHAR(200),
-    UserNickName VARCHAR(100),
+    UserNickName VARCHAR(30),
     Confirmed BOOLEAN,
     ConfirmationToken VARCHAR(100)
 );
@@ -41,7 +41,8 @@ CREATE TABLE POST (
     UserID INT,
     FOREIGN KEY (UserID) REFERENCES USER(UserID),
     Picture VARCHAR(200),
-    TimePosted DATETIME NOT NULL
+    TimePosted DATETIME NOT NULL,
+    Likes INT DEFAULT 0
 );
 CREATE TABLE COMMENT (
     CommentID INT AUTO_INCREMENT PRIMARY KEY,

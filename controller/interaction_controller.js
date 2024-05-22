@@ -11,12 +11,20 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME
 }).promise();
 
-async function keywordToImage(keyword) {
-  const url = `https:api.unsplash.com/search/photos?query=${keyword}&client_id=0-m3L1XIVg9tJ5bs_a_uFAlkWvlmR0l5P-PSG7n8BZU&per_page=1`
-  const response = await fetch(url);
-  const data = await response.json();
-  const imageUrl = data.results[0].urls.regular;
-  return imageUrl;
+async function keywordToImage(keyword, res) {
+  try {
+    const url = `https:api.unsplash.com/search/photos?query=${keyword}&client_id=0-m3L1XIVg9tJ5bs_a_uFAlkWvlmR0l5P-PSG7n8BZU&per_page=1`
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.results.length === 0) {
+      return null;
+    }
+    const imageUrl = data.results[0].urls.regular;
+    return imageUrl;
+  } catch (error) {
+    console.error("Error fetching image:", error);
+    res.redirect("/reminders");
+  }
 }
 
 
@@ -453,7 +461,7 @@ let remindersController = {
       description: req.body.description,
       completed: false,
       keyword: req.body.keyword,
-      banner: await keywordToImage(req.body.keyword)
+      banner: await keywordToImage(req.body.keyword, res)
     };
     pool.query("INSERT INTO REMINDER (Title, Description, Completed, UserID, Keyword, Banner) VALUES (?, ?, ?, ?,?,?);",
         [reminder.title, reminder.description, reminder.completed, req.user.UserID, reminder.keyword, reminder.banner]);

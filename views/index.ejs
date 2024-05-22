@@ -41,24 +41,37 @@
         }
         %>
         <% posts.slice().reverse().forEach(function(post) { %>
-        <div class="post">
-            <% const userData = userDataMap[post.UserID]; %>
-            <div class="user-info">
-                
-                <img src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+            <div class="post">
+              <% const userData = userDataMap[post.UserID]; %>
+              <div class="user-info">
+                <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
                 <p id="post" class="post-info">
-                    <%= userData.username %> <br>
-                    <%= formatDate(post.TimePosted) %>
+                  <%= userData.username %> <br>
+                  <%= formatDate(post.TimePosted) %>
                 </p>
-               
-            </div>
-            
-            <h3><%= post.Title %> </h3>
-            <% if (post.Picture) { %>
+                <div class="report-section" style="text-align: right; margin-left: 270px; ">
+                
+
+                    <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
+                        <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
+                    </button>
+                    
+                  </div>
+              </div>
+              <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
+              <% if (post.Picture) { %>
                 <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
-            <% } %>
-        </div>
-    <% }); %>
+              <% } %>
+              <div class="like-section" style="text-align: left; margin-left: 70px;">
+                
+
+                <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
+                    <img style=" width: 50%; height: 50%;" src="/images/facebook-like-48.png" alt="Like_button">
+                </button>
+                <span id="like-count-<%= post.PostID %>"><%= post.likeCount %></span>
+              </div>
+            </div>
+            <% }); %>
     <div >
         <hr>
         <p id="post-footer" style="text-align: center;">
@@ -71,4 +84,27 @@
 <script>
 function Inbox(otherInboxID) {
     window.location.href = '/chat/'+otherInboxID; 
-  }</script>
+  }
+
+  async function toggleLike(postId) {
+    try {
+      const response = await fetch(`/like/${postId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const likeCountElement = document.getElementById(`like-count-${postId}`);
+        let currentCount = parseInt(likeCountElement.textContent);
+        likeCountElement.textContent = result.liked ? currentCount + 1 : currentCount - 1;
+      } else {
+        console.error('Failed to toggle like');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  </script>

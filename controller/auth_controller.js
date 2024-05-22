@@ -125,12 +125,12 @@ let authController = {
     user_session = {}
     try {
       for (const o in obj) {
-        user_session[o] = JSON.parse(obj[o])['passport']['user']['id']
+        user_session[o] = JSON.parse(obj[o])['passport']['user']
       }
     } catch (err) {
       console.log(err)
     }
-    res.render("admin", {user: req.user, sessions: user_session, isAuthenticated: req.isAuthenticated()});
+    res.render("admin", {sessions: user_session, isAuthenticated: req.isAuthenticated()});
   },
   revokeSession: (req, res) => {
     req.sessionStore.destroy(req.params.SessionID, (err) => {

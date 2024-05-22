@@ -123,7 +123,7 @@ app.get('/confirm_github/:token', authController.confirmGitHubEmail);
 // Adding friends
 app.get("/friends", ensureAuthenticated, interactionController.friendsController.search);
 app.get('/search', ensureAuthenticated, interactionController.friendsController.displayResults);
-app.post('/addFriend/:id', ensureAuthenticated, interactionController.friendsController.addFriend);
+app.get('/addFriend/:id', ensureAuthenticated, interactionController.friendsController.addFriend);
 app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friendsController.acceptFriend);
 
 // Chat

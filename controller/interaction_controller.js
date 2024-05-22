@@ -398,7 +398,6 @@ let friendsController = {
         inboxID: row.InboxID
       };
     }));
-    console.log(otherUsers);
 
     res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
   },

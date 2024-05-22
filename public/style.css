@@ -617,8 +617,17 @@ footer.footer {
   height: 90vh;
 }
 
+.friend_display{
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 76vh;
+}
+
 .inbox {
   height: 10%;
+}
+.friend_list {
+  height: 13%;
 }
 
 .profile_picture {

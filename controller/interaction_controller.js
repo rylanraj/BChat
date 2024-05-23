@@ -90,14 +90,14 @@ const mainFeedController = {
       const userId = req.user.UserID;
       const postId = req.params.postId;
 
-      const [existingLike] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+      const [existingLike] = await pool.query("SELECT * FROM POST_LIKE WHERE PostID = ? AND UserID = ?", [postId, userId]);
 
       if (existingLike.length > 0) {
-        await pool.query("DELETE FROM COMMENT WHERE PostID = ? AND UserID = ?", [postId, userId]);
+        await pool.query("DELETE FROM POST_LIKE WHERE PostID = ? AND UserID = ?", [postId, userId]);
         await pool.query("UPDATE POST SET Likes = Likes - 1 WHERE PostID = ?", [postId]);
         return res.json({ success: true, liked: false });
       } else {
-        await pool.query("INSERT INTO COMMENT (PostID, UserID) VALUES (?, ?)", [postId, userId]);
+        await pool.query("INSERT INTO POST_LIKE (PostID, UserID) VALUES (?, ?)", [postId, userId]);
         await pool.query("UPDATE POST SET Likes = Likes + 1 WHERE PostID = ?", [postId]);
         return res.json({ success: true, liked: true });
       }

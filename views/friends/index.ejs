@@ -63,21 +63,39 @@
                         <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
                         <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
                     </div>
+                    <div class="extend">
+                        <a href=<%="/chat/check/" + friend.Friend.UserID%>><button>Send a Message</button></a>
+                    </div>
+                </div>
+            <% }); %>
+            <% friends_2.forEach(function(friend) { %>
+                <div class="friend_list">
+                    <div class="chat_message">
+                        <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
+                    </div>
+                    <div class="extend">
+                        <a href=<%="/chat/check/" + friend.Friend.UserID%>><button>Send a Message</button></a>
+                    </div>
                 </div>
             <% }); %>
         </div>
         <div class="friend_display" id="request" style="display: none;">
             <% receivedFriendRequests.forEach(function(friendRequest) { %>
-                <div class="receivedFriendRequest">
-                    <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserNickName %></a></h3>
-                    <form action=<%= "/acceptFriend/" + friendRequest.User.UserID %> method="POST">
+                <div class="friend_list">
+                    <div class="chat_message">
+                        <img src="<%= "/" + friendRequest.User.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserNickName %></a></h3>
+                    </div>
+                    <div class="extend">
+                        <form action=<%= "/acceptFriend/" + friendRequest.User.UserID %> method="POST">
                         <button type="submit" name="friend_id" value="<%= friendRequest.User.UserID %>">Accept</button>
                     </form>
+                    </div>
                 </div>
             <% }); %>
         </div>
         <div class="friend_display" id="add" style="display: none;">
-
         </div>
     </div>
 </div>

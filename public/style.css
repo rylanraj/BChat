@@ -700,3 +700,17 @@ a.post-link{
   object-fit: contain;
 }
 
+.extend {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.extend a {
+  font-size: 1vw;
+}
+
+.extend p {
+  font-size: 1vw;
+}

@@ -19,6 +19,9 @@ module.exports = {
         if (req.user.Role === "admin") {
             return next();
         }
+        else {
+            res.redirect("/");
+        }
       } catch (err) {
         console.log(`${__filename}: Line 28`, err)
         res.redirect("/login");

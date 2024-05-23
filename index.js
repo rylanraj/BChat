@@ -97,6 +97,11 @@ app.post("/confirm_email", authController.confirmEmailSubmit);
 // Profiles
 app.get("/profile/:id", ensureAuthenticated, interactionController.profilesController.show);
 
+// Posts
+app.get("/post/:id", ensureAuthenticated, interactionController.postsController.show);
+// Comments
+app.post("/addComment/:id", interactionController.postsController.comment);
+
 // Account confirmation
 app.get('/confirm/:token', async (req, res) => {
     const token = req.params.token;

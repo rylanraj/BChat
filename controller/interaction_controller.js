@@ -11,12 +11,20 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME
 }).promise();
 
-async function keywordToImage(keyword) {
-  const url = `https:api.unsplash.com/search/photos?query=${keyword}&client_id=0-m3L1XIVg9tJ5bs_a_uFAlkWvlmR0l5P-PSG7n8BZU&per_page=1`
-  const response = await fetch(url);
-  const data = await response.json();
-  const imageUrl = data.results[0].urls.regular;
-  return imageUrl;
+async function keywordToImage(keyword, res) {
+  try {
+    const url = `https:api.unsplash.com/search/photos?query=${keyword}&client_id=0-m3L1XIVg9tJ5bs_a_uFAlkWvlmR0l5P-PSG7n8BZU&per_page=1`
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.results.length === 0) {
+      return null;
+    }
+    const imageUrl = data.results[0].urls.regular;
+    return imageUrl;
+  } catch (error) {
+    console.error("Error fetching image:", error);
+    res.redirect("/reminders");
+  }
 }
 
 
@@ -157,6 +165,39 @@ let postsController = {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');
     }
+  },
+  show: async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const [post] = await pool.query("SELECT * FROM POST WHERE PostID = ?", [postId]);
+
+      if (post.length === 0) {
+        return res.status(404).send("Post not found");
+      }
+      const [parent_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NULL ORDER BY TimePosted", [postId]);
+      const [child_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NOT NULL ORDER BY TimePosted", [postId]);
+
+      const [user] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [post[0].UserID]);
+
+      for (let i = 0; i < parent_comments.length; i++) {
+        const [comment_user] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [parent_comments[i].UserID]);
+        parent_comments[i].UserName = comment_user[0].UserName;
+        parent_comments[i].ProfilePicture = comment_user[0].ProfilePicture;
+      }
+
+
+      res.render("posts/post", { post: post[0], user: user[0], isAuthenticated: req.isAuthenticated(),
+        parent_comments: parent_comments, child_comments: child_comments });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  },
+  comment: async (req, res) => {
+    const postID = req.params.id;
+    const commentContent = req.body.content;
+    await pool.query("INSERT INTO COMMENT (PostID, UserID, Content, TimePosted) VALUES (?,?,?,NOW());", [postID, req.user.UserID, commentContent]);
+    res.redirect(`/post/${postID}`);
   }
   
 };
@@ -483,7 +524,7 @@ let remindersController = {
       description: req.body.description,
       completed: false,
       keyword: req.body.keyword,
-      banner: await keywordToImage(req.body.keyword)
+      banner: await keywordToImage(req.body.keyword, res)
     };
     pool.query("INSERT INTO REMINDER (Title, Description, Completed, UserID, Keyword, Banner) VALUES (?, ?, ?, ?,?,?);",
         [reminder.title, reminder.description, reminder.completed, req.user.UserID, reminder.keyword, reminder.banner]);

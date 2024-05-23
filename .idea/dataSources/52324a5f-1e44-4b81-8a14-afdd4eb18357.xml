@@ -958,7 +958,7 @@
     </schema>
     <schema id="305" parent="1" name="bchat_users">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-05-22.18:14:45</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-05-23.02:16:56</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="306" parent="1" name="springuser">
@@ -1102,7 +1102,7 @@
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="337" parent="313" name="CommentID">
-      <AutoIncrement>24</AutoIncrement>
+      <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1115,355 +1115,368 @@
       <DasType>int|0s</DasType>
       <Position>3</Position>
     </column>
-    <foreign-key id="340" parent="313" name="comment_ibfk_1">
+    <column id="340" parent="313" name="ParentCommentID">
+      <DasType>int|0s</DasType>
+      <Position>4</Position>
+    </column>
+    <column id="341" parent="313" name="Content">
+      <DasType>varchar(200)|0s</DasType>
+      <Position>5</Position>
+    </column>
+    <column id="342" parent="313" name="TimePosted">
+      <DasType>datetime|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+    </column>
+    <foreign-key id="343" parent="313" name="comment_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <foreign-key id="341" parent="313" name="comment_ibfk_2">
+    <foreign-key id="344" parent="313" name="comment_ibfk_2">
       <ColNames>PostID</ColNames>
       <RefColNames>PostID</RefColNames>
       <RefTableName>post</RefTableName>
     </foreign-key>
-    <index id="342" parent="313" name="PRIMARY">
+    <index id="345" parent="313" name="PRIMARY">
       <ColNames>CommentID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="343" parent="313" name="UserID">
+    <index id="346" parent="313" name="UserID">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="344" parent="313" name="PostID">
+    <index id="347" parent="313" name="PostID">
       <ColNames>PostID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="345" parent="313" name="PRIMARY">
+    <key id="348" parent="313" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="346" parent="314" name="FriendID">
+    <column id="349" parent="314" name="FriendID">
       <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="347" parent="314" name="UserID">
+    <column id="350" parent="314" name="UserID">
       <DasType>int|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="348" parent="314" name="FriendUserID">
+    <column id="351" parent="314" name="FriendUserID">
       <DasType>int|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="349" parent="314" name="FriendAccepted">
+    <column id="352" parent="314" name="FriendAccepted">
       <DasType>tinyint(1)|0s</DasType>
       <Position>4</Position>
     </column>
-    <foreign-key id="350" parent="314" name="friend_ibfk_1">
+    <foreign-key id="353" parent="314" name="friend_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <foreign-key id="351" parent="314" name="friend_ibfk_2">
+    <foreign-key id="354" parent="314" name="friend_ibfk_2">
       <ColNames>FriendUserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="352" parent="314" name="PRIMARY">
+    <index id="355" parent="314" name="PRIMARY">
       <ColNames>FriendID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="353" parent="314" name="UserID">
+    <index id="356" parent="314" name="UserID">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="354" parent="314" name="FriendUserID">
+    <index id="357" parent="314" name="FriendUserID">
       <ColNames>FriendUserID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="355" parent="314" name="PRIMARY">
+    <key id="358" parent="314" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="356" parent="315" name="InboxID">
+    <column id="359" parent="315" name="InboxID">
       <AutoIncrement>2</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="357" parent="315" name="Last_Message">
+    <column id="360" parent="315" name="Last_Message">
       <DasType>varchar(200)|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="358" parent="315" name="Last_UserID">
+    <column id="361" parent="315" name="Last_UserID">
       <DasType>int|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="359" parent="315" name="User1_ID">
+    <column id="362" parent="315" name="User1_ID">
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="360" parent="315" name="User2_ID">
+    <column id="363" parent="315" name="User2_ID">
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <foreign-key id="361" parent="315" name="inbox_ibfk_1">
+    <foreign-key id="364" parent="315" name="inbox_ibfk_1">
       <ColNames>Last_UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <foreign-key id="362" parent="315" name="inbox_ibfk_2">
+    <foreign-key id="365" parent="315" name="inbox_ibfk_2">
       <ColNames>User1_ID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <foreign-key id="363" parent="315" name="inbox_ibfk_3">
+    <foreign-key id="366" parent="315" name="inbox_ibfk_3">
       <ColNames>User2_ID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="364" parent="315" name="PRIMARY">
+    <index id="367" parent="315" name="PRIMARY">
       <ColNames>InboxID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="365" parent="315" name="Last_UserID">
+    <index id="368" parent="315" name="Last_UserID">
       <ColNames>Last_UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="366" parent="315" name="User1_ID">
+    <index id="369" parent="315" name="User1_ID">
       <ColNames>User1_ID</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="367" parent="315" name="User2_ID">
+    <index id="370" parent="315" name="User2_ID">
       <ColNames>User2_ID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="368" parent="315" name="PRIMARY">
+    <key id="371" parent="315" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="369" parent="316" name="PostID">
+    <column id="372" parent="316" name="PostID">
       <AutoIncrement>5</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="370" parent="316" name="Title">
+    <column id="373" parent="316" name="Title">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="371" parent="316" name="Description">
+    <column id="374" parent="316" name="Description">
       <DasType>varchar(150)|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="372" parent="316" name="UserID">
+    <column id="375" parent="316" name="UserID">
       <DasType>int|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="373" parent="316" name="Picture">
+    <column id="376" parent="316" name="Picture">
       <DasType>varchar(200)|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="374" parent="316" name="TimePosted">
+    <column id="377" parent="316" name="TimePosted">
       <DasType>datetime|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="375" parent="316" name="Likes">
+    <column id="378" parent="316" name="Likes">
       <DasType>int|0s</DasType>
       <DefaultExpression>0</DefaultExpression>
       <Position>7</Position>
     </column>
-    <foreign-key id="376" parent="316" name="post_ibfk_1">
+    <foreign-key id="379" parent="316" name="post_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="377" parent="316" name="PRIMARY">
+    <index id="380" parent="316" name="PRIMARY">
       <ColNames>PostID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="378" parent="316" name="UserID">
+    <index id="381" parent="316" name="UserID">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="379" parent="316" name="PRIMARY">
+    <key id="382" parent="316" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="380" parent="317" name="ReminderID">
+    <column id="383" parent="317" name="ReminderID">
       <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="381" parent="317" name="Title">
+    <column id="384" parent="317" name="Title">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="382" parent="317" name="Description">
+    <column id="385" parent="317" name="Description">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="383" parent="317" name="Completed">
+    <column id="386" parent="317" name="Completed">
       <DasType>tinyint(1)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="384" parent="317" name="Keyword">
+    <column id="387" parent="317" name="Keyword">
       <DasType>varchar(100)|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="385" parent="317" name="Banner">
+    <column id="388" parent="317" name="Banner">
       <DasType>varchar(300)|0s</DasType>
       <Position>6</Position>
     </column>
-    <column id="386" parent="317" name="UserID">
+    <column id="389" parent="317" name="UserID">
       <DasType>int|0s</DasType>
       <Position>7</Position>
     </column>
-    <foreign-key id="387" parent="317" name="reminder_ibfk_1">
+    <foreign-key id="390" parent="317" name="reminder_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="388" parent="317" name="PRIMARY">
+    <index id="391" parent="317" name="PRIMARY">
       <ColNames>ReminderID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="389" parent="317" name="UserID">
+    <index id="392" parent="317" name="UserID">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="390" parent="317" name="PRIMARY">
+    <key id="393" parent="317" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="391" parent="318" name="ReportID">
+    <column id="394" parent="318" name="ReportID">
       <AutoIncrement>1</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="392" parent="318" name="UserID">
+    <column id="395" parent="318" name="UserID">
       <DasType>int|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="393" parent="318" name="Description">
+    <column id="396" parent="318" name="Description">
       <DasType>varchar(200)|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="394" parent="318" name="PostID">
+    <column id="397" parent="318" name="PostID">
       <DasType>int|0s</DasType>
       <Position>4</Position>
     </column>
-    <foreign-key id="395" parent="318" name="report_ibfk_1">
+    <foreign-key id="398" parent="318" name="report_ibfk_1">
       <ColNames>UserID</ColNames>
       <RefColNames>UserID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <foreign-key id="396" parent="318" name="report_ibfk_2">
+    <foreign-key id="399" parent="318" name="report_ibfk_2">
       <ColNames>PostID</ColNames>
       <RefColNames>PostID</RefColNames>
       <RefTableName>post</RefTableName>
     </foreign-key>
-    <index id="397" parent="318" name="PRIMARY">
+    <index id="400" parent="318" name="PRIMARY">
       <ColNames>ReportID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="398" parent="318" name="UserID">
+    <index id="401" parent="318" name="UserID">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="399" parent="318" name="PostID">
+    <index id="402" parent="318" name="PostID">
       <ColNames>PostID</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="400" parent="318" name="PRIMARY">
+    <key id="403" parent="318" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="401" parent="319" name="UserID">
+    <column id="404" parent="319" name="UserID">
       <AutoIncrement>3</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="402" parent="319" name="UserName">
+    <column id="405" parent="319" name="UserName">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="403" parent="319" name="Email">
+    <column id="406" parent="319" name="Email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="404" parent="319" name="GitHubEmail">
+    <column id="407" parent="319" name="GitHubEmail">
       <DasType>varchar(100)|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="405" parent="319" name="Password">
+    <column id="408" parent="319" name="Password">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="406" parent="319" name="Role">
+    <column id="409" parent="319" name="Role">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="407" parent="319" name="StudentSet">
+    <column id="410" parent="319" name="StudentSet">
       <DasType>char(1)|0s</DasType>
       <Position>7</Position>
     </column>
-    <column id="408" parent="319" name="Program">
+    <column id="411" parent="319" name="Program">
       <DasType>varchar(100)|0s</DasType>
       <Position>8</Position>
     </column>
-    <column id="409" parent="319" name="DateJoined">
+    <column id="412" parent="319" name="DateJoined">
       <DasType>date|0s</DasType>
       <Position>9</Position>
     </column>
-    <column id="410" parent="319" name="ProfilePicture">
+    <column id="413" parent="319" name="ProfilePicture">
       <DasType>varchar(200)|0s</DasType>
       <Position>10</Position>
     </column>
-    <column id="411" parent="319" name="UserNickName">
+    <column id="414" parent="319" name="UserNickName">
       <DasType>varchar(100)|0s</DasType>
       <Position>11</Position>
     </column>
-    <column id="412" parent="319" name="Confirmed">
+    <column id="415" parent="319" name="Confirmed">
       <DasType>tinyint(1)|0s</DasType>
       <Position>12</Position>
     </column>
-    <column id="413" parent="319" name="ConfirmationToken">
+    <column id="416" parent="319" name="ConfirmationToken">
       <DasType>varchar(100)|0s</DasType>
       <Position>13</Position>
     </column>
-    <index id="414" parent="319" name="PRIMARY">
+    <index id="417" parent="319" name="PRIMARY">
       <ColNames>UserID</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="415" parent="319" name="PRIMARY">
+    <key id="418" parent="319" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>

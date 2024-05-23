@@ -499,6 +499,27 @@ footer.footer {
   width: 60%;
   
 }
+.comment-section{
+  margin-top: 2%;
+  margin-left: 20%;
+  width: 60%;
+}
+.comment-field{
+  border: none;
+  border-bottom: 1px solid #909090;
+  width: 75%;
+}
+.comment{
+  padding-top: 2%;
+}
+.comment-field:focus{
+  outline: none;
+  border-bottom: 3px solid #0F0F0F;
+}
+a.post-link{
+  color: #000;
+  text-decoration: none;
+}
 .post-footer {
   font-size: 14px;
   color: #999;

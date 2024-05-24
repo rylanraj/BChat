@@ -205,6 +205,8 @@ describe('friendsController', () => {
         mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // User found
         mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // Received friend requests found
         mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // User found
+        mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // Sent friend requests found
+        mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // User found
         await friendsController.search(req, res);
         expect(res.render).toHaveBeenCalledWith('friends/index', expect.any(Object));
     });
@@ -213,6 +215,8 @@ describe('friendsController', () => {
         mysql.query.mockResolvedValueOnce([[{ UserID: 'searchResultUserID' }]]);  // Search results found
         mysql.query.mockResolvedValueOnce([[{ FriendUserID: 'friendUserID' }]]);  // Existing friend requests found
         mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // Existing friend requests_2 found
+        mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // Sent friend requests found
+        mysql.query.mockResolvedValueOnce([[{ UserID: 'friendUserID' }]]);  // User found
         await friendsController.displayResults(req, res);
         expect(res.render).toHaveBeenCalledWith('searchResults', expect.any(Object));
     });

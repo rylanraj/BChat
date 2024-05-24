@@ -377,6 +377,85 @@ footer.footer {
   font-size: 2vw !important;
   background-color: #C1C6C6;
 }
+
+.section2_name{
+  color: #000000;
+  text-align: center;
+  height: 44px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+}
+
+.section_search{
+  display: flex;
+  color: #000000;
+  text-align: center;
+  height: 44px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+  justify-content: center;
+  align-items: center;
+}
+
+.search_icon {
+  display: flex;
+  width: 50px;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.search_input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.name_area {
+  width: 80%;
+}
+
+.input {
+  border: none;
+  background-color: transparent;
+  font-size: 1vw;
+  width: 98%;
+}
+
+.tab {
+  display: flex;
+  height: 100%;
+}
+
+.list {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.req {
+  display: flex;
+  justify-content: center;
+  width: 34%;
+}
+
+.add {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.active {
+  background-color: #a1b0c0;
+}
+
+.search_field {
+  display: flex;
+  background-color: rgb(238, 238, 238);
+  height: 80%;
+  width: 95%;
+}
+
 .user_profile_section {
   position: fixed;
   top: 83px;
@@ -576,8 +655,19 @@ a.post-link{
   height: 90vh;
 }
 
+.friend_display{
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 76vh;
+}
+
 .inbox {
   height: 10%;
+}
+.friend_list {
+  display: flex;
+  height: 13%;
+  flex-direction: row;
 }
 
 .profile_picture {
@@ -623,3 +713,17 @@ a.post-link{
   object-fit: contain;
 }
 
+.extend {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.extend a {
+  font-size: 1vw;
+}
+
+.extend p {
+  font-size: 1vw;
+}

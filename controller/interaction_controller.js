@@ -185,8 +185,8 @@ let postsController = {
       if (post.length === 0) {
         return res.status(404).send("Post not found");
       }
-      const [parent_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NULL ORDER BY TimePosted", [postId]);
-      const [child_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NOT NULL ORDER BY TimePosted", [postId]);
+      const [parent_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NULL ORDER BY TimePosted DESC", [postId]);
+      const [child_comments] = await pool.query("SELECT * FROM COMMENT WHERE PostID = ? AND ParentCommentID IS NOT NULL ORDER BY TimePosted DESC", [postId]);
 
       const [user] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [post[0].UserID]);
 

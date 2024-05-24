@@ -17,6 +17,7 @@ h5,
 h6 {
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
+  margin-bottom: 0; /* Removing the margin underneath all window names */
 }
 
 header.masthead {
@@ -210,7 +211,7 @@ footer.footer {
 
 /* Responsive Image */
 .ProductLogo {
-  padding: 2px;
+  padding: 0px 2px 2px 2px; /* Reduced padding-top to improve border thickness consistency */
   border-radius: 10px;
   background-color: #f8f9fa;
   position: absolute;
@@ -356,6 +357,19 @@ footer.footer {
   justify-content: center;
   align-items: center;
 }
+.chat-upper{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#closeButton {
+  background-color: #C1C6C6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 1.15;
+}
 .section_name{
  
   color: #003c71;
@@ -363,6 +377,7 @@ footer.footer {
   height: 44px;
   font-size: 2vw !important;
   background-color: #C1C6C6;
+  padding-top: 3px;
 }
 
 .section2_name{
@@ -371,6 +386,16 @@ footer.footer {
   height: 44px;
   font-size: 2vw !important;
   background-color: #ffffff;
+}
+
+/* Friends tab names */
+#l, #r, #a{
+  padding-top: 4px; /* Adding padding to compensate for no margin underneath Window title */
+}
+
+/* Adding padding between the Friends tab names and their respective icons*/
+#l p, #r p, #a p{
+  padding-left: 4px;
 }
 
 .section_search{
@@ -693,7 +718,7 @@ a.post-link{
 
 .post-img {
   background-color: #d3dcdc;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
   border-radius: 24px;
   width: 533px;
   height: 300px;
@@ -713,4 +738,10 @@ a.post-link{
 
 .extend p {
   font-size: 1vw;
+}
+
+/* Adding space between the Create Post window title and the container below it 
+to compensate for no h2 bottom margin */
+.container .form-group:first-child {
+  padding-top: 5px;
 }

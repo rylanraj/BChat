@@ -357,6 +357,19 @@ footer.footer {
   justify-content: center;
   align-items: center;
 }
+.chat-upper{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#closeButton {
+  background-color: #C1C6C6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 1.15;
+}
 .section_name{
  
   color: #003c71;

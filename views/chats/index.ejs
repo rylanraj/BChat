@@ -40,7 +40,10 @@
     </div>
     <div class="user_feed_section">
       <div class="section_name">
-        <h2><%= otherUserName %></h2>
+        <div class="chat-upper">
+          <h2><%= otherUserName %></h2>
+          <button id="closeButton">X</button>
+        </div>
         <div class="chat_display">
             <ul id="discussion">
             <% chatMessages.forEach(chat => { %>
@@ -162,6 +165,10 @@
           }
         });
         
+    });
+    let closeButton = document.getElementById('closeButton');
+    closeButton.addEventListener('click', () => {
+      window.location.href = '/';
     });
     </script>
   </body>

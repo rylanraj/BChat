@@ -357,16 +357,109 @@ footer.footer {
   align-items: center;
 }
 .section_name{
+ 
   color: #003c71;
   text-align: center;
   height: 44px;
+  font-size: 2vw !important;
   background-color: #C1C6C6;
 }
+
+.section2_name{
+  color: #000000;
+  text-align: center;
+  height: 44px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+}
+
+.section_search{
+  display: flex;
+  color: #000000;
+  text-align: center;
+  height: 44px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+  justify-content: center;
+  align-items: center;
+}
+
+.search_icon {
+  display: flex;
+  width: 50px;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.search_input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.name_area {
+  width: 80%;
+}
+
+.input {
+  border: none;
+  background-color: transparent;
+  font-size: 1vw;
+  width: 98%;
+}
+
+.tab {
+  display: flex;
+  height: 100%;
+}
+
+.list {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.req {
+  display: flex;
+  justify-content: center;
+  width: 34%;
+}
+
+.add {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.active {
+  background-color: #a1b0c0;
+}
+
+.search_field {
+  display: flex;
+  background-color: rgb(238, 238, 238);
+  height: 80%;
+  width: 95%;
+}
+
 .user_profile_section {
   position: fixed;
   top: 83px;
   left: 0;
   width: 30%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
+.user_feed_section {
+  overflow-y: auto;
+  margin-left: 35%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
   height: calc(100% - 83px);
   background: #f8f9fa; /* or any other color or image */
   /* Add other styles as needed based on the design in the photo */
@@ -380,6 +473,7 @@ footer.footer {
 #discussion {
 	width: 100%;
 	margin: 0 auto;
+  padding: 0;
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
@@ -389,13 +483,14 @@ footer.footer {
   display: flex;
   flex-flow: row;
   max-width: 50%;
+  height: 10%;
   padding: 0.50em ;
 }
 .area.send {
   align-self: flex-end;
   justify-content: end;
-
 }
+
 .area.recep {
   align-self: flex-start;
   align-content: start;
@@ -466,3 +561,156 @@ footer.footer {
   cursor: pointer;
 }
 
+.bio-text{
+  font-style: inter;
+  font-size: 1vw;
+  color:#000;
+  
+  text-align: center;
+}
+.form-control{
+  font-size: 1vw;
+}
+.post{
+  margin-top: 15px;
+  margin-left: 20%;
+  text-align:center;
+  width: 60%;
+  
+}
+.comment-section{
+  margin-top: 2%;
+  margin-left: 20%;
+  width: 60%;
+}
+.comment-field{
+  border: none;
+  border-bottom: 1px solid #909090;
+  width: 75%;
+}
+.comment{
+  padding-top: 2%;
+}
+.comment-field:focus{
+  outline: none;
+  border-bottom: 3px solid #0F0F0F;
+}
+a.post-link{
+  color: #000;
+  text-decoration: none;
+}
+.post-footer {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
+
+.user-info {
+
+  display: flex; /* Use flexbox */
+  
+}
+.user-info p {
+  align-self:flex-end;
+}
+
+.user-info-img {
+  object-fit: cover;
+  background-color: #d3dcdc;
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.post-info{
+  font-size: 1vw;
+}
+
+
+.chat_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 80vh;
+}
+
+.inbox_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 90vh;
+}
+
+.friend_display{
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 76vh;
+}
+
+.inbox {
+  height: 10%;
+}
+.friend_list {
+  display: flex;
+  height: 13%;
+  flex-direction: row;
+}
+
+.profile_picture {
+  width: 80px; 
+  height: 80px; /* Adjust size as needed */
+  border-radius: 50%; /* Creates a circular shape */
+  background-color: #ccc; /* Sample background color */
+  margin: 10px;
+}
+
+/* CSS to style the message content */
+.message_content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-align: left;
+  font-size: small;
+}
+
+/* CSS to style the chat message div */
+.chat_message {
+  height: 100%;
+  display: flex; /* Use flexbox for layout */
+  align-items: center; /* Center items vertically */
+  
+}
+
+.profilePicture{
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  border-style: solid;
+}
+
+.post-img {
+  background-color: #d3dcdc;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 24px;
+  width: 533px;
+  height: 300px;
+  object-fit: contain;
+}
+
+.extend {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.extend a {
+  font-size: 1vw;
+}
+
+.extend p {
+  font-size: 1vw;
+}

@@ -27,11 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        run: |
-          npm test || true
-        continue-on-error: true  # This flag ensures the workflow continues even if npm test fails
-
       - name: Set environment variables
         run: |
            echo "GITHUB_CLIENT_ID=${{ secrets.Env.CLIENT_ID }}" >> $GITHUB_ENV

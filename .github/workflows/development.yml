@@ -34,15 +34,10 @@ jobs:
 
       - name: Set environment variables
         run: |
-          export GITHUB_CLIENT_ID="${{ secrets.GITHUB_CLIENT_ID }}"
-          export GITHUB_CLIENT_SECRET="${{ secrets.GITHUB_CLIENT_SECRET }}"
-          export GITHUB_CALLBACK_URL="${{ secrets.GITHUB_CALLBACK_URL }}"
-          export DB_HOST="${{ secrets.DB_HOST }}"
-          export DB_PORT="${{ secrets.DB_PORT }}"
-          export DB_USER="${{ secrets.DB_USER }}"
-          export DB_PASS="${{ secrets.DB_PASS }}"
-          export DB_NAME="${{ secrets.DB_NAME }}"
-          export EMAIL_PASS="${{ secrets.EMAIL_PASS }}"
+          export GITHUB_CLIENT_ID="${{ secrets.CLIENT_ID }}"
+          export GITHUB_CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}"
+          export GITHUB_CALLBACK_URL="${{ secrets.CALLBACK_URL }}"
+         
 
       - name: Run npm test
         run: npm test || true

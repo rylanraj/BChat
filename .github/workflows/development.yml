@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['21.x'] # Adjust versions as needed
+        node-version: ['20.x'] # Adjust versions as needed
 
     steps:
       - name: Checkout repository
@@ -33,12 +33,7 @@ jobs:
           echo "GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
           echo "GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "GITHUB_CALLBACK_URL=${{ secrets.CALLBACK_URL }}" >> $GITHUB_ENV
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_ENV
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-
+         
       # Run tests
       - name: Run tests
         run: npm test || true

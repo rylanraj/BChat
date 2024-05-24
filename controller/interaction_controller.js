@@ -78,7 +78,9 @@ const mainFeedController = {
         return { ...post, likeCount: likeCount[0]?.Likes || 0 };
       }));
 
-      res.render("index", { user: user, posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
+      
+
+      res.render("index", { posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
       console.error("Error fetching main feed data:", error);
@@ -109,14 +111,14 @@ const mainFeedController = {
   reportPost: async (req, res) => {
     const user = req.user;
     const postID = req.params.postId;
-    console.log(user, postID);
     const [existingReport] = await pool.query("SELECT * FROM POST_REPORT WHERE PostID = ? AND ReporterID = ?", [postID, user["UserID"]]);
     if (existingReport.length > 0) {
       await pool.query("UPDATE POST_REPORT SET Status = 1 WHERE PostID = ? AND ReporterID = ?", [postID, user["UserID"]]);
     } else {
       await pool.query("INSERT INTO POST_REPORT (PostID, ReporterID, Status) VALUES (?,?,1)", [postID, user["UserID"]]);
     }
-  }
+  },
+  
 };
 
 
@@ -196,9 +198,13 @@ let postsController = {
         parent_comments[i].ProfilePicture = comment_user[0].ProfilePicture;
       }
 
-
-      res.render("posts/post", { post: post[0], user: user[0], isAuthenticated: req.isAuthenticated(),
-        parent_comments: parent_comments, child_comments: child_comments });
+      res.render("posts/post", {
+        post: post[0],
+        user: user[0],
+        isAuthenticated: req.isAuthenticated(),
+        parent_comments: parent_comments,
+        child_comments: child_comments
+      });
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');
@@ -210,7 +216,6 @@ let postsController = {
     await pool.query("INSERT INTO COMMENT (PostID, UserID, Content, TimePosted) VALUES (?,?,?,NOW());", [postID, req.user.UserID, commentContent]);
     res.redirect(`/post/${postID}`);
   }
-  
 };
 
 let chatController = {

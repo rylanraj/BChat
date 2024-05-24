@@ -29,9 +29,9 @@ jobs:
 
       - name: Set environment variables
         run: |
-           echo "GITHUB_CLIENT_ID=${{ secrets.Env.CLIENT_ID }}" >> $GITHUB_ENV
-           echo "GITHUB_CLIENT_SECRET=${{ secrets.Env.CLIENT_SECRET }}" >> $GITHUB_ENV
-           echo "GITHUB_CALLBACK_URL=${{ secrets.Env.CALLBACK_URL }}" >> $GITHUB_ENV
+           echo "GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
+           echo "GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> $GITHUB_ENV
+           echo "GITHUB_CALLBACK_URL=${{ secrets.CALLBACK_URL }}" >> $GITHUB_ENV
          
       - name: Run npm test
         run: npm test || true

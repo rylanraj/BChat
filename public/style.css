@@ -2,6 +2,16 @@
   display: inline-block
 }
 
+#loginHeader{
+  color: #003C71 !important;
+  font:  1.5rem "Inter" !important;
+  font-weight: 700 !important;
+}
+.footer-main{
+  background-color: #003C71 !important;
+  width: 100% !important;
+  height: 10% !important;
+}
 
 html,
 body {
@@ -595,6 +605,12 @@ footer.footer {
 }
 .form-control{
   font-size: 1vw;
+}
+input.form-control{
+  background-color: #d5dcdc; !important;
+  border-radius: 0.75rem !important;
+  width: 16.8125 rem !important;
+  height: 2.0625rem !important;
 }
 .post{
   margin-top: 15px;

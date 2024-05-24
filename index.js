@@ -73,6 +73,7 @@ app.set("view engine", "ejs");
 app.get("/",ensureAuthenticated, interactionController.mainFeedController.index);
 
 app.post('/like/:postId', interactionController.mainFeedController.likePost);
+app.post('/report/:postId', interactionController.mainFeedController.reportPost);
 
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
 app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);

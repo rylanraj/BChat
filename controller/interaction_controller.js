@@ -78,7 +78,7 @@ const mainFeedController = {
         return { ...post, likeCount: likeCount[0]?.Likes || 0 };
       }));
 
-      res.render("index", { posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
+      res.render("index", { user: user, posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
       console.error("Error fetching main feed data:", error);
@@ -104,6 +104,17 @@ const mainFeedController = {
     } catch (error) {
       console.error("Error handling like action:", error);
       res.status(500).send('Internal Server Error');
+    }
+  },
+  reportPost: async (req, res) => {
+    const user = req.user;
+    const postID = req.params.postId;
+    console.log(user, postID);
+    const [existingReport] = await pool.query("SELECT * FROM POST_REPORT WHERE PostID = ? AND ReporterID = ?", [postID, user["UserID"]]);
+    if (existingReport.length > 0) {
+      await pool.query("UPDATE POST_REPORT SET Status = 1 WHERE PostID = ? AND ReporterID = ?", [postID, user["UserID"]]);
+    } else {
+      await pool.query("INSERT INTO POST_REPORT (PostID, ReporterID, Status) VALUES (?,?,1)", [postID, user["UserID"]]);
     }
   }
 };

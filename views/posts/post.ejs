@@ -27,10 +27,16 @@ function formatDate(timeString) {
         <div class="report-section" style="text-align: right; margin-left: 270px; ">
 
 
-            <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
+            <button id="" style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="report('<%= post.PostID %>')">
                 <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
             </button>
-
+            <div id="popup<%= post.PostID %>" class="popup">
+              <div class="popup-content">
+                <p>Are you sure you want to report this post?</p>
+                <button onclick="Submit('<%= post.PostID %>')">Yes</button>
+                <button onclick="Close('<%= post.PostID %>')">No</button>
+              </div>
+            </div>
         </div>
     </div>
     <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
@@ -70,6 +76,7 @@ function formatDate(timeString) {
         <% }) %>
 </div>
 <script>
+    const userID = '<%= user %>';
     function Inbox(otherInboxID) {
         window.location.href = '/chat/'+otherInboxID;
     }
@@ -106,5 +113,21 @@ function formatDate(timeString) {
         commentSubmit.style.display = 'none';
         commentCancel.style.display = 'none';
     });
+
+    async function report(postId) {
+    document.getElementById('popup'+postId).style.display = 'block';
+  }
+  async function Submit(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
+  
+    await fetch(`/report/${postId}`, {
+      method: 'POST',
+      userID: userID,
+
+    });
+  }
+  async function Close(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
+  }
 </script>
 </html>

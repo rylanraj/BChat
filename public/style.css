@@ -74,7 +74,9 @@ h6 {
   font-weight: 700;
   margin-bottom: 0; /* Removing the margin underneath all window names */
 }
-
+h2{
+  font-weight: normal;
+}
 header.masthead {
   position: relative;
   background-color: #fff;
@@ -431,7 +433,7 @@ footer.footer {
   text-align: center;
   height: 44px;
   font-size: 2vw !important;
-  background-color: #C1C6C6;
+  background-color: #D3DCDC;
   padding-top: 3px;
 }
 
@@ -445,12 +447,13 @@ footer.footer {
 
 /* Friends tab names */
 #l, #r, #a{
-  padding-top: 4px; /* Adding padding to compensate for no margin underneath Window title */
+  padding-top: 6px; /* Adding padding to compensate for no margin underneath Window title */
 }
 
-/* Adding padding between the Friends tab names and their respective icons*/
-#l p, #r p, #a p{
-  padding-left: 4px;
+/* Repositioning tab icons */
+#l svg, #r svg, #a svg {
+  position: relative;
+  top: 15%;
 }
 
 .section_search{
@@ -513,7 +516,7 @@ footer.footer {
 }
 
 .active {
-  background-color: #a1b0c0;
+  background-color: rgba(0, 60, 113, 0.3); /* 30% opacity BCIT blue */
 }
 
 .search_field {
@@ -719,6 +722,23 @@ a.post-link{
   
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
+/* CSS for styling user profile icons in chat and friends windows */
+.chat_message img {
+  position: relative;
+  top: 10%;
+  width: 50px;
+  height: 50px;
+}
+
+.friend_list .chat_message h3 { /* Adjusts appearance of the users appearing in the friends tabs lists */
+  font-size: 1.6rem;
+  padding-top: 11px;
+}
+
+.message_content h1 {
+  font-size: 1.75em;
+  padding-bottom: 2px;
+}
 
 .post-info{
   font-size: 1.25rem;
@@ -750,6 +770,26 @@ a.post-link{
 
 .inbox {
   height: 10%;
+  padding-top: 15px;
+  margin-bottom: 8px; /* Spacing user inboxes out */
+}
+/* friends list */
+#list .extend {
+  padding-top: 18px; /* To align the button with the user's name */
+}
+
+/* friend requests */
+#request .extend {
+  padding-top: 10px; /* To align the button with the user's name */
+  padding-right: 20px;
+}
+
+.extend button {
+  border: none;
+  border-radius: 20px; /* Increase border radius for a more rounded button */
+  background-color: #D9D9D9; /* Add a background color */
+  padding: 5px 10px; /* top/bottom, left/right */
+  font-size: 0.9rem;
 }
 .friend_list {
   display: flex;
@@ -809,6 +849,7 @@ a.post-link{
 
 .extend a {
   font-size: 1vw;
+  padding-right: 20px;
 }
 
 .extend p {

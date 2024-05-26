@@ -447,13 +447,18 @@ footer.footer {
 
 /* Friends tab names */
 #l, #r, #a{
-  padding-top: 6px; /* Adding padding to compensate for no margin underneath Window title */
+  padding-top: 0; /* Adding padding to compensate for no margin underneath Window title */
 }
 
 /* Repositioning tab icons */
 #l svg, #r svg, #a svg {
   position: relative;
   top: 15%;
+}
+
+/* Adding padding between the Friends tab names and their respective icons*/
+#l p, #r p, #a p{
+  padding-left: 10px;
 }
 
 .section_search{

@@ -440,14 +440,14 @@ footer.footer {
 .section2_name{
   color: #000000;
   text-align: center;
-  height: 44px;
+  height: 52px;
   font-size: 2vw !important;
   background-color: #ffffff;
 }
 
 /* Friends tab names */
 #l, #r, #a{
-  padding-top: 0; /* Adding padding to compensate for no margin underneath Window title */
+  padding-top: 6px; /* Adding padding to compensate for no margin underneath Window title */
 }
 
 /* Repositioning tab icons */

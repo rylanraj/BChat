@@ -444,6 +444,9 @@ footer.footer {
   font-size: 2vw !important;
   background-color: #ffffff;
 }
+.dropdown-menu-kebab a{
+  text-align: left;
+}
 
 /* Friends tab names */
 #l, #r, #a{

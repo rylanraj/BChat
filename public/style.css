@@ -765,7 +765,7 @@ a.post-link{
 .report-section { /* CSS for repositioning post report button */
   position: relative;
   left: 10%;
-  margin-left: 50px !important;
+  margin-left: 50px !important; /* left-margin value may vary from system to system */
 }
 
 .report-section .kebab-menu {

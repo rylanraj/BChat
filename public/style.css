@@ -419,6 +419,13 @@ footer.footer {
   align-items: center;
   justify-content: space-between;
 }
+
+/* CSS for stying name that appears at the top of the chat window */
+.chat-upper h2 {
+  padding-left: 10px;
+  padding-bottom: 5px;
+}
+
 #closeButton {
   position: relative;
   background-color: #000000;
@@ -577,6 +584,7 @@ footer.footer {
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
+  padding-bottom: 55px;
 }
 
 .area {
@@ -584,7 +592,7 @@ footer.footer {
   flex-flow: row;
   max-width: 50%;
   height: 10%;
-  padding: 0.50em ;
+  padding: 0.3em ;
 }
 .area.send {
   align-self: flex-end;

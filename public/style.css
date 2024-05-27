@@ -419,6 +419,13 @@ footer.footer {
   align-items: center;
   justify-content: space-between;
 }
+
+/* CSS for stying name that appears at the top of the chat window */
+.chat-upper h2 {
+  padding-left: 10px;
+  padding-bottom: 5px;
+}
+
 #closeButton {
   position: relative;
   background-color: #000000;
@@ -577,6 +584,7 @@ footer.footer {
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
+  padding-bottom: 55px;
 }
 
 .area {
@@ -584,7 +592,7 @@ footer.footer {
   flex-flow: row;
   max-width: 50%;
   height: 10%;
-  padding: 0.50em ;
+  padding: 0.3em ;
 }
 .area.send {
   align-self: flex-end;
@@ -619,7 +627,7 @@ footer.footer {
 	margin: 0.0625em;
 	max-width: 100%;
   text-align: end;
-  background-color: cornflowerblue;
+  background-color: #0069ff;
   color: white;
   text-align: end;
 }
@@ -706,7 +714,18 @@ input.form-control{
 .picInput{
   height: 3.0625rem !important;
 }
-
+button.btn.btn-default{
+  background-color: #003C71;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn.btn-default:hover{
+  background-color: #0056b3;
+}
 .post{
   margin-top: 15px;
   margin-left: 20%;

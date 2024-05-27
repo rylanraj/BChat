@@ -108,10 +108,17 @@
                     <div class="report-section" style="text-align: right; margin-left: 270px; ">
                 
 
-                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;">
+                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;"onclick="report('<%= post.PostID %>')">
                             <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
                         </button>
-                        
+                        <div id="popup<%= post.PostID %>" class="popup">
+                            <div class="popup-content">
+                              <p>Are you sure you want to report this post?</p><div class="buttons">
+                                <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                                <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                              </div>
+                            </div>
+                          </div>
                       </div>
                   </div>
                   <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
@@ -240,10 +247,17 @@
                     <div class="report-section" style="text-align: right; margin-left: 270px; ">
                 
 
-                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;">
+                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;"onclick="report('<%= post.PostID %>')">
                             <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
                         </button>
-                        
+                        <div id="popup<%= post.PostID %>" class="popup">
+                            <div class="popup-content">
+                              <p>Are you sure you want to report this post?</p><div class="buttons">
+                                <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                                <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                              </div>
+                            </div>
+                          </div>
                       </div>
                   </div>
                   <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
@@ -274,6 +288,7 @@
 
 
     <script>
+        const userID= '<%= id %>';
         // Initialize a boolean variable to track form changes
         var formChanged = false;
     
@@ -398,6 +413,23 @@ document.getElementById('profile-form').addEventListener('submit', function(e) {
     } catch (error) {
       console.error('Error:', error);
     }
+  }
+  async function report(postId) {
+    document.getElementById('popup'+postId).style.display = 'block';
+  }
+  async function Submit(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
+    console.log(postId);
+  
+    await fetch(`/report/${postId}`, {
+      method: 'POST',
+      userID: userID,
+
+    });
+  
+  }
+  async function Close(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
   }
     </script>
     

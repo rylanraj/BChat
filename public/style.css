@@ -500,6 +500,18 @@ footer.footer {
   /* Add other styles as needed based on the design in the photo */
 }
 
+.report_feed_section {
+  overflow-y: auto;
+  margin-left: 22%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
 .editable {
   cursor: pointer;
 }
@@ -570,25 +582,71 @@ footer.footer {
 }
 
 .popup {
-  display: none;
-  position: fixed;
-  top: 0;
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
 .popup-content {
-  background-color: white;
-  border: 1px solid #ccc;
-  width: 300px;
-  height: 200px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  max-width: 400px; /* Max width */
+  border-radius: 10px; /* Rounded corners */
+  text-align: center; /* Center text */
+}
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.yes-btn, .no-btn {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.yes-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.no-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.yes-btn:hover {
+  background-color: #45a049;
+}
+
+.no-btn:hover {
+  background-color: #e53935;
 }
 
 .close {
@@ -599,15 +657,14 @@ footer.footer {
 .bio-text{
   font-style: inter;
   font-size: 1vw;
-  color:#000;
-  
+  color:#000; 
   text-align: center;
 }
 .form-control{
   font-size: 1vw;
 }
 input.form-control{
-  background-color: #d5dcdc; !important;
+  background-color: #d5dcdc !important;
   border-radius: 0.75rem !important;
   width: 16.8125 rem !important;
   height: 2.0625rem !important;

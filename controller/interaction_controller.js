@@ -234,30 +234,43 @@ let postsController = {
       res.status(500).send('Internal Server Error');
     }
   },
-  editSubmit(req,res){
+  async editSubmit(req, res) {
     let postID = req.params.id;
     let title = req.body.title;
     let description = req.body.description;
     let file = req.file;
     let filePath = file ? file.path : null;
     let removePhoto = req.body.removePhoto;
+    const [post] = await pool.query("SELECT * FROM POST WHERE PostID = ?", [postID]);
+
+    // If the current user isn't the owner of the post
+    if (post.length === 0 || post[0].UserID !== req.user.UserID) {
+      return res.status(403).send("You don't have permission to edit this post");
+    }
     if (filePath) {
       filePath = filePath.replace(/\\/g, '/');
-      pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = ? WHERE PostID = ?;", [title, description, filePath, postID]);
+      await pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = ? WHERE PostID = ?;", [title, description, filePath, postID]);
       res.redirect("/post/" + postID);
-    }
-    else if (removePhoto && !filePath) {
-        pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = NULL WHERE PostID = ?;", [title, description, postID]);
-        res.redirect("/post/" + postID);
-    }
-    else {
-      pool.query("UPDATE POST SET Title = ?, Description = ? WHERE PostID = ?;", [title, description, postID]);
+    } else if (removePhoto && !filePath) {
+      await pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = NULL WHERE PostID = ?;", [title, description, postID]);
+      res.redirect("/post/" + postID);
+    } else {
+      await pool.query("UPDATE POST SET Title = ?, Description = ? WHERE PostID = ?;", [title, description, postID]);
       res.redirect("/post/" + postID);
     }
 
   },
   delete: async (req, res) => {
-
+    let postID = req.params.id;
+    const [post] = await pool.query("SELECT * FROM POST WHERE PostID = ?", [postID]);
+    if (post.length === 0 || post[0].UserID !== req.user.UserID) {
+      return res.status(403).send("You don't have permission to delete this post");
+    } else {
+        await pool.query("DELETE FROM COMMENT WHERE PostID = ?", [postID]);
+        await pool.query("DELETE FROM POST_LIKE WHERE PostID = ?", [postID]);
+        await pool.query("DELETE FROM POST WHERE PostID = ?", [postID]);
+        res.redirect("/profile/" + req.user.UserID);
+    }
   }
 
 };

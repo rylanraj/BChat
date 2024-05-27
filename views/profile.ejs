@@ -132,7 +132,7 @@
                                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                                     <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
                                     <a href="#">Copy Link</a>
-                                    <a href="#">Delete</a>
+                                    <a href="#" onclick="deletePost('<%= post.PostID %>')">Delete</a>
                                     <% } %>
                                 </div>
                             </div>
@@ -336,6 +336,25 @@
 
 
     <script>
+        async function deletePost(postId) {
+            try {
+                const response = await fetch(`/post/delete/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // If the server responds with a success status, redirect to the desired page
+                    window.location.href = '/profile/<%= otherUser.UserID %>';
+                } else {
+                    console.error('Failed to delete post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
         window.onload = function() {
             // Get all dropdown menus
             var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');

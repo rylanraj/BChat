@@ -76,7 +76,7 @@ function formatDate(timeString) {
 <div class="comment-section">
     <h3>Comments</h3>
     <form action=<%="/addComment/" + post.PostID%> method="POST">
-        <input class="comment-field" id="general-comment-field" type="text" autocomplete="off" name="content" placeholder="Add your comment here">
+        <input class="comment-field" id="general-comment-field" type="text" autocomplete="off" name="content" maxlength="2500" placeholder="Add your comment here">
         <div>
             <button type="reset" id="general-comment-cancel" style="display: none">Cancel</button>
             <button type="submit" id="general-comment-submit" style="display: none">Add Comment</button>

@@ -44,11 +44,12 @@ const fetchPosts = async () => {
 const mainFeedController = {
   index: async (req, res) => {
     try {
+      const user = req.user.UserID;
       const [posts] = await pool.query("SELECT * FROM POST");
       const userIds = posts.map(post => post.UserID);
 
       if (userIds.length === 0) {
-        return res.render("index", { posts: [], userDataMap: {}, otherUsers: [], isAuthenticated: req.isAuthenticated() });
+        return res.render("index", { id:user, posts: [], userDataMap: {}, otherUsers: [], isAuthenticated: req.isAuthenticated() });
       }
 
       const [users] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
@@ -57,7 +58,6 @@ const mainFeedController = {
         userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
       });
 
-      const user = req.user.UserID;
       const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
       const otherUsers = await Promise.all(inboxes.map(async row => {

@@ -121,11 +121,14 @@ let authController = {
     res.redirect("/login");
   },
   adminPanel: async (req, res) => {
+    user_session = {}
     obj = JSON.parse(JSON.stringify(req.sessionStore.sessions))
 
     const reports = await pool.query("SELECT * FROM POST_REPORT");
     const postIds = reports[0].map(report => report.PostID);
-
+    if (postIds.length === 0) {
+      return res.render("admin", {posts: [], userDataMap: {}, user: req.user, sessions: user_session, isAuthenticated: req.isAuthenticated()});
+    }
     const [posts] = await pool.query("SELECT * FROM POST WHERE PostID IN (?)", [postIds]);
     
     const userIds = posts.map(post => post.UserID);
@@ -137,7 +140,6 @@ let authController = {
     });
 
 
-    user_session = {}
     try {
       for (const o in obj) {
         user_session[o] = JSON.parse(obj[o])['passport']['user']['id']

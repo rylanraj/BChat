@@ -37,7 +37,7 @@ CREATE TABLE FRIEND (
 CREATE TABLE POST (
     PostID INT AUTO_INCREMENT PRIMARY KEY,
     Title VARCHAR(100) NOT NULL,
-    Description VARCHAR(150),
+    Description VARCHAR(2500),
     UserID INT,
     Picture VARCHAR(200),
     Likes INT Default 0,
@@ -51,7 +51,7 @@ CREATE TABLE COMMENT (
     PostID INT,
     FOREIGN KEY (PostID) REFERENCES POST(PostID),
     ParentCommentID INT,
-    Content VARCHAR(200),
+    Content VARCHAR(2500),
     TimePosted DATETIME NOT NULL
 );
 CREATE TABLE POST_LIKE (
@@ -83,7 +83,7 @@ CREATE TABLE CHAT (
     MessageID INT AUTO_INCREMENT PRIMARY KEY,
     Inbox_ID INT,
     SenderID INT,
-    Message VARCHAR(200),
+    Message VARCHAR(500),
     DateSent DATETIME NOT NULL,
     FOREIGN KEY (Inbox_ID) REFERENCES INBOX(InboxID),
     FOREIGN KEY (SenderID) REFERENCES USER(UserID)

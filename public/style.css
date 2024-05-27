@@ -1,3 +1,45 @@
+#main-page{
+  background-color: #F2F2F2;
+}
+.dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  background-color: #5A5A5A;
+  border-radius: 50%;
+  display: block;
+  margin-bottom: 0.4rem;
+  margin-left: 3rem;
+}
+.dropdown-menu-kebab {
+  display: none; /* Initially hide the menu */
+  position: absolute; /* Position the menu relative to the button */
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+.dropdown-menu-kebab a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu-kebab a:hover {background-color: #f1f1f1}
+.post-kebab{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 3px;
+  border-radius: 24px;
+  border: none;
+  background-color: transparent;
+}
+.post-kebab:focus{
+  outline: none;
+}
+.kebab-menu{
+  position: relative;
+}
 .deleteForm {
   display: inline-block
 }
@@ -10,8 +52,11 @@
 .footer-main{
   background-color: #003C71 !important;
   width: 100% !important;
-  height: 10% !important;
+  height: 5% !important;
+  position: fixed;
+  bottom: 0;
 }
+
 
 html,
 body {
@@ -29,7 +74,9 @@ h6 {
   font-weight: 700;
   margin-bottom: 0; /* Removing the margin underneath all window names */
 }
-
+h2{
+  font-weight: normal;
+}
 header.masthead {
   position: relative;
   background-color: #fff;
@@ -372,13 +419,29 @@ footer.footer {
   align-items: center;
   justify-content: space-between;
 }
+
+/* CSS for stying name that appears at the top of the chat window */
+.chat-upper h2 {
+  padding-left: 10px;
+  padding-bottom: 5px;
+}
+
 #closeButton {
-  background-color: #C1C6C6;
+  position: relative;
+  background-color: #000000;
   color: white;
   border: none;
   cursor: pointer;
   font-size: 1em;
-  line-height: 1.15;
+  line-height: 2.63rem;
+  top: -0.2rem;
+
+}
+#closeButton:focus{
+  outline: none;
+}
+#closeButton:hover {
+  background-color: #000000;
 }
 .section_name{
  
@@ -386,26 +449,35 @@ footer.footer {
   text-align: center;
   height: 44px;
   font-size: 2vw !important;
-  background-color: #C1C6C6;
+  background-color: #D3DCDC;
   padding-top: 3px;
 }
 
 .section2_name{
   color: #000000;
   text-align: center;
-  height: 44px;
+  height: 52px;
   font-size: 2vw !important;
   background-color: #ffffff;
+}
+.dropdown-menu-kebab a{
+  text-align: left;
 }
 
 /* Friends tab names */
 #l, #r, #a{
-  padding-top: 4px; /* Adding padding to compensate for no margin underneath Window title */
+  padding-top: 6px; /* Adding padding to compensate for no margin underneath Window title */
+}
+
+/* Repositioning tab icons */
+#l svg, #r svg, #a svg {
+  position: relative;
+  top: 15%;
 }
 
 /* Adding padding between the Friends tab names and their respective icons*/
 #l p, #r p, #a p{
-  padding-left: 4px;
+  padding-left: 10px;
 }
 
 .section_search{
@@ -468,7 +540,7 @@ footer.footer {
 }
 
 .active {
-  background-color: #a1b0c0;
+  background-color: rgba(0, 60, 113, 0.3); /* 30% opacity BCIT blue */
 }
 
 .search_field {
@@ -524,6 +596,7 @@ footer.footer {
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
+  padding-bottom: 55px;
 }
 
 .area {
@@ -531,7 +604,7 @@ footer.footer {
   flex-flow: row;
   max-width: 50%;
   height: 10%;
-  padding: 0.50em ;
+  padding: 0.3em ;
 }
 .area.send {
   align-self: flex-end;
@@ -553,18 +626,21 @@ footer.footer {
 .area:hover .delete{
   display: flex;
 }
-
+.url {
+  word-break: break-all;
+}
+.longWord{
+    word-break: break-all;
+}
 .area.send.bubble {
   align-items: end;
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: end;
-  background-color: cornflowerblue;
+  background-color: #0069ff;
   color: white;
-  border-bottom-right-radius: 0.1em;
-	border-top-right-radius: 0.1em;
   text-align: end;
 }
 
@@ -573,12 +649,10 @@ footer.footer {
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: start;
   background-color:  rgb(206, 206, 206);
 	color: black;
-  border-bottom-left-radius: 0.1em;
- 	border-top-left-radius: 0.1em;
 }
 
 .popup {
@@ -595,7 +669,39 @@ footer.footer {
 }
 
 .popup-content {
-  background-color: #fefefe;
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 350px;
+  /* height: 200px; */
+  padding: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  text-align: center;
+}
+.popup-content button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+.popup-content button:last-of-type {
+  background-color: #6c757d;
+}
+
+.popup-content button:last-of-type:hover {
+  background-color: #5a6268;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
@@ -666,20 +772,43 @@ footer.footer {
 input.form-control{
   background-color: #d5dcdc !important;
   border-radius: 0.75rem !important;
-  width: 16.8125 rem !important;
+  width: 16.8125rem !important;
   height: 2.0625rem !important;
+}
+.picInput{
+  height: 3.0625rem !important;
+}
+button.btn.btn-default{
+  background-color: #003C71;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn.btn-default:hover{
+  background-color: #0056b3;
 }
 .post{
   margin-top: 15px;
   margin-left: 20%;
   text-align:center;
   width: 60%;
-  
+}
+
+.feed-post{
+  border-bottom: 2px solid #D3DCDC; /* Adjust color and thickness as needed */
+}
+.like-section{
+  margin-left: 0px !important; /* CSS to make like button aligned to the left side of a post */
+  padding-bottom: 1.25rem;
 }
 .comment-section{
   margin-top: 2%;
   margin-left: 20%;
   width: 60%;
+  padding-bottom: 4rem;
 }
 .comment-field{
   border: none;
@@ -704,29 +833,90 @@ a.post-link{
 }
 
 .user-info {
-
   display: flex; /* Use flexbox */
-  
 }
 .user-info p {
-  align-self:flex-end;
+  font-size: 0.9rem;
+  height: 25px;
+  width: 300px;
+  align-self:flex-start;
+}
+
+.user-info a { /* div containing profile picture */
+  padding-top: 3px;
+}
+
+.report-section { /* CSS for repositioning post report button */
+  position: relative;
+  left: 10%;
+  margin-left: 50px !important; /* left-margin value may vary from system to system */
+}
+
+.report-section .kebab-menu {
+  button { /* CSS for styling the post report button */
+    padding-top: 5px;
+    transform: scale(0.75, 0.75);
+  }
 }
 
 .user-info-img {
+  width: 3rem;
+  height: 3rem;
   object-fit: cover;
   background-color: #d3dcdc;
   align-self: flex-start;
   margin-right: 10px; /* Add some spacing between the image and text */
   border-radius: 50%; /* Make the image a circle */
   overflow: hidden; /* Clip the parts of the image that exceed the circle */
-  
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+/* CSS for styling user profile icons in chat and friends windows */
+.chat_message img {
+  position: relative;
+  top: 10%;
+  width: 50px;
+  height: 50px;
+}
+
+.friend_list .chat_message h3 { /* Adjusts appearance of the users appearing in the friends tabs lists */
+  font-size: 1.2rem;
+  padding-left: 5px;
+  padding-top: 11px;
+}
+
+.message_content h1 {
+  font-size: 1.25rem;
+  padding-bottom: 2px;
+  padding-top: 1px;
+}
+
+/* CSS for aligning post title and description to the left */
+.post-link div {
+  padding-left: 5px;
+  margin-left: 0px !important;
+}
+
+/* CSS for styling post title */
+.post-link h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .post-info{
-  font-size: 1vw;
+  font-size: 1.25rem;
+  margin-left: 0.25rem;
 }
 
+#post-username{
+  padding-top: 5px;
+  text-align: left;
+  margin-bottom: 0.25rem;
+}
+
+#post-date {
+  text-align: left;
+  margin-bottom: 0.9rem;
+}
 
 .chat_display {
   flex-grow: 1; /* Grow to fill remaining space */
@@ -748,7 +938,43 @@ a.post-link{
 
 .inbox {
   height: 10%;
+  padding-top: 15px;
+  margin-bottom: 8px; /* Spacing user inboxes out */
 }
+
+/* friends list */
+#list .extend {
+  padding-top: 15px; /* To align the button with the user's name */
+  margin-left: 15px;
+}
+
+/* Add friends "Add friend" */
+#list .extend a {
+  margin-right: 3px;
+  padding-bottom: 5px;
+}
+
+/* Add friends Already added/requested text */
+#list .extend p {
+  margin-top: 20px;
+  margin-right: 15px;
+  width: 300px; /* To display names and usernames in 1 line in the search list */
+}
+
+/* friend requests */
+#request .extend {
+  padding-top: 10px; /* To align the button with the user's name */
+  padding-right: 20px;
+}
+
+.extend button {
+  border: none;
+  border-radius: 20px; /* Increase border radius for a more rounded button */
+  background-color: #D9D9D9; /* Add a background color */
+  padding: 5px 10px; /* top/bottom, left/right */
+  font-size: 0.9rem;
+}
+
 .friend_list {
   display: flex;
   height: 13%;
@@ -791,9 +1017,9 @@ a.post-link{
 
 .post-img {
   background-color: #d3dcdc;
-  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
   border-radius: 24px;
-  width: 533px;
+  /* width: 533px; */
+  width: 100%;
   height: 300px;
   object-fit: contain;
 }
@@ -807,6 +1033,7 @@ a.post-link{
 
 .extend a {
   font-size: 1vw;
+  padding-right: 20px;
 }
 
 .extend p {

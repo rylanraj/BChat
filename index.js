@@ -83,6 +83,12 @@ app.get("/reminder/:id", ensureAuthenticated, interactionController.remindersCon
 app.get("/reminder/:id/edit", ensureAuthenticated, interactionController.remindersController.edit);
 app.post("/reminder/", ensureAuthenticated, interactionController.remindersController.create);
 
+// Edit post
+app.get("/post/edit/:id", ensureAuthenticated, interactionController.postsController.edit);
+
+// Delete post
+app.post("/post/delete/:id", interactionController.postsController.delete);
+
 // ⭐ Implement these two routes below!
 app.post("/reminder/update/:id", interactionController.remindersController.update);
 app.post("/reminder/delete/:id", interactionController.remindersController.delete);
@@ -153,6 +159,8 @@ app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), i
 
 // Define route for handling file uploads
 app.post('/upload', ensureAuthenticated, upload.single('photo'), interactionController.postsController.create);
+// For editing posts
+app.post('/post/edit/:id', ensureAuthenticated, upload.single('photo'), interactionController.postsController.editSubmit);
 
 // Github login
 app.get('/github',
@@ -216,6 +224,6 @@ io.on('connection', (socket) => {
 
 server.listen(3001, function () {
   console.log(
-    "Server running. Visit: http://localhost:3001/reminders in your browser 🚀"
+    "Server running. Visit: http://localhost:3001/ in your browser 🚀"
   );
 });

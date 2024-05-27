@@ -19,17 +19,38 @@ function formatDate(timeString) {
 %>
 <div class="post">
     <div class="user-info">
-        <img class="user-info-img" src="<%= "/" + user.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
-        <p id="post" class="post-info">
-            <%= user.UserName %> <br>
-            <%= formatDate(post.TimePosted) %>
-        </p>
+        <img class="user-info-img" src="<%= "/" + creator.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+        <div class="text-user-info">
+            <p class="post-info" id="post-username">
+                <%= creator.UserName %>
+            </p>
+            <p class="post-info" id="post-date">
+                <%= formatDate(post.TimePosted) %>
+            </p>
+        </div>
         <div class="report-section" style="text-align: right; margin-left: 270px; ">
+            <!-- Kebab button and dropdown menu -->
+            <div class="kebab-menu">
+                <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
 
+                <!-- Dropdown menu -->
+                <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
 
-            <button id="" style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="report('<%= post.PostID %>')">
-                <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
-            </button>
+                    <% if (post.UserID !== user.UserID) { %>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                        <a onclick="report('<%= post.PostID %>')">Report</a>
+                        <a href="#">Message Creator</a>
+                    <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
+                        <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                        <a href="#">Delete</a>
+                    <% } %>
+                </div>
+            </div>
             <div id="popup<%= post.PostID %>" class="popup">
                 <div class="popup-content">
                   <p>Are you sure you want to report this post?</p><div class="buttons">
@@ -56,7 +77,7 @@ function formatDate(timeString) {
 <div class="comment-section">
     <h3>Comments</h3>
     <form action=<%="/addComment/" + post.PostID%> method="POST">
-        <input class="comment-field" id="general-comment-field" type="text" autocomplete="off" name="content" placeholder="Add your comment here">
+        <input class="comment-field" id="general-comment-field" type="text" autocomplete="off" name="content" maxlength="2500" placeholder="Add your comment here">
         <div>
             <button type="reset" id="general-comment-cancel" style="display: none">Cancel</button>
             <button type="submit" id="general-comment-submit" style="display: none">Add Comment</button>
@@ -75,9 +96,75 @@ function formatDate(timeString) {
                 <p id="post"><%= comment.Content %></p>
             </div>
         <% }) %>
+    </div>
 </div>
+    <footer class="footer-main">
+
+    </footer>
 <script>
-    const userID = '<%= user %>';
+    function copyLink(postId) {
+        // Prevent the default action of the <a> tag
+        event.preventDefault();
+
+        // Construct the URL of the post
+        const postUrl = window.location.origin + '/post/' + postId;
+
+        // Copy the URL to the clipboard
+        navigator.clipboard.writeText(postUrl)
+            .then(() => {
+                console.log('Link copied to clipboard');
+
+                // Create a new div element for the message
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = 'Copied to clipboard';
+                messageDiv.style.position = 'fixed';
+                messageDiv.style.bottom = '20px';
+                messageDiv.style.left = '50%';
+                messageDiv.style.backgroundColor = 'lightgreen';
+                messageDiv.style.padding = '10px';
+                messageDiv.style.borderRadius = '5px';
+
+                // Append the message to the body
+                document.body.appendChild(messageDiv);
+
+                // Remove the message after 2 seconds
+                setTimeout(() => {
+                    document.body.removeChild(messageDiv);
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Error copying link to clipboard:', err);
+            });
+    }
+    window.onload = function() {
+        // Get all dropdown menus
+        var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');
+
+        // Initialize style.display to 'none' for each dropdown menu
+        for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].style.display = 'none';
+        }
+    }
+    function toggleMenu(postId) {
+        var menu = document.getElementById('dropdownMenu' + postId);
+        if (menu.style.display === 'none') {
+            menu.style.display = 'block';
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+    document.addEventListener('click', function(event) {
+        var kebabMenus = document.querySelectorAll('.kebab-menu');
+        var isClickInside = Array.from(kebabMenus).some(menu => menu.contains(event.target));
+
+        if (!isClickInside) {
+            var dropdowns = document.querySelectorAll('.dropdown-menu-kebab');
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = 'none';
+            }
+        }
+    });
+    const userID = '<%= user.UserID %>';
     function Inbox(otherInboxID) {
         window.location.href = '/chat/'+otherInboxID;
     }

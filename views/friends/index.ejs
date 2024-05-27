@@ -3,41 +3,41 @@
         <h2>Chat</h2>
         <div class="inbox_display" id="display">
             <% otherUsers.forEach(user => { %>
-              <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
-                <div class="chat_message">
-                  <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
-                  <div class="message_content">
-                    <h1><%= user.otherUserName %></h1>
-                    <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
-                  </div>
+                <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
+                    <div class="chat_message">
+                        <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <div class="message_content">
+                            <h1><%= user.otherUserName %></h1>
+                            <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
+                        </div>
+                    </div>
                 </div>
-              </div>
             <% }) %>
-          </div>
+        </div>
     </div>
 </div>
 <div class="user_feed_section">
     <div class="section_name">
-    <h2>Friends</h2>
+        <h2>Friends</h2>
         <div class="section2_name">
             <div class="tab">
                 <div class="list active" id="l">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
                         <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
-                        </svg>
+                    </svg>
                     <p>Friends List</p>
                 </div>
                 <div class="req" id="r">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
                         <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                         <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
-                        </svg>
+                    </svg>
                     <p>Friend Requests</p>
                 </div>
                 <div class="add" id="a">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                        </svg>
+                    </svg>
                     <p>Add Friends</p>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                 <div class="friend_list">
                     <div class="chat_message">
                         <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
-                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
+                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserName %>  (<%= friend.Friend.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
                         <a href=<%="/chat/check/" + friend.Friend.UserID%>><button>Send a Message</button></a>
@@ -72,7 +72,7 @@
                 <div class="friend_list">
                     <div class="chat_message">
                         <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
-                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserNickName %></a></h3>
+                        <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserName %>  (<%= friend.Friend.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
                         <a href=<%="/chat/check/" + friend.Friend.UserID%>><button>Send a Message</button></a>
@@ -85,12 +85,12 @@
                 <div class="friend_list">
                     <div class="chat_message">
                         <img src="<%= "/" + friendRequest.User.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
-                        <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserNickName %></a></h3>
+                        <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserName %>  (<%= friendRequest.User.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
                         <form action=<%= "/acceptFriend/" + friendRequest.User.UserID %> method="POST">
-                        <button type="submit" name="friend_id" value="<%= friendRequest.User.UserID %>">Accept</button>
-                    </form>
+                            <button type="submit" name="friend_id" value="<%= friendRequest.User.UserID %>">Accept</button>
+                        </form>
                     </div>
                 </div>
             <% }); %>
@@ -109,7 +109,7 @@
     const add = document.getElementById('add');
 
     l.addEventListener('click', () => {
-        l.style.backgroundColor = '#a1b0c0';
+        l.style.backgroundColor = 'rgba(0, 60, 113, 0.3)';
         r.style.backgroundColor = 'white';
         a.style.backgroundColor = 'white';
         list.style.display = 'block';
@@ -118,16 +118,16 @@
     });
 
     r.addEventListener('click', () => {
-        r.style.backgroundColor = '#a1b0c0';
+        r.style.backgroundColor = 'rgba(0, 60, 113, 0.3)';
         l.style.backgroundColor = 'white';
-        a.style.backgroundColor = 'white'; 
+        a.style.backgroundColor = 'white';
         list.style.display = 'none';
         request.style.display = 'block';
         add.style.display = 'none';
     });
 
     a.addEventListener('click', () => {
-        a.style.backgroundColor = '#a1b0c0';
+        a.style.backgroundColor = 'rgba(0, 60, 113, 0.3)';
         r.style.backgroundColor = 'white';
         l.style.backgroundColor = 'white';
         list.style.display = 'none';
@@ -136,6 +136,6 @@
     });
 
     function Inbox(otherInboxID) {
-        window.location.href = '/chat/'+otherInboxID; 
-      }
+        window.location.href = '/chat/'+otherInboxID;
+    }
 </script>

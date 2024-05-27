@@ -714,7 +714,18 @@ input.form-control{
 .picInput{
   height: 3.0625rem !important;
 }
-
+button.btn.btn-default{
+  background-color: #003C71;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn.btn-default:hover{
+  background-color: #0056b3;
+}
 .post{
   margin-top: 15px;
   margin-left: 20%;

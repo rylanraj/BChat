@@ -4,7 +4,7 @@
 .dot {
   height: 0.5rem;
   width: 0.5rem;
-  background-color: #bbb;
+  background-color: #5A5A5A;
   border-radius: 50%;
   display: block;
   margin-bottom: 0.4rem;
@@ -679,13 +679,15 @@ input.form-control{
 }
 .picInput{
   height: 3.0625rem !important;
+}
+
 .post{
   margin-top: 15px;
   margin-left: 20%;
   text-align:center;
   width: 60%;
-  
 }
+
 .feed-post{
   border-bottom: 2px solid #D3DCDC; /* Adjust color and thickness as needed */
 }
@@ -745,10 +747,6 @@ a.post-link{
   button { /* CSS for styling the post report button */
     padding-top: 5px;
     transform: scale(0.75, 0.75);
-  }
-
-  .dot {
-    background-color: #5A5A5A;
   }
 }
 

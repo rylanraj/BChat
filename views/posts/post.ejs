@@ -52,12 +52,13 @@ function formatDate(timeString) {
                 </div>
             </div>
             <div id="popup<%= post.PostID %>" class="popup">
-              <div class="popup-content">
-                <p>Are you sure you want to report this post?</p>
-                <button onclick="Submit('<%= post.PostID %>')">Yes</button>
-                <button onclick="Close('<%= post.PostID %>')">No</button>
+                <div class="popup-content">
+                  <p>Are you sure you want to report this post?</p><div class="buttons">
+                    <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                    <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                  </div>
+                </div>
               </div>
-            </div>
         </div>
     </div>
     <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>

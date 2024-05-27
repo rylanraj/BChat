@@ -63,7 +63,7 @@ let authController = {
         return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: req.isAuthenticated() });
       }
 
-      // If the email does not end with bcit.ca, return an error
+      // If the password does not end with bcit.ca, return an error
       if (!email.endsWith("@my.bcit.ca")) {
         return res.render("auth/register", { error: "Please use your myBCIT email", isAuthenticated:
               req.isAuthenticated()
@@ -120,17 +120,40 @@ let authController = {
     });
     res.redirect("/login");
   },
-  adminPanel: (req, res) => {
-    obj = JSON.parse(JSON.stringify(req.sessionStore.sessions))
+  adminPanel: async (req, res) => {
     user_session = {}
+    obj = JSON.parse(JSON.stringify(req.sessionStore.sessions))
+
+    const reports = await pool.query("SELECT * FROM POST_REPORT");
+    const postIds = reports[0].map(report => report.PostID);
+    if (postIds.length === 0) {
+      return res.render("admin", {posts: [], userDataMap: {}, user: req.user, sessions: user_session, isAuthenticated: req.isAuthenticated()});
+    }
+    const [posts] = await pool.query("SELECT * FROM POST WHERE PostID IN (?)", [postIds]);
+    
+    const userIds = posts.map(post => post.UserID);
+
+    const [users] = await pool.query("SELECT UserID, UserName, ProfilePicture FROM USER WHERE UserID IN (?)", [userIds]);
+    const userDataMap = {};
+    users.forEach(user => {
+      userDataMap[user.UserID] = { username: user.UserName, profilePicture: user.ProfilePicture };
+    });
+
+
     try {
       for (const o in obj) {
-        user_session[o] = JSON.parse(obj[o])['passport']['user']
+        user_session[o] = JSON.parse(obj[o])['passport']['user']['id']
       }
     } catch (err) {
       console.log(err)
     }
-    res.render("admin", {sessions: user_session, isAuthenticated: req.isAuthenticated()});
+    res.render("admin", {posts: posts, userDataMap: userDataMap,user: req.user, sessions: user_session, isAuthenticated: req.isAuthenticated()});
+  },
+  removePost: async (req, res) => {
+    const postId = req.params.postID;
+    await pool.query("DELETE FROM POST WHERE PostID = ?;", [postId]);
+    await pool.query("DELETE FROM POST_REPORT WHERE PostID = ?;", [postId]);
+    res.redirect("/admin");
   },
   revokeSession: (req, res) => {
     req.sessionStore.destroy(req.params.SessionID, (err) => {

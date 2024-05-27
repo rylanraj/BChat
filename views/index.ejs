@@ -58,7 +58,6 @@
                   </div>
                 <div class="report-section" style="text-align: right; margin-left: 270px; ">
 
-
                     <!-- Kebab button and dropdown menu -->
                     <div class="kebab-menu">
                         <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
@@ -83,9 +82,10 @@
                     </div>
                     <div id="popup<%= post.PostID %>" class="popup">
                       <div class="popup-content">
-                        <p>Are you sure you want to report this post?</p>
-                        <button onclick="Submit('<%= post.PostID %>')">Yes</button>
-                        <button onclick="Close('<%= post.PostID %>')">No</button>
+                        <p>Are you sure you want to report this post?</p><div class="buttons">
+                          <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                          <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -149,6 +149,7 @@
 </footer> -->
 </body>
 <script>
+
     function copyLink(postId) {
         // Prevent the default action of the <a> tag
         event.preventDefault();
@@ -234,13 +235,12 @@
         }
     });
 
-
 function Inbox(otherInboxID) {
     window.location.href = '/chat/'+otherInboxID; 
   }
 
   async function toggleLike(postId) {
-    try {
+    try { 
       const response = await fetch(`/like/${postId}`, {
         method: 'POST',
         headers: {
@@ -266,6 +266,7 @@ function Inbox(otherInboxID) {
   }
   async function Submit(postId) {
     document.getElementById('popup'+postId).style.display = 'none';
+    console.log(postId);
   
     await fetch(`/report/${postId}`, {
       method: 'POST',

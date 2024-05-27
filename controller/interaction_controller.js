@@ -1,4 +1,4 @@
-// Setup MySQL connection from .env
+// Setup MySQL connection from ..env
 const mysql = require('mysql2');
 const {data} = require("express-session/session/cookie");
 require('dotenv').config();

@@ -8,7 +8,7 @@ const saltRounds = 10;
 // Import crypto for generating confirmation tokens
 const crypto = require('crypto');
 
-// Setup MySQL connection from .env
+// Setup MySQL connection from ..env
 const mysql = require('mysql2');
 require('dotenv').config();
 

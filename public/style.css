@@ -663,9 +663,9 @@ footer.footer {
   font-size: 1vw;
 }
 input.form-control{
-  background-color: #d5dcdc; !important;
+  background-color: #d5dcdc !important;
   border-radius: 0.75rem !important;
-  width: 16.8125 rem !important;
+  width: 16.8125rem !important;
   height: 2.0625rem !important;
 }
 .post{
@@ -679,7 +679,8 @@ input.form-control{
   border-bottom: 2px solid #D3DCDC; /* Adjust color and thickness as needed */
 }
 .like-section{
-  padding-bottom: 1.5rem;
+  margin-left: 0px !important; /* CSS to make like button aligned to the left side of a post */
+  padding-bottom: 1.25rem;
 }
 .comment-section{
   margin-top: 2%;
@@ -710,26 +711,47 @@ a.post-link{
 }
 
 .user-info {
-
   display: flex; /* Use flexbox */
-  
 }
 .user-info p {
-  align-self:flex-end;
+  font-size: 0.9rem;
+  height: 25px;
+  width: 300px;
+  align-self:flex-start;
+}
+
+.user-info a { /* div containing profile picture */
+  padding-top: 3px;
+}
+
+.report-section { /* CSS for repositioning post report button */
+  position: relative;
+  left: 10%;
+  margin-left: 0px !important;
+}
+
+.report-section .kebab-menu {
+  button { /* CSS for styling the post report button */
+    padding-top: 5px;
+    transform: scale(0.75, 0.75);
+  }
+
+  .dot {
+    background-color: #5A5A5A;
+  }
 }
 
 .user-info-img {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3rem;
+  height: 3rem;
   object-fit: cover;
   background-color: #d3dcdc;
   align-self: flex-start;
   margin-right: 10px; /* Add some spacing between the image and text */
   border-radius: 50%; /* Make the image a circle */
   overflow: hidden; /* Clip the parts of the image that exceed the circle */
-  
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
+
 /* CSS for styling user profile icons in chat and friends windows */
 .chat_message img {
   position: relative;
@@ -748,15 +770,33 @@ a.post-link{
   padding-bottom: 2px;
 }
 
+/* CSS for aligning post title and description to the left */
+.post-link div {
+  padding-left: 5px;
+  margin-left: 0px !important;
+}
+
+/* CSS for styling post title */
+.post-link h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
 .post-info{
   font-size: 1.25rem;
   margin-left: 0.25rem;
 }
+
 #post-username{
+  padding-top: 5px;
   text-align: left;
-  margin-bottom: 0rem;
+  margin-bottom: 0.25rem;
 }
 
+#post-date {
+  text-align: left;
+  margin-bottom: 0.9rem;
+}
 
 .chat_display {
   flex-grow: 1; /* Grow to fill remaining space */
@@ -841,9 +881,9 @@ a.post-link{
 
 .post-img {
   background-color: #d3dcdc;
-  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
   border-radius: 24px;
-  width: 533px;
+  /* width: 533px; */
+  width: 100%;
   height: 300px;
   object-fit: contain;
 }

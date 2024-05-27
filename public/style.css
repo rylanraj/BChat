@@ -606,13 +606,18 @@ footer.footer {
 .area:hover .delete{
   display: flex;
 }
-
+.url {
+  word-break: break-all;
+}
+.longWord{
+    word-break: break-all;
+}
 .area.send.bubble {
   align-items: end;
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: end;
   background-color: cornflowerblue;
   color: white;
@@ -626,7 +631,7 @@ footer.footer {
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: start;
   background-color:  rgb(206, 206, 206);
 	color: black;

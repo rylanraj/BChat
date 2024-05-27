@@ -41,12 +41,12 @@ function formatDate(timeString) {
                 <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
 
                     <% if (post.UserID !== user.UserID) { %>
-                        <a href="#">Copy Link</a>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                         <a onclick="report('<%= post.PostID %>')">Report</a>
                         <a href="#">Message Creator</a>
                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                         <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
-                        <a href="#">Copy Link</a>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                         <a href="#">Delete</a>
                     <% } %>
                 </div>
@@ -101,6 +101,40 @@ function formatDate(timeString) {
 
     </footer>
 <script>
+    function copyLink(postId) {
+        // Prevent the default action of the <a> tag
+        event.preventDefault();
+
+        // Construct the URL of the post
+        const postUrl = window.location.origin + '/post/' + postId;
+
+        // Copy the URL to the clipboard
+        navigator.clipboard.writeText(postUrl)
+            .then(() => {
+                console.log('Link copied to clipboard');
+
+                // Create a new div element for the message
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = 'Copied to clipboard';
+                messageDiv.style.position = 'fixed';
+                messageDiv.style.bottom = '20px';
+                messageDiv.style.left = '50%';
+                messageDiv.style.backgroundColor = 'lightgreen';
+                messageDiv.style.padding = '10px';
+                messageDiv.style.borderRadius = '5px';
+
+                // Append the message to the body
+                document.body.appendChild(messageDiv);
+
+                // Remove the message after 2 seconds
+                setTimeout(() => {
+                    document.body.removeChild(messageDiv);
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Error copying link to clipboard:', err);
+            });
+    }
     window.onload = function() {
         // Get all dropdown menus
         var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');

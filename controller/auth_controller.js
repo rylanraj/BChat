@@ -151,8 +151,10 @@ let authController = {
   },
   removePost: async (req, res) => {
     const postId = req.params.postID;
-    await pool.query("DELETE FROM POST WHERE PostID = ?;", [postId]);
     await pool.query("DELETE FROM POST_REPORT WHERE PostID = ?;", [postId]);
+    await pool.query("DELETE FROM POST_LIKE WHERE PostID = ?;", [postId]);
+    await pool.query("DELETE FROM COMMENT WHERE PostID = ?;", [postId]);
+    await pool.query("DELETE FROM POST WHERE PostID = ?;", [postId]);
     res.redirect("/admin");
   },
   revokeSession: (req, res) => {

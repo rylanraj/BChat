@@ -127,12 +127,12 @@
                                 <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
 
                                     <% if (post.UserID !== user.UserID) { %>
-                                        <a href="#">Copy Link</a>
+                                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                                         <a href="#">Report</a>
                                         <a href="#">Message Creator</a>
                                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                                     <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
-                                    <a href="#">Copy Link</a>
+                                    <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                                     <a href="#" onclick="deletePost('<%= post.PostID %>')">Delete</a>
                                     <% } %>
                                 </div>
@@ -296,16 +296,36 @@
                   <% const userData = userDataMap[post.UserID]; %>
                   <div class="user-info">
                     <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
-                    <p id="post" class="post-info">
-                      <%= userData.username %> <br>
-                      <%= formatDate(post.TimePosted) %>
-                    </p>
+                      <div class="text-user-info">
+                          <p class="post-info" id="post-username">
+                              <%= userData.username %>
+                          </p>
+                          <p class="post-info" id="post-date">
+                              <%= formatDate(post.TimePosted) %>
+                          </p>
+                      </div>
                     <div class="report-section" style="text-align: right; margin-left: 270px; ">
-                
+                        <div class="kebab-menu">
+                            <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </button>
 
-                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;"onclick="report('<%= post.PostID %>')">
-                            <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
-                        </button>
+                            <!-- Dropdown menu -->
+                            <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
+
+                                <% if (post.UserID !== user.UserID) { %>
+                                    <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                                    <a href="#" onclick="report('<%= post.PostID %>')">Report</a>
+                                    <a href="#">Message Creator</a>
+                                <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
+                                <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
+                                <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                                <a href="#" onclick="deletePost('<%= post.PostID %>')">Delete</a>
+                                <% } %>
+                            </div>
+                        </div>
                         <div id="popup<%= post.PostID %>" class="popup">
                             <div class="popup-content">
                               <p>Are you sure you want to report this post?</p><div class="buttons">
@@ -317,9 +337,11 @@
                       </div>
                   </div>
                   <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
-                  <% if (post.Picture) { %>
-                    <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
-                  <% } %>
+                    <% if (post.Picture) { %>
+                    <a href=<%="/post/" + post.PostID%>>
+                        <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                    </a>
+                    <% } %>
                   <div class="like-section" style="text-align: left; margin-left: 70px;">
                 
 
@@ -344,7 +366,40 @@
 
 
     <script>
+        function copyLink(postId) {
+            // Prevent the default action of the <a> tag
+            event.preventDefault();
 
+            // Construct the URL of the post
+            const postUrl = window.location.origin + '/post/' + postId;
+
+            // Copy the URL to the clipboard
+            navigator.clipboard.writeText(postUrl)
+                .then(() => {
+                    console.log('Link copied to clipboard');
+
+                    // Create a new div element for the message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.textContent = 'Copied to clipboard';
+                    messageDiv.style.position = 'fixed';
+                    messageDiv.style.bottom = '20px';
+                    messageDiv.style.left = '50%';
+                    messageDiv.style.backgroundColor = 'lightgreen';
+                    messageDiv.style.padding = '10px';
+                    messageDiv.style.borderRadius = '5px';
+
+                    // Append the message to the body
+                    document.body.appendChild(messageDiv);
+
+                    // Remove the message after 2 seconds
+                    setTimeout(() => {
+                        document.body.removeChild(messageDiv);
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error copying link to clipboard:', err);
+                });
+        }
         async function deletePost(postId) {
             try {
                 const response = await fetch(`/post/delete/${postId}`, {

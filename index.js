@@ -186,6 +186,8 @@ app.get("/logout", authController.logout);
 // Admin
 app.get("/admin", isAdmin, authController.adminPanel);
 app.get("/admin/revoke/:SessionID", isAdmin, authController.revokeSession);
+app.get("/admin/remove/:postID", isAdmin, authController.removePost);
+
 
 
 

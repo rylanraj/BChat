@@ -80,7 +80,7 @@ const mainFeedController = {
 
       
 
-      res.render("index", { posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
+      res.render("index", { id:user, posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
       console.error("Error fetching main feed data:", error);
@@ -330,7 +330,7 @@ let profilesController = {
             return { ...post, likeCount: likeCount[0]?.Likes || 0 };
         }));
 
-        res.render("profile.ejs", { otherUser: userRows[0], posts: postsWithLikes, userDataMap: userDataMap });
+        res.render("profile.ejs", { id:loggedInUserId, otherUser: userRows[0], posts: postsWithLikes, userDataMap: userDataMap });
     } catch (error) {
         console.error("Error fetching user data:", error);
         res.status(500).send("Internal Server Error");

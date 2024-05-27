@@ -4,3 +4,4 @@ node_modules
 uploads
 notes.js
 tests.sql
+ca-certificate.crt

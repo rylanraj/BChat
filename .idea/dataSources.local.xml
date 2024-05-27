@@ -20,5 +20,25 @@
       <secret-storage>master_key</secret-storage>
       <schema-mapping />
     </data-source>
+    <data-source name="@BCHAT" uuid="171897fd-27ac-458c-baf7-568cefc4b8b4">
+      <database-info product="MySQL" version="8.0.30" jdbc-version="4.2" driver-name="MySQL Connector/J" driver-version="mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c)" dbms="MYSQL" exact-version="8.0.30" exact-driver-version="8.2">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>&quot;</identifier-quote-string>
+        <jdbc-catalog-is-schema>true</jdbc-catalog-is-schema>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>doadmin</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema" qname="@" />
+        </introspection-scope>
+      </schema-mapping>
+      <ssl-config use-ide-store="true" use-java-store="true" use-system-store="true">
+        <ca-cert>C:\Users\rylan\Desktop\Coding Projects\Agile-Project\ca-certificate.crt</ca-cert>
+        <enabled>true</enabled>
+        <mode>REQUIRE</mode>
+      </ssl-config>
+    </data-source>
   </component>
 </project>

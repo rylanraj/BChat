@@ -17,12 +17,18 @@ const saltRounds = 10;
 const mysql = require('mysql2');
 require('dotenv').config();
 
+const fs = require('fs');
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    ssl: {
+        ca: fs.readFileSync('./ca-certificate.crt')
+    },
+    waitForConnections: true,
 }).promise();
 
 const localLogin = new LocalStrategy(
@@ -33,7 +39,7 @@ const localLogin = new LocalStrategy(
     },
     async (req, email, password, done) => {
         try {
-            const [rows, fields] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
+            const [rows, fields] = await pool.query("SELECT * FROM bchat_users.USER WHERE Email = ?;", [email]);
             const user = rows[0];
             if (user) {
                 const match = await bcrypt.compare(password, user.Password);
@@ -87,7 +93,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const findOrCreate = async (githubProfile, callback) => {
-    const [rows] = await pool.query("SELECT * FROM bchat_users.user WHERE GitHubEmail = ?;", [githubProfile._json.email]);
+    const [rows] = await pool.query("SELECT * FROM bchat_users.USER WHERE GitHubEmail = ?;", [githubProfile._json.email]);
 
     if (rows.length > 0) {
         callback(null, rows[0]);
@@ -99,9 +105,9 @@ const findOrCreate = async (githubProfile, callback) => {
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
 
-        await pool.query("INSERT INTO bchat_users.user (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
+        await pool.query("INSERT INTO bchat_users.USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
-        const [newRows] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [githubProfile._json.email]);
+        const [newRows] = await pool.query("SELECT * FROM bchat_users.USER WHERE Email = ?;", [githubProfile._json.email]);
         callback(null, newRows[0]);
     }
 }

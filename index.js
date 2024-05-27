@@ -115,11 +115,11 @@ app.get('/confirm/:token', async (req, res) => {
 
     try {
         // Validate the token against the database
-        const [users] = await pool.query("SELECT * FROM bchat_users.user WHERE ConfirmationToken = ?;", [token]);
+        const [users] = await pool.query("SELECT * FROM bchat_users.USER WHERE ConfirmationToken = ?;", [token]);
 
         if (users.length > 0) {
             // If a user with the token exists, mark them as confirmed
-            await pool.query("UPDATE bchat_users.user SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
+            await pool.query("UPDATE bchat_users.USER SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
 
             res.send('Your account has been confirmed!');
         } else {

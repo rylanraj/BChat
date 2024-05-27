@@ -26,6 +26,23 @@ async function keywordToImage(keyword, res) {
     res.redirect("/reminders");
   }
 }
+async function fetchOtherUsers(user) {
+  const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+  const otherUsers = await Promise.all(inboxes.map(async row => {
+    const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
+    const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
+    return {
+      otherUserID: otherUserId,
+      otherUserName: otherUser.UserName,
+      lastMessage: row.Last_Message,
+      profilePicture: otherUser.ProfilePicture,
+      inboxID: row.InboxID
+    };
+  }));
+
+  return otherUsers;
+}
 
 
 // Function to fetch posts from the database
@@ -78,7 +95,7 @@ const mainFeedController = {
         return { ...post, likeCount: likeCount[0]?.Likes || 0 };
       }));
 
-      
+
 
       res.render("index", { posts: postsWithLikes, userDataMap: userDataMap, otherUsers: otherUsers, isAuthenticated: req.isAuthenticated() });
 
@@ -118,7 +135,7 @@ const mainFeedController = {
       await pool.query("INSERT INTO POST_REPORT (PostID, ReporterID, Status) VALUES (?,?,1)", [postID, user["UserID"]]);
     }
   },
-  
+
 };
 
 
@@ -130,23 +147,7 @@ const mainFeedController = {
 let postsController = {
   new: async (req, res) => {
     try {
-      // Fetch other users for display in the chat section
-      const user = req.user.UserID;
-      const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
-
-      const otherUsers = await Promise.all(inboxes.map(async row => {
-        const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
-        const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
-        return {
-          otherUserID: otherUserId,
-          otherUserName: otherUser.UserName,
-          lastMessage: row.Last_Message,
-          profilePicture: otherUser.ProfilePicture,
-          inboxID: row.InboxID
-        };
-      }));
-
-      // Render the create_post view with otherUsers
+      const otherUsers = await fetchOtherUsers(req.user.UserID);
       res.render("create_post.ejs", { otherUsers: otherUsers });
     } catch (error) {
       console.error("Error rendering create_post view:", error);
@@ -156,7 +157,7 @@ let postsController = {
   create: async (req, res) => {
     try {
       const file = req.file;
-      
+
       // Process other form fields (e.g., title, description)
       const title = req.body.title;
       const description = req.body.description;
@@ -168,7 +169,7 @@ let postsController = {
         filePath = filePath.replace(/\\/g, '/');
       }
 
-      // Save post-details to the database 
+      // Save post-details to the database
       pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 
@@ -200,7 +201,7 @@ let postsController = {
 
       res.render("posts/post", {
         post: post[0],
-        user: user[0],
+        creator: user[0],
         isAuthenticated: req.isAuthenticated(),
         parent_comments: parent_comments,
         child_comments: child_comments
@@ -215,13 +216,56 @@ let postsController = {
     const commentContent = req.body.content;
     await pool.query("INSERT INTO COMMENT (PostID, UserID, Content, TimePosted) VALUES (?,?,?,NOW());", [postID, req.user.UserID, commentContent]);
     res.redirect(`/post/${postID}`);
+  },
+  edit: async (req, res) => {
+    try {
+      const postID = req.params.id;
+      const [post] = await pool.query("SELECT * FROM POST WHERE PostID = ?", [postID]);
+
+      // If the current user isn't the owner of the post
+        if (post.length === 0 || post[0].UserID !== req.user.UserID) {
+            return res.status(403).send("You don't have permission to edit this post");
+        }
+
+      const otherUsers = await fetchOtherUsers(req.user.UserID);
+      res.render("posts/edit", { otherUsers: otherUsers, post: post[0] });
+    } catch (error) {
+      console.error("Error rendering edit_post view:", error);
+      res.status(500).send('Internal Server Error');
+    }
+  },
+  editSubmit(req,res){
+    let postID = req.params.id;
+    let title = req.body.title;
+    let description = req.body.description;
+    let file = req.file;
+    let filePath = file ? file.path : null;
+    let removePhoto = req.body.removePhoto;
+    if (filePath) {
+      filePath = filePath.replace(/\\/g, '/');
+      pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = ? WHERE PostID = ?;", [title, description, filePath, postID]);
+      res.redirect("/post/" + postID);
+    }
+    else if (removePhoto && !filePath) {
+        pool.query("UPDATE POST SET Title = ?, Description = ?, Picture = NULL WHERE PostID = ?;", [title, description, postID]);
+        res.redirect("/post/" + postID);
+    }
+    else {
+      pool.query("UPDATE POST SET Title = ?, Description = ? WHERE PostID = ?;", [title, description, postID]);
+      res.redirect("/post/" + postID);
+    }
+
+  },
+  delete: async (req, res) => {
+
   }
+
 };
 
 let chatController = {
   chat: async (req, res) => {
     const user = req.user.UserID
-    
+
     let inboxID = req.params.id;
 
     let [inboxs, fields_3] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
@@ -250,7 +294,7 @@ let chatController = {
       }
     }));
 
-  
+
     let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
     let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
 
@@ -263,7 +307,7 @@ let chatController = {
     }else{
       res.render("chats/index.ejs", {chatMessages: rows, userID: user, inboxID:inboxID, otherUsers: otherUser, otherUserName: userName[0].UserName});
     }
-    
+
   },
   chatUpdate: async (inboxID, userID, message) => {
     // console.log(inboxID, userID, message, searchUser);
@@ -280,9 +324,9 @@ let chatController = {
   },
   chatCheck: async (req, res) => {
     let user = req.user.UserID;
-    let otherUserID = req.params.id; 
+    let otherUserID = req.params.id;
     let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
-    
+
     if (rows.length > 0) {
       let inboxID = rows[0].InboxID;
       res.redirect(`/chat/${inboxID}`);
@@ -290,7 +334,7 @@ let chatController = {
       await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID, User1_ID, User2_ID) VALUES (null, null, ?, ?);", [user, otherUserID]);
 
       let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
-      
+
       let inboxID = rows_2[0].InboxID;
 
       res.redirect(`/chat/${inboxID}`);
@@ -336,7 +380,7 @@ let profilesController = {
         res.status(500).send("Internal Server Error");
     }
 },
-  
+
   update: async (req, res) => {
     let userToUpdate = req.params.id;
     let newUsername = req.body.username;
@@ -347,15 +391,15 @@ let profilesController = {
     console.log(newStudentSet)
     // Access the uploaded profile picture
     const profilePicture = req.file;
-  
+
     // Save the file path to the database
     let filePath = profilePicture ? profilePicture.path : null;
-  
+
     // Replace backslashes with forward slashes
     if (filePath) {
       filePath = filePath.replace(/\\/g, '/');
     }
-    
+
     // Update the user with the new fields only if the "Set" field is not empty
     if (newStudentSet !== undefined) {
       const sql = "UPDATE USER SET StudentSet = ?";
@@ -370,7 +414,7 @@ let profilesController = {
     }
       const sql = "UPDATE USER SET UserName = ?, UserNickName = ?, Program = ?,  Email = ?, ProfilePicture = ? WHERE UserID = ?";
       const params = [newUsername, newNickname, newProgram, newEmail, filePath || req.user.ProfilePicture, userToUpdate];
-  
+
       try {
         const result = await pool.query(sql, params);
         // Handle result here
@@ -378,8 +422,8 @@ let profilesController = {
         console.log(err);
         // Handle error here
       }
-    
-  
+
+
     // Redirect the user to the profile page
     res.redirect(`/profile/${userToUpdate}`);
   },
@@ -405,7 +449,7 @@ let profilesController = {
     }
   }
 };
-  
+
 
 
 
@@ -587,7 +631,7 @@ let remindersController = {
     let user = req.user
 
     await pool.query("DELETE FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToDelete, user.UserID]);
-    
+
     res.redirect("/reminders");
   }
 };

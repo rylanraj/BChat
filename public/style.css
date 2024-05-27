@@ -420,12 +420,21 @@ footer.footer {
   justify-content: space-between;
 }
 #closeButton {
-  background-color: #C1C6C6;
+  position: relative;
+  background-color: #000000;
   color: white;
   border: none;
   cursor: pointer;
   font-size: 1em;
-  line-height: 1.15;
+  line-height: 2.63rem;
+  top: -0.2rem;
+
+}
+#closeButton:focus{
+  outline: none;
+}
+#closeButton:hover {
+  background-color: #000000;
 }
 .section_name{
  
@@ -668,6 +677,8 @@ input.form-control{
   width: 16.8125rem !important;
   height: 2.0625rem !important;
 }
+.picInput{
+  height: 3.0625rem !important;
 .post{
   margin-top: 15px;
   margin-left: 20%;

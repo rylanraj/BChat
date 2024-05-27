@@ -19,17 +19,38 @@ function formatDate(timeString) {
 %>
 <div class="post">
     <div class="user-info">
-        <img class="user-info-img" src="<%= "/" + user.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
-        <p id="post" class="post-info">
-            <%= user.UserName %> <br>
-            <%= formatDate(post.TimePosted) %>
-        </p>
+        <img class="user-info-img" src="<%= "/" + creator.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+        <div class="text-user-info">
+            <p class="post-info" id="post-username">
+                <%= creator.UserName %>
+            </p>
+            <p class="post-info" id="post-date">
+                <%= formatDate(post.TimePosted) %>
+            </p>
+        </div>
         <div class="report-section" style="text-align: right; margin-left: 270px; ">
+            <!-- Kebab button and dropdown menu -->
+            <div class="kebab-menu">
+                <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
 
+                <!-- Dropdown menu -->
+                <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
 
-            <button id="" style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="report('<%= post.PostID %>')">
-                <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
-            </button>
+                    <% if (post.UserID !== user.UserID) { %>
+                        <a href="#">Copy Link</a>
+                        <a onclick="report('<%= post.PostID %>')">Report</a>
+                        <a href="#">Message Creator</a>
+                    <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
+                        <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
+                        <a href="#">Copy Link</a>
+                        <a href="#">Delete</a>
+                    <% } %>
+                </div>
+            </div>
             <div id="popup<%= post.PostID %>" class="popup">
               <div class="popup-content">
                 <p>Are you sure you want to report this post?</p>
@@ -80,7 +101,35 @@ function formatDate(timeString) {
 
     </footer>
 <script>
-    const userID = '<%= user %>';
+    window.onload = function() {
+        // Get all dropdown menus
+        var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');
+
+        // Initialize style.display to 'none' for each dropdown menu
+        for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].style.display = 'none';
+        }
+    }
+    function toggleMenu(postId) {
+        var menu = document.getElementById('dropdownMenu' + postId);
+        if (menu.style.display === 'none') {
+            menu.style.display = 'block';
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+    document.addEventListener('click', function(event) {
+        var kebabMenus = document.querySelectorAll('.kebab-menu');
+        var isClickInside = Array.from(kebabMenus).some(menu => menu.contains(event.target));
+
+        if (!isClickInside) {
+            var dropdowns = document.querySelectorAll('.dropdown-menu-kebab');
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = 'none';
+            }
+        }
+    });
+    const userID = '<%= user.UserID %>';
     function Inbox(otherInboxID) {
         window.location.href = '/chat/'+otherInboxID;
     }

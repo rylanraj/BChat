@@ -97,48 +97,110 @@
             }
             %>
             <% posts.slice().reverse().forEach(function(post) { %>
-                <div class="post">
-                  <% const userData = userDataMap[post.UserID]; %>
-                  <div class="user-info">
-                    <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
-                    <p id="post" class="post-info">
-                      <%= userData.username %> <br>
-                      <%= formatDate(post.TimePosted) %>
-                    </p>
-                    <div class="report-section" style="text-align: right; margin-left: 270px; ">
-                
+                <div class="post feed-post">
+                    <% const userData = userDataMap[post.UserID]; %>
+                    <div class="user-info">
+                        <a href=<%="/profile/" + post.UserID%>>
+                            <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                        </a>
+                        <div class="text-user-info">
+                            <p class="post-info" id="post-username">
+                                <%= userData.username %>
+                            </p>
+                            <p class="post-info" id="post-date">
+                                <%= formatDate(post.TimePosted) %>
+                            </p>
+                        </div>
+                        <div class="report-section" style="text-align: right; margin-left: 270px; ">
 
-                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;">
-                            <img style=" width: 50%; height: 50%;" src="/images/megaphone-3-48.png" alt="Like_button">
-                        </button>
-                        
-                      </div>
-                  </div>
-                  <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
-                  <% if (post.Picture) { %>
+
+                            <!-- Kebab button and dropdown menu -->
+                            <div class="kebab-menu">
+                                <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                </button>
+
+                                <!-- Dropdown menu -->
+                                <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
+
+                                    <% if (post.UserID !== user.UserID) { %>
+                                        <a href="#">Copy Link</a>
+                                        <a href="#">Report</a>
+                                        <a href="#">Message Creator</a>
+                                    <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
+                                    <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
+                                    <a href="#">Copy Link</a>
+                                    <a href="#">Delete</a>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div id="popup<%= post.PostID %>" class="popup">
+                                <div class="popup-content">
+                                    <p>Are you sure you want to report this post?</p>
+                                    <button onclick="Submit('<%= post.PostID %>')">Yes</button>
+                                    <button onclick="Close('<%= post.PostID %>')">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%
+                        function formatTitle(title, charLimit) {
+                            let words = title.split(' ');
+                            let longWordExists = true;
+
+                            while (longWordExists) {
+                                longWordExists = false;
+                                words = words.flatMap(word => {
+                                    if (word.length > charLimit) {
+                                        longWordExists = true;
+                                        return [word.slice(0, charLimit), word.slice(charLimit)];
+                                    }
+                                    return word;
+                                });
+                            }
+
+                            return words.join(' ');
+                        }
+                    %>
+                    <%
+                        function truncateTitle(title, charLimit) {
+                            if (title.length > charLimit) {
+                                return title.slice(0, charLimit) + '...';
+                            }
+                            return title;
+                        }
+                    %>
+                    <a class="post-link" href=<%="/post/" + post.PostID%>>
+                        <div style="text-align: left; margin-left: 70px;"><h3><%= truncateTitle(formatTitle(post.Title, 33), 70) %> </h3><p id="post"><%= formatTitle(truncateTitle(post.Description, 200), 70) %></p></div>
+                    </a>
+                    <% if (post.Picture) { %>
                     <a href=<%="/post/" + post.PostID%>>
                         <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
                     </a>
-                  <% } %>
-                  <div class="like-section" style="text-align: left; margin-left: 70px;">
-                
+                    <% } %>
+                    <div class="like-section" style="text-align: left; margin-left: 70px;">
 
-                    <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
-                        <img style=" width: 50%; height: 50%;" src="/images/facebook-like-48.png" alt="Like_button">
-                    </button>
-                    <span id="like-count-<%= post.PostID %>"><%= post.likeCount %></span>
-                  </div>
+
+                        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
+                            <img style=" width: 50%; height: 50%;" src="/images/facebook-like-48.png" alt="Like_button">
+                        </button>
+                        <span id="like-count-<%= post.PostID %>"><%= post.likeCount %></span>
+                    </div>
                 </div>
                 <% }); %>
-        <div >
-            <hr>
-            <p id="post-footer" style="text-align: center;">
-                *Cricket noises.*<br>
-                No older posts found.
-            </p> 
-        </div>
+            <div>
+                <hr>
+                <p id="post-footer" style="text-align: center; padding-bottom: 4rem;">
+                    *Cricket noises.*<br>
+                    No older posts found.
+                </p>
+            </div>
+
         </div>
     </div>
+    <footer class="footer-main" id="index-footer"></footer>
     
     
     
@@ -274,6 +336,34 @@
 
 
     <script>
+        window.onload = function() {
+            // Get all dropdown menus
+            var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');
+
+            // Initialize style.display to 'none' for each dropdown menu
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = 'none';
+            }
+        }
+        function toggleMenu(postId) {
+            var menu = document.getElementById('dropdownMenu' + postId);
+            if (menu.style.display === 'none') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+        document.addEventListener('click', function(event) {
+            var kebabMenus = document.querySelectorAll('.kebab-menu');
+            var isClickInside = Array.from(kebabMenus).some(menu => menu.contains(event.target));
+
+            if (!isClickInside) {
+                var dropdowns = document.querySelectorAll('.dropdown-menu-kebab');
+                for (var i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].style.display = 'none';
+                }
+            }
+        });
         // Initialize a boolean variable to track form changes
         var formChanged = false;
     
@@ -399,6 +489,22 @@ document.getElementById('profile-form').addEventListener('submit', function(e) {
       console.error('Error:', error);
     }
   }
+    async function report(postId) {
+        document.getElementById('popup'+postId).style.display = 'block';
+    }
+    async function Submit(postId) {
+        document.getElementById('popup'+postId).style.display = 'none';
+
+        await fetch(`/report/${postId}`, {
+            method: 'POST',
+            userID: userID,
+
+        });
+
+    }
+    async function Close(postId) {
+        document.getElementById('popup'+postId).style.display = 'none';
+    }
     </script>
     
 </body>

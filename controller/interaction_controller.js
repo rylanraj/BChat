@@ -310,9 +310,14 @@ let chatController = {
 
     let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
     let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
-
-    const otherUserID = rows_2[0].User1_ID == user ? rows_2[0].User2_ID : rows_2[0].User1_ID;
-
+    let otherUserID;
+    if (rows_2.length > 0) {
+      otherUserID = rows_2[0].User1_ID == user ? rows_2[0].User2_ID : rows_2[0].User1_ID;
+      // Rest of your code...
+    } else {
+      console.error("Error: No chat found with that ID.");
+      return res.redirect("/")
+    }
     const [userName, fields_4] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
 
     if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
@@ -365,9 +370,28 @@ let profilesController = {
         const [userRows] = await pool.query("SELECT * FROM USER WHERE UserID = ?;", [userToFind]);
         if (userRows.length === 0) {
             // Handle case where user is not found
-            return res.status(404).send("User not found");
+          return res.status(404).send(`
+            <html>
+              <body>
+                <h1>User not found, redirecting in <span id="countdown">3</span> seconds...</h1>
+                <script>
+                  var countdown = 3;
+                  var countdownElement = document.getElementById('countdown');
+          
+                  var intervalId = setInterval(function() {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+          
+                    if (countdown <= 0) {
+                      clearInterval(intervalId);
+                      window.location.href = "/";
+                    }
+                  }, 1000);
+                </script>
+              </body>
+            </html>
+          `);
         }
-
         // Fetch the posts made by the user
         const [postRows] = await pool.query("SELECT * FROM POST WHERE UserID = ?;", [userToFind]);
 

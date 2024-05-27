@@ -1,9 +1,19 @@
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<% if (message && message.length > 0) { %>
+<div class="alert alert-danger" role="alert">
+  <%= message %>
+</div>
+<% } %>
 <div class="container-fluid main">
   <div class="col-lg-3 m-auto text-center second index">
     <div class="rounded-lg bg-light text-center content">
       <form action="/login" method="POST">
         <div class="form-group">
-          <h3 class="text-center p-4 text-primary">Log In</h3>
+          <h3 class="text-center p-4 text-primary" id="loginHeader">Log In</h3>
           <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="myBCIT Email">
         </div>
         <div class="form-group">
@@ -30,6 +40,9 @@
     </div>
   </div>
 </div>
+<!-- <footer class="footer-main">
+
+</footer> -->
 
 
 

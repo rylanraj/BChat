@@ -1,5 +1,60 @@
+#main-page{
+  background-color: #F2F2F2;
+}
+.dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  background-color: #5A5A5A;
+  border-radius: 50%;
+  display: block;
+  margin-bottom: 0.4rem;
+  margin-left: 3rem;
+}
+.dropdown-menu-kebab {
+  display: none; /* Initially hide the menu */
+  position: absolute; /* Position the menu relative to the button */
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+.dropdown-menu-kebab a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu-kebab a:hover {background-color: #f1f1f1}
+.post-kebab{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 3px;
+  border-radius: 24px;
+  border: none;
+  background-color: transparent;
+}
+.post-kebab:focus{
+  outline: none;
+}
+.kebab-menu{
+  position: relative;
+}
 .deleteForm {
   display: inline-block
+}
+
+#loginHeader{
+  color: #003C71 !important;
+  font:  1.5rem "Inter" !important;
+  font-weight: 700 !important;
+}
+.footer-main{
+  background-color: #003C71 !important;
+  width: 100% !important;
+  height: 5% !important;
+  position: fixed;
+  bottom: 0;
 }
 
 
@@ -17,8 +72,11 @@ h5,
 h6 {
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
+  margin-bottom: 0; /* Removing the margin underneath all window names */
 }
-
+h2{
+  font-weight: normal;
+}
 header.masthead {
   position: relative;
   background-color: #fff;
@@ -210,7 +268,7 @@ footer.footer {
 
 /* Responsive Image */
 .ProductLogo {
-  padding: 2px;
+  padding: 0px 2px 2px 2px; /* Reduced padding-top to improve border thickness consistency */
   border-radius: 10px;
   background-color: #f8f9fa;
   position: absolute;
@@ -356,17 +414,171 @@ footer.footer {
   justify-content: center;
   align-items: center;
 }
+.chat-upper{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* CSS for stying name that appears at the top of the chat window */
+.chat-upper h2 {
+  padding-left: 10px;
+  padding-bottom: 5px;
+}
+
+#closeButton {
+  position: relative;
+  background-color: #000000;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 2.63rem;
+  top: -0.2rem;
+
+}
+#closeButton:focus{
+  outline: none;
+}
+#closeButton:hover {
+  background-color: #000000;
+}
 .section_name{
+ 
   color: #003c71;
   text-align: center;
   height: 44px;
-  background-color: #C1C6C6;
+  font-size: 2vw !important;
+  background-color: #D3DCDC;
+  padding-top: 3px;
 }
+
+.section2_name{
+  color: #000000;
+  text-align: center;
+  height: 52px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+}
+.dropdown-menu-kebab a{
+  text-align: left;
+}
+
+/* Friends tab names */
+#l, #r, #a{
+  padding-top: 6px; /* Adding padding to compensate for no margin underneath Window title */
+}
+
+/* Repositioning tab icons */
+#l svg, #r svg, #a svg {
+  position: relative;
+  top: 15%;
+}
+
+/* Adding padding between the Friends tab names and their respective icons*/
+#l p, #r p, #a p{
+  padding-left: 10px;
+}
+
+.section_search{
+  display: flex;
+  color: #000000;
+  text-align: center;
+  height: 44px;
+  font-size: 2vw !important;
+  background-color: #ffffff;
+  justify-content: center;
+  align-items: center;
+}
+
+.search_icon {
+  display: flex;
+  width: 50px;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.search_input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.name_area {
+  width: 80%;
+}
+
+.input {
+  border: none;
+  background-color: transparent;
+  font-size: 1vw;
+  width: 98%;
+}
+
+.tab {
+  display: flex;
+  height: 100%;
+}
+
+.list {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.req {
+  display: flex;
+  justify-content: center;
+  width: 34%;
+}
+
+.add {
+  display: flex;
+  justify-content: center;
+  width: 33%;
+}
+
+.active {
+  background-color: rgba(0, 60, 113, 0.3); /* 30% opacity BCIT blue */
+}
+
+.search_field {
+  display: flex;
+  background-color: rgb(238, 238, 238);
+  height: 80%;
+  width: 95%;
+}
+
 .user_profile_section {
   position: fixed;
   top: 83px;
   left: 0;
   width: 30%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
+.user_feed_section {
+  overflow-y: auto;
+  margin-left: 35%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
+  height: calc(100% - 83px);
+  background: #f8f9fa; /* or any other color or image */
+  /* Add other styles as needed based on the design in the photo */
+}
+
+.report_feed_section {
+  overflow-y: auto;
+  margin-left: 22%;
+  position: fixed;
+  top: 83px;
+  left: 0;
+  width: 60%;
   height: calc(100% - 83px);
   background: #f8f9fa; /* or any other color or image */
   /* Add other styles as needed based on the design in the photo */
@@ -380,22 +592,25 @@ footer.footer {
 #discussion {
 	width: 100%;
 	margin: 0 auto;
+  padding: 0;
 	list-style: none;
 	display: flex;
 	flex-flow: column wrap;
+  padding-bottom: 55px;
 }
 
 .area {
   display: flex;
   flex-flow: row;
   max-width: 50%;
-  padding: 0.50em ;
+  height: 10%;
+  padding: 0.3em ;
 }
 .area.send {
   align-self: flex-end;
   justify-content: end;
-
 }
+
 .area.recep {
   align-self: flex-start;
   align-content: start;
@@ -411,18 +626,21 @@ footer.footer {
 .area:hover .delete{
   display: flex;
 }
-
+.url {
+  word-break: break-all;
+}
+.longWord{
+    word-break: break-all;
+}
 .area.send.bubble {
   align-items: end;
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: end;
-  background-color: cornflowerblue;
+  background-color: #0069ff;
   color: white;
-  border-bottom-right-radius: 0.1em;
-	border-top-right-radius: 0.1em;
   text-align: end;
 }
 
@@ -431,34 +649,110 @@ footer.footer {
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
-	max-width: 80%;
+	max-width: 100%;
   text-align: start;
   background-color:  rgb(206, 206, 206);
 	color: black;
-  border-bottom-left-radius: 0.1em;
- 	border-top-left-radius: 0.1em;
 }
 
 .popup {
-  display: none;
-  position: fixed;
-  top: 0;
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
 .popup-content {
   background-color: white;
   border: 1px solid #ccc;
-  width: 300px;
-  height: 200px;
+  width: 350px;
+  /* height: 200px; */
+  padding: 20px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  border-radius: 8px;
+  text-align: center;
+}
+.popup-content button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+.popup-content button:last-of-type {
+  background-color: #6c757d;
+}
+
+.popup-content button:last-of-type:hover {
+  background-color: #5a6268;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  max-width: 400px; /* Max width */
+  border-radius: 10px; /* Rounded corners */
+  text-align: center; /* Center text */
+}
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.yes-btn, .no-btn {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.yes-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.no-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.yes-btn:hover {
+  background-color: #45a049;
+}
+
+.no-btn:hover {
+  background-color: #e53935;
 }
 
 .close {
@@ -466,3 +760,288 @@ footer.footer {
   cursor: pointer;
 }
 
+.bio-text{
+  font-style: inter;
+  font-size: 1vw;
+  color:#000; 
+  text-align: center;
+}
+.form-control{
+  font-size: 1vw;
+}
+input.form-control{
+  background-color: #d5dcdc !important;
+  border-radius: 0.75rem !important;
+  width: 16.8125rem !important;
+  height: 2.0625rem !important;
+}
+.picInput{
+  height: 3.0625rem !important;
+}
+button.btn.btn-default{
+  background-color: #003C71;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button.btn.btn-default:hover{
+  background-color: #0056b3;
+}
+.post{
+  margin-top: 15px;
+  margin-left: 20%;
+  text-align:center;
+  width: 60%;
+}
+
+.feed-post{
+  border-bottom: 2px solid #D3DCDC; /* Adjust color and thickness as needed */
+}
+.like-section{
+  margin-left: 0px !important; /* CSS to make like button aligned to the left side of a post */
+  padding-bottom: 1.25rem;
+}
+.comment-section{
+  margin-top: 2%;
+  margin-left: 20%;
+  width: 60%;
+  padding-bottom: 4rem;
+}
+.comment-field{
+  border: none;
+  border-bottom: 1px solid #909090;
+  width: 75%;
+}
+.comment{
+  padding-top: 2%;
+}
+.comment-field:focus{
+  outline: none;
+  border-bottom: 3px solid #0F0F0F;
+}
+a.post-link{
+  color: #000;
+  text-decoration: none;
+}
+.post-footer {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
+
+.user-info {
+  display: flex; /* Use flexbox */
+}
+.user-info p {
+  font-size: 0.9rem;
+  height: 25px;
+  width: 300px;
+  align-self:flex-start;
+}
+
+.user-info a { /* div containing profile picture */
+  padding-top: 3px;
+}
+
+.report-section { /* CSS for repositioning post report button */
+  position: relative;
+  left: 10%;
+  margin-left: 50px !important; /* left-margin value may vary from system to system */
+}
+
+.report-section .kebab-menu {
+  button { /* CSS for styling the post report button */
+    padding-top: 5px;
+    transform: scale(0.75, 0.75);
+  }
+}
+
+.user-info-img {
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  background-color: #d3dcdc;
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+}
+
+/* CSS for styling user profile icons in chat and friends windows */
+.chat_message img {
+  position: relative;
+  top: 10%;
+  width: 50px;
+  height: 50px;
+}
+
+.friend_list .chat_message h3 { /* Adjusts appearance of the users appearing in the friends tabs lists */
+  font-size: 1.2rem;
+  padding-left: 5px;
+  padding-top: 11px;
+}
+
+.message_content h1 {
+  font-size: 1.25rem;
+  padding-bottom: 2px;
+  padding-top: 1px;
+}
+
+/* CSS for aligning post title and description to the left */
+.post-link div {
+  padding-left: 5px;
+  margin-left: 0px !important;
+}
+
+/* CSS for styling post title */
+.post-link h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.post-info{
+  font-size: 1.25rem;
+  margin-left: 0.25rem;
+}
+
+#post-username{
+  padding-top: 5px;
+  text-align: left;
+  margin-bottom: 0.25rem;
+}
+
+#post-date {
+  text-align: left;
+  margin-bottom: 0.9rem;
+}
+
+.chat_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 80vh;
+}
+
+.inbox_display {
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 90vh;
+}
+
+.friend_display{
+  flex-grow: 1; /* Grow to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 76vh;
+}
+
+.inbox {
+  height: 10%;
+  padding-top: 15px;
+  margin-bottom: 8px; /* Spacing user inboxes out */
+}
+
+/* friends list */
+#list .extend {
+  padding-top: 15px; /* To align the button with the user's name */
+  margin-left: 15px;
+}
+
+/* Add friends "Add friend" */
+#list .extend a {
+  margin-right: 3px;
+  padding-bottom: 5px;
+}
+
+/* Add friends Already added/requested text */
+#list .extend p {
+  margin-top: 20px;
+  margin-right: 15px;
+  width: 300px; /* To display names and usernames in 1 line in the search list */
+}
+
+/* friend requests */
+#request .extend {
+  padding-top: 10px; /* To align the button with the user's name */
+  padding-right: 20px;
+}
+
+.extend button {
+  border: none;
+  border-radius: 20px; /* Increase border radius for a more rounded button */
+  background-color: #D9D9D9; /* Add a background color */
+  padding: 5px 10px; /* top/bottom, left/right */
+  font-size: 0.9rem;
+}
+
+.friend_list {
+  display: flex;
+  height: 13%;
+  flex-direction: row;
+}
+
+.profile_picture {
+  width: 80px; 
+  height: 80px; /* Adjust size as needed */
+  border-radius: 50%; /* Creates a circular shape */
+  background-color: #ccc; /* Sample background color */
+  margin: 10px;
+}
+
+/* CSS to style the message content */
+.message_content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-align: left;
+  font-size: small;
+}
+
+/* CSS to style the chat message div */
+.chat_message {
+  height: 100%;
+  display: flex; /* Use flexbox for layout */
+  align-items: center; /* Center items vertically */
+  
+}
+
+.profilePicture{
+  align-self: flex-start;
+  margin-right: 10px; /* Add some spacing between the image and text */
+  border-radius: 50%; /* Make the image a circle */
+  overflow: hidden; /* Clip the parts of the image that exceed the circle */
+  border-style: solid;
+}
+
+.post-img {
+  background-color: #d3dcdc;
+  border-radius: 24px;
+  /* width: 533px; */
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+}
+
+.extend {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.extend a {
+  font-size: 1vw;
+  padding-right: 20px;
+}
+
+.extend p {
+  font-size: 1vw;
+}
+
+/* Adding space between the Create Post window title and the container below it 
+to compensate for no h2 bottom margin */
+.container .form-group:first-child {
+  padding-top: 5px;
+}

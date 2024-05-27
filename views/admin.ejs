@@ -1,14 +1,79 @@
-<div class="container">
-    <h1 class="mt-4">Admin Dashboard</h1>
-    <p class="lead mb-3">Welcome <%= user.name %></p>
-        <% for (const obj in sessions) { %>
-        <div>
-            <p>SessionID: <%= obj %></p>
+<div class="report_feed_section">
+    <div style="position: fixed; width: 59.3%;" class="section_name">
+        <h2>Report Feed</h2>
+    </div>
+    <div style="margin-top: 50px;">
+        <%
+        function formatDate(timeString) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             
-            <p>UserID: <%= sessions[obj] %></p>
-            <a href="/admin/revoke/<%= obj %>">Revoke Session</a>
-        </div>
-        <% } %>
+            const date = new Date(timeString);
+            const month = months[date.getMonth()];
+            const day = date.getDate();
+            const year = date.getFullYear();
+            
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if minutes is less than 10
+            
+            return `${month} ${day}, ${year} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+        }
+        %>
+        <% posts.slice().reverse().forEach(function(post) { %>
+            <div class="post">
+              <% const userData = userDataMap[post.UserID]; %>
+              <div class="user-info">
+                <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <p id="post" class="post-info">
+                  <%= userData.username %> <br>
+                  <%= formatDate(post.TimePosted) %>
+                </p>
+                <div class="report-section" style="text-align: right; margin-left: 270px; ">
+                
 
-    <a href="/logout" class="btn btn-secondary">Logout</a>
+                    <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border-color: red; background-color: #ffffff;color: red;"onclick="remove('<%= post.PostID %>')">Remove
+                    </button>
+                    <div id="popup<%= post.PostID %>" class="popup">
+                        <div class="popup-content">
+                          <p>Are you sure you want to remove this post?</p><div class="buttons">
+                            <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                            <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+                <a class="post-link" href=<%="/post/" + post.PostID%>>
+                    <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
+                </a>
+              <% if (post.Picture) { %>
+                <a href=<%="/post/" + post.PostID%>>
+                    <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                </a>
+              <% } %>
+            </div>
+            <% }); %>
+    <div >
+        <hr>
+        <p id="post-footer" style="text-align: center;">
+            *Cricket noises.*<br>
+            No older posts found.
+        </p> 
+    </div>
+    </div>
 </div>
+<script>
+    async function remove(postId) {
+        document.getElementById('popup'+postId).style.display = 'block';
+    }
+    async function Submit(postId) {
+        document.getElementById('popup'+postId).style.display = 'none';
+
+        window.location.href = '/admin/remove/' + postId;
+    }
+    async function Close(postId) {
+        document.getElementById('popup'+postId).style.display = 'none';
+    }
+</script>

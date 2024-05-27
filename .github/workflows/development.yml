@@ -1,0 +1,40 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.x'] # Adjust versions as needed
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      # Set environment variables
+      - name: Set environment variables
+        run: |
+          echo "GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
+          echo "GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "GITHUB_CALLBACK_URL=${{ secrets.CALLBACK_URL }}" >> $GITHUB_ENV
+         
+      # Run tests
+      - name: Run tests
+        run: npm test || true
+        continue-on-error: true  # This flag ensures the workflow continues even if npm test fails

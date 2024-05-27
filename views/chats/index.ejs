@@ -1,97 +1,193 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Socket.IO chat</title>
-    <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Socket.IO chat</title>
+  <style>
+    body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+    #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); position: absolute; bottom: 0; }
+    #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+    #input:focus { outline: none; }
+    #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff;display: flex; justify-content: center; align-items: center;}
 
-      
-    </style>
-  </head>
-  <body>
-    <ul id="discussion">
-      <% chatMessages.forEach(chat => { %>
-        <% if (userID==chat.SenderID) { %>
-          <div class="area send">
-            <div class="delete">
-              <a onclick="deleteMessage('<%= chat.MessageID %>')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                </svg>
-              </a>
-              <div id="popup<%= chat.MessageID %>" class="popup">
-                <div class="popup-content">
-                  <p>Are you sure you want to delete this message?</p>
-                  <button onclick="Delete('<%= chat.MessageID %>')">Yes</button>
-                  <button onclick="Close()">No</button>
+
+  </style>
+</head>
+<body>
+<div class="user_profile_section">
+  <div class="section_name">
+    <h2>Chat</h2>
+    <div class="inbox_display" id="display">
+      <% otherUsers.forEach(user => { %>
+        <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
+          <div class="chat_message">
+
+            <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+
+            <div class="message_content">
+              <h1><%= user.otherUserName %></h1>
+              <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+
+
+    </div>
+
+  </div>
+</div>
+<div class="user_feed_section">
+  <div class="section_name">
+    <div class="chat-upper">
+      <h2><%= otherUserName %></h2>
+      <button id="closeButton">X</button>
+    </div>
+    <%
+      function isURL(str) {
+        return str.startsWith('https');
+      }
+      function containsLongWord(str) {
+        const words = str.split(' ');
+        for (let i = 0; i < words.length; i++) {
+          if (words[i].length > 19) {
+            return true;
+          }
+        }
+        return false;
+      }
+    %>
+    <div class="chat_display">
+      <ul id="discussion">
+        <% chatMessages.forEach(chat => { %>
+          <% if (userID==chat.SenderID) { %>
+            <div class="area send">
+              <div class="delete">
+                <a onclick="deleteMessage('<%= chat.MessageID %>')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                  </svg>
+                </a>
+                <div id="popup<%= chat.MessageID %>" class="popup">
+                  <div class="popup-content">
+                    <p>Are you sure you want to delete this message?</p>
+                    <button onclick="Delete('<%= chat.MessageID %>')">Yes</button>
+                    <button onclick="Close('<%= chat.MessageID %>')">No</button>
+                  </div>
                 </div>
               </div>
+              <div class="area send bubble">
+                <% if(isURL(chat.Message)){ %>
+                  <a href="<%= chat.Message %>" target="_blank">
+                    <li class="url"><%= chat.Message %></li>
+                  </a>
+                <% } else if(containsLongWord(chat.Message)){ %>
+                    <li class="longWord"><%= chat.Message %></li>
+                <% } else { %>
+                    <li class="individualMessage"><%= chat.Message %></li>
+                <% } %>
+              </div>
             </div>
-            <div class="area send bubble">
-              <li ><%= chat.Message %></li>
+
+          <% } else { %>
+            <div class="area recep" >
+              <div class="area recep bubble">
+                <% if(isURL(chat.Message)){ %>
+                  <a href="<%= chat.Message %>" target="_blank">
+                    <li class="url"><%= chat.Message %></li>
+                  </a>
+                <% } else if(containsLongWord(chat.Message)){ %>
+                  <li class="longWord"><%= chat.Message %></li>
+                <% } else { %>
+                  <li class="individualMessage"><%= chat.Message %></li>
+                <% } %>
+              </div>
             </div>
-          </div>
-          
-        <% } else { %>
-          <div class="area recep" >
-            <div class="area recep bubble">
-              <li ><%= chat.Message %></li>
-            </div>
-          </div>
-        <% } %>
-      <% }) %>
-    </ul>
-    
+          <% } %>
+        <% }) %>
+      </ul>
+    </div>
+
     <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
+      <input id="input" autocomplete="off" maxlength="500"/><button>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+        </svg>
+      </button>
     </form>
-    
-    <script>
-    const socket = io();
-    const inboxID = '<%= inboxID %>';
-    const userID = '<%= userID %>';
+  </div>
+</div>
+<script>
+  window.onload = function() {
+    // ... existing code ...
 
-    const form = document.getElementById('form');
-    const messages = document.getElementById('discussion');
+    // Scroll to the bottom of the chat
+    const chatDisplay = document.querySelector('.chat_display');
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  };
+  const socket = io();
+  const inboxID = '<%= inboxID %>';
+  const userID = '<%= userID %>';
 
-    function deleteMessage(messageID) {
-      document.getElementById('popup'+messageID).style.display = 'block';
+  const form = document.getElementById('form');
+  const messages = document.getElementById('discussion');
+  const display = document.getElementById('display');
+
+  function isURL(str) {
+    return str.startsWith('https');
+  }
+  function containsLongWord(str) {
+    const words = str.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      if (words[i].length > 19) {
+        return true;
+      }
     }
-    function Delete(messageID) {
-      socket.emit('delete message', {
-        MessageID: messageID,
-        inboxID: inboxID});
+    return false;
+  }
 
-      document.getElementById('popup'+messageID).style.display = 'none';
-    }
-    function Close() {
-      document.getElementById('popup'+messageID).style.display = 'none';
-    }
+  function deleteMessage(messageID) {
+    document.getElementById('popup'+messageID).style.display = 'block';
+  }
+  function Delete(messageID) {
+    socket.emit('delete message', {
+      MessageID: messageID,
+      inboxID: inboxID});
 
-    form.addEventListener('submit', (e) => {
+    document.getElementById('popup'+messageID).style.display = 'none';
+  }
+  function Close(messageID) {
+    document.getElementById('popup'+messageID).style.display = 'none';
+  }
+  function Inbox(otherInboxID) {
+    window.location.href = '/chat/'+otherInboxID;
+  }
+
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value) {
       socket.emit('chat message', {
         inboxID: inboxID,
         userID: userID,
         message: input.value
-       });
+      });
       input.value = '';
-    }
+    }});
 
-    socket.on('new message', async (data) => {
-        const chatMessages  = await data;
-        messages.innerHTML='';
-        await chatMessages.forEach(chat => {
-          if (userID==chat.SenderID) {
-            messages.innerHTML+=`<div class="area send">
+  socket.on('new message', async (data) => {
+    const chatMessages = data;
+    lastMessage = chatMessages[chatMessages.length-1];
+    document.getElementById('latest'+inboxID).innerHTML = lastMessage.Message;
+
+    messages.innerHTML='';
+
+
+    await chatMessages.forEach(chat => {
+      if (userID==chat.SenderID) {
+        if(isURL(chat.Message)){
+          messages.innerHTML+=`<div class="area send">
             <div class="delete">
               <a onclick="deleteMessage(${chat.MessageID})">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
@@ -103,7 +199,54 @@
                 <div class="popup-content">
                   <p>Are you sure you want to delete this message?</p>
                   <button onclick="Delete(${chat.MessageID})">Yes</button>
-                  <button onclick="Close()">No</button>
+                  <button onclick="Close(${chat.MessageID})">No</button>
+                </div>
+              </div>
+            </div>
+            <div class="area send bubble">
+                <a href=${chat.Message} target="_blank">
+                    <li class="url">${chat.Message}</li>
+                </a>
+            </div>
+          </div>`;
+        }
+        else if(containsLongWord(chat.Message)){
+          messages.innerHTML+=`<div class="area send">
+            <div class="delete">
+              <a onclick="deleteMessage(${chat.MessageID})">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>
+              </a>
+              <div id="popup${chat.MessageID}" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to delete this message?</p>
+                  <button onclick="Delete(${chat.MessageID})">Yes</button>
+                  <button onclick="Close(${chat.MessageID})">No</button>
+                </div>
+              </div>
+            </div>
+            <div class="area send bubble">
+                  <li class="longWord">${chat.Message}</li>
+            </div>
+          </div>`;
+        }
+        else{
+          // This should be the default case
+          messages.innerHTML+=`<div class="area send">
+            <div class="delete">
+              <a onclick="deleteMessage(${chat.MessageID})">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>
+              </a>
+              <div id="popup${chat.MessageID}" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to delete this message?</p>
+                  <button onclick="Delete(${chat.MessageID})">Yes</button>
+                  <button onclick="Close(${chat.MessageID})">No</button>
                 </div>
               </div>
             </div>
@@ -111,18 +254,45 @@
               <li >${chat.Message}</li>
             </div>
           </div>`;
-          }else {
-            messages.innerHTML+=`<div class="area recep" >
+        }
+      }else {
+        if (isURL(chat.Message)) {
+          messages.innerHTML+=`<div class="area recep" >
+            <div class="area recep bubble">
+                <a href=${chat.Message} target="_blank">
+                    <li class="url">${chat.Message}</li>
+                </a>
+            </div>
+          </div>`;
+        }
+        else if (containsLongWord(chat.Message)) {
+          messages.innerHTML+=`<div class="area recep" >
+            <div class="area recep bubble">
+              <li class="longWord">${chat.Message}</li>
+            </div>
+          </div>`;
+        }
+
+        else {
+          messages.innerHTML+=`<div class="area recep" >
             <div class="area recep bubble">
               <li >${chat.Message}</li>
             </div>
           </div>`;
-          }
-        });
-        
-    });
+        }
+
+      }
+      // Scroll to the bottom of the chat
+        const chatDisplay = document.querySelector('.chat_display');
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
     });
-    </script>
-  </body>
+
+  });
+  let closeButton = document.getElementById('closeButton');
+  closeButton.addEventListener('click', () => {
+    window.location.href = '/';
+  });
+</script>
+</body>
 </html>

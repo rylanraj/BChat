@@ -1,0 +1,221 @@
+<html lang="en">
+<%
+function formatDate(timeString) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const date = new Date(timeString);
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM format
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if minutes is less than 10
+
+    return `${month} ${day}, ${year} - ${formattedHours}:${formattedMinutes} ${ampm}`;
+}
+%>
+<div class="post">
+    <div class="user-info">
+        <img class="user-info-img" src="<%= "/" + creator.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+        <div class="text-user-info">
+            <p class="post-info" id="post-username">
+                <%= creator.UserName %>
+            </p>
+            <p class="post-info" id="post-date">
+                <%= formatDate(post.TimePosted) %>
+            </p>
+        </div>
+        <div class="report-section" style="text-align: right; margin-left: 270px; ">
+            <!-- Kebab button and dropdown menu -->
+            <div class="kebab-menu">
+                <button class="post-kebab" onclick="toggleMenu('<%= post.PostID %>')">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div id="dropdownMenu<%= post.PostID %>" class="dropdown-menu-kebab">
+
+                    <% if (post.UserID !== user.UserID) { %>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                        <a onclick="report('<%= post.PostID %>')">Report</a>
+                        <a href="#">Message Creator</a>
+                    <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
+                        <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
+                        <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
+                        <a href="#">Delete</a>
+                    <% } %>
+                </div>
+            </div>
+            <div id="popup<%= post.PostID %>" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to report this post?</p><div class="buttons">
+                    <button class="yes-btn" onclick="Submit('<%= post.PostID %>')">Yes</button>
+                    <button class="no-btn" onclick="Close('<%= post.PostID %>')">No</button>
+                  </div>
+                </div>
+              </div>
+        </div>
+    </div>
+    <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
+    <% if (post.Picture) { %>
+        <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+    <% } %>
+    <div class="like-section" style="text-align: left; margin-left: 70px;">
+
+
+        <button style=" padding-top: 5px;padding-bottom: 5px; margin-top: 10px;border-radius: 24px; border: none; background-color: #d3dcdc ;" onclick="toggleLike('<%= post.PostID %>')">
+            <img style=" width: 50%; height: 50%;" src="/images/facebook-like-48.png" alt="Like_button">
+        </button>
+        <span id="like-count-<%= post.PostID %>"><%= post.Likes %></span>
+    </div>
+</div>
+<div class="comment-section">
+    <h3>Comments</h3>
+    <form action=<%="/addComment/" + post.PostID%> method="POST">
+        <input class="comment-field" id="general-comment-field" type="text" autocomplete="off" name="content" maxlength="2500" placeholder="Add your comment here">
+        <div>
+            <button type="reset" id="general-comment-cancel" style="display: none">Cancel</button>
+            <button type="submit" id="general-comment-submit" style="display: none">Add Comment</button>
+        </div>
+    </form>
+    <div class="comments">
+        <% parent_comments.forEach(function(comment) { %>
+            <div class="comment">
+                <img class="user-info-img" src="<%= "/" + comment.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <div class="user-info">
+                    <p id="post" class="post-info">
+                        <%= comment.UserName %> <br>
+                        <%= formatDate(comment.TimePosted) %>
+                    </p>
+                </div>
+                <p id="post"><%= comment.Content %></p>
+            </div>
+        <% }) %>
+    </div>
+</div>
+    <footer class="footer-main">
+
+    </footer>
+<script>
+    function copyLink(postId) {
+        // Prevent the default action of the <a> tag
+        event.preventDefault();
+
+        // Construct the URL of the post
+        const postUrl = window.location.origin + '/post/' + postId;
+
+        // Copy the URL to the clipboard
+        navigator.clipboard.writeText(postUrl)
+            .then(() => {
+                console.log('Link copied to clipboard');
+
+                // Create a new div element for the message
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = 'Copied to clipboard';
+                messageDiv.style.position = 'fixed';
+                messageDiv.style.bottom = '20px';
+                messageDiv.style.left = '50%';
+                messageDiv.style.backgroundColor = 'lightgreen';
+                messageDiv.style.padding = '10px';
+                messageDiv.style.borderRadius = '5px';
+
+                // Append the message to the body
+                document.body.appendChild(messageDiv);
+
+                // Remove the message after 2 seconds
+                setTimeout(() => {
+                    document.body.removeChild(messageDiv);
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Error copying link to clipboard:', err);
+            });
+    }
+    window.onload = function() {
+        // Get all dropdown menus
+        var dropdowns = document.getElementsByClassName('dropdown-menu-kebab');
+
+        // Initialize style.display to 'none' for each dropdown menu
+        for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].style.display = 'none';
+        }
+    }
+    function toggleMenu(postId) {
+        var menu = document.getElementById('dropdownMenu' + postId);
+        if (menu.style.display === 'none') {
+            menu.style.display = 'block';
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+    document.addEventListener('click', function(event) {
+        var kebabMenus = document.querySelectorAll('.kebab-menu');
+        var isClickInside = Array.from(kebabMenus).some(menu => menu.contains(event.target));
+
+        if (!isClickInside) {
+            var dropdowns = document.querySelectorAll('.dropdown-menu-kebab');
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = 'none';
+            }
+        }
+    });
+    const userID = '<%= user.UserID %>';
+    function Inbox(otherInboxID) {
+        window.location.href = '/chat/'+otherInboxID;
+    }
+
+    async function toggleLike(postId) {
+        try {
+            const response = await fetch(`/like/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                const likeCountElement = document.getElementById(`like-count-${postId}`);
+                let currentCount = parseInt(likeCountElement.textContent);
+                likeCountElement.textContent = result.liked ? currentCount + 1 : currentCount - 1;
+            } else {
+                console.error('Failed to toggle like');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    let commentField = document.getElementById('general-comment-field');
+    let commentSubmit = document.getElementById('general-comment-submit');
+    let commentCancel = document.getElementById('general-comment-cancel');
+    commentField.addEventListener('focus', () => {
+        commentSubmit.style.display = 'inline';
+        commentCancel.style.display = 'inline';
+    });
+    commentCancel.addEventListener('click', () => {
+        commentSubmit.style.display = 'none';
+        commentCancel.style.display = 'none';
+    });
+
+    async function report(postId) {
+    document.getElementById('popup'+postId).style.display = 'block';
+  }
+  async function Submit(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
+  
+    await fetch(`/report/${postId}`, {
+      method: 'POST',
+      userID: userID,
+
+    });
+  }
+  async function Close(postId) {
+    document.getElementById('popup'+postId).style.display = 'none';
+  }
+</script>
+</html>

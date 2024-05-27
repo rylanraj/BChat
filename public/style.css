@@ -800,13 +800,15 @@ a.post-link{
 }
 
 .friend_list .chat_message h3 { /* Adjusts appearance of the users appearing in the friends tabs lists */
-  font-size: 1.6rem;
+  font-size: 1.2rem;
+  padding-left: 5px;
   padding-top: 11px;
 }
 
 .message_content h1 {
-  font-size: 1.75em;
+  font-size: 1.25rem;
   padding-bottom: 2px;
+  padding-top: 1px;
 }
 
 /* CSS for aligning post title and description to the left */
@@ -860,9 +862,24 @@ a.post-link{
   padding-top: 15px;
   margin-bottom: 8px; /* Spacing user inboxes out */
 }
+
 /* friends list */
 #list .extend {
-  padding-top: 18px; /* To align the button with the user's name */
+  padding-top: 15px; /* To align the button with the user's name */
+  margin-left: 15px;
+}
+
+/* Add friends "Add friend" */
+#list .extend a {
+  margin-right: 3px;
+  padding-bottom: 5px;
+}
+
+/* Add friends Already added/requested text */
+#list .extend p {
+  margin-top: 20px;
+  margin-right: 15px;
+  width: 300px; /* To display names and usernames in 1 line in the search list */
 }
 
 /* friend requests */
@@ -878,6 +895,7 @@ a.post-link{
   padding: 5px 10px; /* top/bottom, left/right */
   font-size: 0.9rem;
 }
+
 .friend_list {
   display: flex;
   height: 13%;

@@ -107,7 +107,7 @@ const findOrCreate = async (githubProfile, callback) => {
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
         if (githubProfile._json.email === null) {
-            return callback(new Error('We could not find your GitHub email, make sure it is set to public on your account'), null);
+            return callback('We could not find your GitHub email, make sure it is set to public on your account', null);
         }
         await pool.query("INSERT INTO bchat_users.USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);

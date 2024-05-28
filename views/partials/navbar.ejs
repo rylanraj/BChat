@@ -16,13 +16,15 @@
       
     </button>
     <div class="dropdown-content">
-      <a href="/reminders">Reminder List</a>
-      <a href="/reminder/new">Create</a>
       <a href="/post/new">New Post</a>
+      <a href="/reminder/new">New Reminder</a>
+      <a href="/reminders">Reminder List</a>
+
+
       
       
       <% if (isAuthenticated) { %>
-        <a href="/friends">Friends List</a>
+        <a href="/friends">Friends</a>
         <a href="/logout">Logout</a>
         
       <% } else { %>

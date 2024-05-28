@@ -47,7 +47,7 @@ function formatDate(timeString) {
                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                         <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
                         <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
-                        <a href="#">Delete</a>
+                        <a href="#" onclick="deletePost('<%= post.PostID %>')">Delete</a>
                     <% } %>
                 </div>
             </div>
@@ -102,6 +102,25 @@ function formatDate(timeString) {
 
     </footer>
 <script>
+    async function deletePost(postId) {
+        try {
+            const response = await fetch(`/post/delete/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                // If the server responds with a success status, redirect to the desired page
+                window.location.href = '/';
+            } else {
+                console.error('Failed to delete post');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     function copyLink(postId) {
         // Prevent the default action of the <a> tag
         event.preventDefault();

@@ -1,14 +1,19 @@
-// Setup MySQL connection from .env
+// Setup MySQL connection from ..env
 const mysql = require('mysql2');
 const {data} = require("express-session/session/cookie");
 require('dotenv').config();
+
+const fs = require('fs');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  ssl: {
+    ca: fs.readFileSync('./ca-certificate.crt')
+  }
 }).promise();
 
 async function keywordToImage(keyword, res) {
@@ -543,7 +548,7 @@ let friendsController = {
     const searchQuery = req.query.query;
     // This query will return all users that match the search query except the user who is currently logged in
     const [results] = await pool.query
-    ("SELECT * FROM User WHERE UserNickName LIKE ? AND UserID != ?", [`%${searchQuery}%`, req.user.UserID]);
+    ("SELECT * FROM USER WHERE UserNickName LIKE ? AND UserID != ?", [`%${searchQuery}%`, req.user.UserID]);
 
     // This query will return all friend requests that the user has sent
     const [existingFriendRequests] = await pool.query("SELECT * FROM FRIEND WHERE UserID = ?", [req.user.UserID]);

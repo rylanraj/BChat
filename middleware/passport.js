@@ -72,7 +72,7 @@ const githubLogin = new GithubStrategy({
 function(req, accessToken, refreshToken, profile, done) {
             findOrCreate(profile, function (err, user) {
                 if (err) {
-                    return done(err, null, req.flash('error', err));
+                    return done(err);
                 }
                 return done(null, user);
             });

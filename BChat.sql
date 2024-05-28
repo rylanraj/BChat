@@ -14,7 +14,8 @@ CREATE TABLE USER (
     ProfilePicture VARCHAR(200),
     UserNickName VARCHAR(100),
     Confirmed BOOLEAN,
-    ConfirmationToken VARCHAR(100)
+    ConfirmationToken VARCHAR(100),
+    GitHubUserName VARCHAR(100)
 );
 CREATE TABLE REMINDER (
     ReminderID INT AUTO_INCREMENT PRIMARY KEY,

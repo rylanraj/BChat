@@ -97,7 +97,7 @@ let authController = {
         from: 'bchatbcit@gmail.com',
         to: email,
         subject: 'Account Confirmation',
-        text: `Hello, ${username}! Please confirm your account by clicking the following link: http://64.23.207.255/confirm/${confirmationToken}`
+        text: `Hello, ${username}! Please confirm your account by clicking the following link: http://bchat.social/confirm/${confirmationToken}`
       };
 
       await transporter.sendMail(mailOptions, function (error, info) {
@@ -202,7 +202,7 @@ let authController = {
         from: 'bchatbcit@gmail.com',
         to: BCITemail,
         subject: 'Update GitHub Email Request',
-        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: http://64.23.207.255/confirm_github/${token} (Ignore this email if you did not make this request)`
+        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: http://bchat.social/confirm_github/${token} (Ignore this email if you did not make this request)`
       };
 
       await transporter.sendMail(mailOptions, function (error, info) {
@@ -294,7 +294,7 @@ async function sendConfirmationEmail(githubEmail, BCITemail, user, req, res){
     from: 'bchatbcit@gmail.com',
     to: BCITemail,
     subject: 'Account Confirmation',
-    text: `Hello, ${user[0].UserName}! Please confirm your account by clicking the following link: http://64.23.207.255/confirm/${confirmationToken}`
+    text: `Hello, ${user[0].UserName}! Please confirm your account by clicking the following link: http://bchat.social/confirm/${confirmationToken}`
   };
 
   await transporter.sendMail(mailOptions, function (error, info) {

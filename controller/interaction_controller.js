@@ -526,7 +526,10 @@ let friendsController = {
       const [friendRequest] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [receivedFriendRequests[i].UserID]);
       receivedFriendRequests[i].User = friendRequest[0];
     }
+    const [existingFriendRequests] = await pool.query("SELECT * FROM FRIEND WHERE UserID = ?", [req.user.UserID]);
 
+    // This query will return all friend requests that the user has received
+    const [existingFriendRequests_2] = await pool.query("SELECT * FROM FRIEND WHERE FriendUserID = ?", [req.user.UserID]);
     const user = req.user.UserID;
       const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
@@ -544,7 +547,8 @@ let friendsController = {
       };
     }));
 
-    res.render("friends/index", {allUsers:allUsers ,friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
+    res.render("friends/index", {allUsers:allUsers ,friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers,existingFriendRequests: existingFriendRequests,
+      existingFriendRequests_2: existingFriendRequests_2});
   },
   displayResults: async (req, res) => {
     const searchQuery = req.query.query;

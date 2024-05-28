@@ -73,6 +73,9 @@ const githubLogin = new GithubStrategy({
         // console.log("Passport.js profile: ", profile);
         try {
             const userModelOutput = findOrCreate(profile, function (err, user) {
+                if (err.message === 'GitHub email is null') {
+                    return done(null, false, req.flash('error', 'GitHub email is null'));
+                }
                 return done(err, user);
             })
         }

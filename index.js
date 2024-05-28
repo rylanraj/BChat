@@ -164,36 +164,26 @@ app.post('/post/edit/:id', ensureAuthenticated, upload.single('photo'), interact
 
 // Github login
 app.get('/github',
-    passport.authenticate('github'), (err, req, res) => {
-        if (err) {
-            console.error(err);
-            res.redirect('/login');
-        }
-    });
+    passport.authenticate('github'));
 
 app.get('/github/callback',
     passport.authenticate('github', {
         failureRedirect: '/login',
         failureMessage: true }),
     async function (req, res) {
-        if (req.error){
-            console.error(req.error);
-            res.redirect('/login');
+        // Check if the user's email is confirmed
+        if (!req.user.Confirmed == true || req.user.Password === "tempPassword") {
+            // If the email is not confirmed, destroy the session and redirect to a specific page
+            req.session.destroy(function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.redirect('/confirm-email');
+                }
+            });
         } else {
-            // Check if the user's email is confirmed
-            if (!req.user.Confirmed == true || req.user.Password === "tempPassword") {
-                // If the email is not confirmed, destroy the session and redirect to a specific page
-                req.session.destroy(function (err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        res.redirect('/confirm-email');
-                    }
-                });
-            } else {
-                // If the email is confirmed, redirect to the home page
-                res.redirect('/');
-            }
+            // If the email is confirmed, redirect to the home page
+            res.redirect('/');
         }
     }
 );

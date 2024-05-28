@@ -70,7 +70,6 @@ const githubLogin = new GithubStrategy({
         callbackURL: GITHUB_CALLBACK_URL
     },
 function(req, accessToken, refreshToken, profile, done) {
-            console.log(profile);
             findOrCreate(profile, function (err, user) {
                 if (err) {
                     return done(err);

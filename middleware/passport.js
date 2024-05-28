@@ -72,7 +72,7 @@ const githubLogin = new GithubStrategy({
     function(req,accessToken, refreshToken, profile, done) {
         // console.log("Passport.js profile: ", profile);
         try {
-            const userModelOutput = findOrCreate(profile, function (err, user) {
+            const userModelOutput = findOrCreate(req,profile, function (err, user) {
                 if (err.message === 'GitHub email is null') {
                     return done(null, false, req.flash('error', 'GitHub email is null'));
                 }
@@ -116,7 +116,7 @@ const findOrCreate = async (req, githubProfile, callback) => {
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
         if (githubProfile._json.email === null) {
-            callback(new Error('GitHub email is null'));
+            return req.flash('error', 'GitHub email is null');
         }
         await pool.query("INSERT INTO bchat_users.USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);

@@ -18,7 +18,6 @@ const mysql = require('mysql2');
 require('dotenv').config();
 
 const fs = require('fs');
-const {render} = require("ejs");
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -70,22 +69,13 @@ const githubLogin = new GithubStrategy({
         clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: GITHUB_CALLBACK_URL
     },
-    function(req,accessToken, refreshToken, profile, done) {
-        // console.log("Passport.js profile: ", profile);
-        try {
-            const userModelOutput = findOrCreate(req,profile, function (err, user) {
-                if (err.message === 'GitHub email is null') {
-                    return done(null, false, req.flash('error', 'GitHub email is null'));
+function(accessToken, refreshToken, profile, done) {
+            findOrCreate(profile, function (err, user) {
+                if (err) {
+                    return done(err);
                 }
-                return done(err, user);
-            })
-        }
-        catch (err) {
-            if (err.message === 'GitHub email is null') {
-                return done(null, false, req.flash('error', 'GitHub email is null'));
-            }
-        }
-
+                return done(null, user);
+            });
 
     }
 
@@ -104,7 +94,7 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-const findOrCreate = async (req, githubProfile, callback) => {
+const findOrCreate = async (githubProfile, callback) => {
     const [rows] = await pool.query("SELECT * FROM bchat_users.USER WHERE GitHubEmail = ?;", [githubProfile._json.email]);
 
     if (rows.length > 0) {
@@ -117,7 +107,7 @@ const findOrCreate = async (req, githubProfile, callback) => {
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
         if (githubProfile._json.email === null) {
-            return render('login', { error: 'GitHub email is null' });
+            return callback(new Error('GitHub email is null'), null);
         }
         await pool.query("INSERT INTO bchat_users.USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);

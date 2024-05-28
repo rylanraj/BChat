@@ -164,7 +164,12 @@ app.post('/post/edit/:id', ensureAuthenticated, upload.single('photo'), interact
 
 // Github login
 app.get('/github',
-    passport.authenticate('github'));
+    passport.authenticate('github'), (err, req, res) => {
+        if (err) {
+            console.error(err);
+            res.redirect('/login');
+        }
+    });
 
 app.get('/github/callback',
     passport.authenticate('github', {

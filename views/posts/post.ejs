@@ -43,7 +43,7 @@ function formatDate(timeString) {
                     <% if (post.UserID !== user.UserID) { %>
                         <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                         <a onclick="report('<%= post.PostID %>')">Report</a>
-                        <a href="#">Message Creator</a>
+                        <a href="/chat/check/<%= post.UserID %>">Message Creator</a>
                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                         <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
                         <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>

@@ -155,8 +155,10 @@
         event.preventDefault();
 
         // Construct the URL of the post
+        console.log(postId);
+        console.log(window.location.origin);
         const postUrl = window.location.origin + '/post/' + postId;
-
+        console.log(postUrl);
         // Copy the URL to the clipboard
         navigator.clipboard.writeText(postUrl)
             .then(() => {

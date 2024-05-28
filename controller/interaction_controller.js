@@ -530,6 +530,8 @@ let friendsController = {
     const user = req.user.UserID;
       const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
+    const [allUsers] = await pool.query("SELECT * FROM USER WHERE UserID != ?", [user]);
+
     const otherUsers = await Promise.all(inboxes.map(async row => {
       const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
       const [[otherUser]] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [otherUserId]);
@@ -542,7 +544,7 @@ let friendsController = {
       };
     }));
 
-    res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
+    res.render("friends/index", {allUsers:allUsers ,friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
   },
   displayResults: async (req, res) => {
     const searchQuery = req.query.query;

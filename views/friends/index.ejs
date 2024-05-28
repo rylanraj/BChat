@@ -96,10 +96,9 @@
             <% }); %>
         </div>
         <div class="friend_display" id="add" style="display: none;">
-            <div class="friend_list">
                 <% allUsers.forEach(function(user) { %>
                     <div class="friend_list">
-                        <div class="chat_message">
+                        <div class="chat_message" style="margin-top: 10px;">
                             <img src="<%= "/" + user.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
                             <h3><a href=<%="/profile/" + user.UserID%>><%= user.UserName %>  (<%=user.UserNickName%>)</a></h3>
                         </div>

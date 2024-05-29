@@ -681,6 +681,29 @@ footer.footer {
   border-radius: 8px;
   text-align: center;
 }
+.popup-content .yes-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px;
+  font-size: 14px;
+}
+.popup-content .yes-btn:hover {
+  background-color: #0056b3;
+    color: white;
+}
+
+.popup-content .no-btn {
+  background-color: #6c757d;
+    color: white;
+}
+
+.popup-content .no-btn:hover {
+  background-color: #5a6268;
+}
 .popup-content button {
   background-color: #007bff;
   color: white;

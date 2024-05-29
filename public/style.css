@@ -655,25 +655,24 @@ footer.footer {
 	color: black;
 }
 
-/* Popup container */
 .popup {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  display: none; /* Hidden by default /
+  position: fixed; / Stay in place /
+  z-index: 1; / Sit on top /
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  width: 100%; / Full width /
+  height: 100%; / Full height /
+  overflow: auto; / Enable scroll if needed /
+  background-color: rgb(0,0,0); / Fallback color /
+  background-color: rgba(0,0,0,0.4); / Black w/ opacity /
 }
 
-/* Popup content */
 .popup-content {
   background-color: white;
   border: 1px solid #ccc;
   width: 350px;
+  / height: 200px; */
   padding: 20px;
   position: absolute;
   top: 50%;
@@ -682,9 +681,7 @@ footer.footer {
   border-radius: 8px;
   text-align: center;
 }
-
-/* Yes button */
-.popup-content .yes-btn {
+.popup-content button {
   background-color: #007bff;
   color: white;
   border: none;
@@ -695,22 +692,35 @@ footer.footer {
   font-size: 14px;
 }
 
-.popup-content .yes-btn:hover {
+.popup-content button:hover {
   background-color: #0056b3;
-  color: white;
 }
 
-/* No button */
-.popup-content .no-btn {
+.popup-content button:last-of-type {
   background-color: #6c757d;
-  color: white;
 }
 
-.popup-content .no-btn:hover {
+.popup-content button:last-of-type:hover {
   background-color: #5a6268;
 }
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
 
-/* General button styling */
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
 .yes-btn, .no-btn {
   padding: 10px 20px;
   margin: 5px;
@@ -719,7 +729,6 @@ footer.footer {
   cursor: pointer;
   font-size: 16px;
 }
-
 
 .yes-btn {
   background-color: #4CAF50;

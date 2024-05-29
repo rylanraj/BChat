@@ -48,6 +48,7 @@
                     <div class="bcit-pic-input">
                         <input type="file" style="display: none;" id="fileInput" name="photo">
                         <label for="fileInput" style="margin-top: 10px; border-radius: 12px ; padding: 5px; color: #f8f9fa; background-color: #007bff;">Choose a picture</label>
+                        <span class="file-name" id="fileName">No file chosen</span>
                     </div>
                 </div>
                 <hr style="color:black !important; height: 2px;">
@@ -56,6 +57,11 @@
         </div>
     </div>
 </div>
-<script>function Inbox(otherInboxID) {
+<script>
+    document.getElementById('fileInput').addEventListener('change', function() {
+        var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('fileName').textContent = fileName;
+    });
+function Inbox(otherInboxID) {
         window.location.href = '/chat/'+otherInboxID;
     }</script>

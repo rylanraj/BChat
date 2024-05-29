@@ -21,18 +21,24 @@
     <h2>Create Post</h2>
     <div class="container">
         <form  action="/upload" method="POST" enctype="multipart/form-data">
-          <div class="form-group">
+          <div class="form-group" >
             <label for="title">Title</label>
-            <input style="border-radius: 24px !important;" type="text" class="form-control" id="titleInput" placeholder="Title" name="title" maxlength="100">
+            <input style="width: 100% !important; height: 5em !important; border-radius: 12px !important;" type="text" class="form-control" id="titleInput" placeholder="Title" name="title" maxlength="100">
           </div>
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea style="border-radius: 24px !important;" class="form-control" id="descriptionInput" rows="3" placeholder="Description" name="description" maxlength="2500"></textarea>
+            <textarea style="min-height: 20em !important; border-radius: 12px !important; background-color: #d5dcdc;" class="form-control" id="descriptionInput" rows="3" placeholder="Description" name="description" maxlength="2500"></textarea>
           </div>
-          <div>
-            <input type="file" class="form-control picInput" name="photo" accept="image/*">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
+          <label for="description">Photo</label>
+          <div class="bcit-pic-input">
+            
+            <input type="file" style="display: none;" id="fileInput" name="photo">
+            <label for="fileInput" style="border-radius: 12px ; padding: 5px; color: #f8f9fa; background-color: #007bff;">Choose a picture</label>
+        </div>
+        
+          <hr style="color:black !important; height: 2px;">
+          <div style="justify-self: start; width: fit-content;"><button type="submit" class="btn btn-default" id="sbmt" style="background-color: #007bff;">Submit</button></div>
+          
         </form>
       </div>
   </div>

@@ -1036,3 +1036,44 @@ to compensate for no h2 bottom margin */
 .container .form-group:first-child {
   padding-top: 5px;
 }
+.bcit-pic-input{ 
+  font-size: 20px;
+  
+  width: fit-content;
+}
+.bcit-pic-input:hover label{
+  
+  cursor: pointer;
+  background-color:#0056b3!important;
+}
+
+button#sbmt:hover{
+  background-color:#0056b3!important;
+}
+button#general-comment-submit, button#general-comment-cancel {
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button#general-comment-submit {
+  background-color: #007bff;
+}
+
+button#general-comment-cancel {
+  background-color: #6c757d;
+}
+
+button#general-comment-submit:hover {
+  background-color: #0056b3;
+}
+
+button#general-comment-cancel:hover {
+  background-color: #5a6268;
+}
+

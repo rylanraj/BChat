@@ -655,6 +655,7 @@ footer.footer {
 	color: black;
 }
 
+/* Popup container */
 .popup {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -668,11 +669,11 @@ footer.footer {
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+/* Popup content */
 .popup-content {
   background-color: white;
   border: 1px solid #ccc;
   width: 350px;
-  /* height: 200px; */
   padding: 20px;
   position: absolute;
   top: 50%;
@@ -681,6 +682,8 @@ footer.footer {
   border-radius: 8px;
   text-align: center;
 }
+
+/* Yes button */
 .popup-content .yes-btn {
   background-color: #007bff;
   color: white;
@@ -691,66 +694,23 @@ footer.footer {
   margin: 0 10px;
   font-size: 14px;
 }
+
 .popup-content .yes-btn:hover {
   background-color: #0056b3;
-    color: white;
+  color: white;
 }
 
+/* No button */
 .popup-content .no-btn {
   background-color: #6c757d;
-    color: white;
+  color: white;
 }
 
 .popup-content .no-btn:hover {
   background-color: #5a6268;
 }
-.popup-content button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 0 10px;
-  font-size: 14px;
-}
 
-.popup-content button:hover {
-  background-color: #0056b3;
-}
-
-.popup-content button:last-of-type {
-  background-color: #6c757d;
-}
-
-.popup-content button:last-of-type:hover {
-  background-color: #5a6268;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-  max-width: 400px; /* Max width */
-  border-radius: 10px; /* Rounded corners */
-  text-align: center; /* Center text */
-}
-.close-btn {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.buttons {
-  margin-top: 20px;
-}
-
+/* General button styling */
 .yes-btn, .no-btn {
   padding: 10px 20px;
   margin: 5px;
@@ -759,6 +719,7 @@ footer.footer {
   cursor: pointer;
   font-size: 16px;
 }
+
 
 .yes-btn {
   background-color: #4CAF50;

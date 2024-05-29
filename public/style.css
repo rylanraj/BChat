@@ -656,7 +656,7 @@ footer.footer {
 }
 
 .popup {
-  display: none; /* Hidden by default /
+  display: none;  Hidden by default /
   position: fixed; / Stay in place /
   z-index: 1; / Sit on top /
   left: 0;
@@ -672,7 +672,7 @@ footer.footer {
   background-color: white;
   border: 1px solid #ccc;
   width: 350px;
-  / height: 200px; */
+  / height: 200px; 
   padding: 20px;
   position: absolute;
   top: 50%;

@@ -717,12 +717,6 @@ footer.footer {
   font-weight: bold;
 }
 
-.close-btn:hover,
-.close-btn:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
 
 .buttons {
   margin-top: 20px;

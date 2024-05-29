@@ -1082,3 +1082,7 @@ button#general-comment-cancel:hover {
   background-color: #5a6268;
 }
 
+.post div {
+  margin-left: 0 !important; 
+}
+

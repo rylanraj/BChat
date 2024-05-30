@@ -54,7 +54,7 @@ async function fetchOtherUsers(user) {
 const fetchPosts = async () => {
   try {
       // Get a database connection from the pool and execute the query
-      const [rows, fields] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
+      const [rows] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
       // You may need to fetch additional data related to each post, such as user information
       return rows;
   } catch (error) {
@@ -287,11 +287,11 @@ let chatController = {
 
     let inboxID = req.params.id;
 
-    let [inboxs, fields_3] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+    let [inboxs] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
     const otherUser = await Promise.all(inboxs.map( async row => {
       if (row.User1_ID == user) {
-        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User2_ID]);
+        let [pp] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User2_ID]);
         let data={
           otherUserID: row.User2_ID,
           otherUserName: pp[0].UserName,
@@ -301,7 +301,7 @@ let chatController = {
         }
         return data;
       } else {
-        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User1_ID]);
+        let [pp] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User1_ID]);
         let data={
           otherUserID: row.User1_ID,
           otherUserName: pp[0].UserName,
@@ -314,8 +314,8 @@ let chatController = {
     }));
 
 
-    let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
-    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    let [rows_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
+    let [rows] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
     let otherUserID;
     if (rows_2.length > 0) {
       otherUserID = rows_2[0].User1_ID == user ? rows_2[0].User2_ID : rows_2[0].User1_ID;
@@ -324,7 +324,7 @@ let chatController = {
       console.error("Error: No chat found with that ID.");
       return res.redirect("/")
     }
-    const [userName, fields_4] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
+    const [userName] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
 
     if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
       res.redirect("/friends");
@@ -340,7 +340,7 @@ let chatController = {
     await pool.query("UPDATE INBOX SET Last_Message = ?, Last_UserID = ? WHERE InboxID = ?;", [message, userID, inboxID]);
   },
   chatGet: async (inboxID) => {
-    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    let [rows] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
     return rows;
   },
   chatDelete: async (MessageID) => {
@@ -349,7 +349,7 @@ let chatController = {
   chatCheck: async (req, res) => {
     let user = req.user.UserID;
     let otherUserID = req.params.id;
-    let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+    let [rows] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
 
     if (rows.length > 0) {
       let inboxID = rows[0].InboxID;
@@ -357,7 +357,7 @@ let chatController = {
     } else {
       await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID, User1_ID, User2_ID) VALUES (null, null, ?, ?);", [user, otherUserID]);
 
-      let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+      let [rows_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
 
       let inboxID = rows_2[0].InboxID;
 
@@ -601,7 +601,7 @@ let remindersController = {
   list: async (req, res) => {
     let user = req.user
     try{
-      const [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE UserID = ?;", [user.UserID]);
+      const [rows] = await pool.query("SELECT * FROM REMINDER WHERE UserID = ?;", [user.UserID]);
       res.render("reminder/index", {
         reminders: rows, user: user
       });
@@ -617,7 +617,7 @@ let remindersController = {
   listOne: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
     if (rows.length > 0) {
       res.render("reminder/single-reminder", {reminderItem: rows[0]});
     } else {
@@ -643,7 +643,7 @@ let remindersController = {
   edit: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
     if (rows.length > 0) {
       res.render("reminder/edit", {reminderItem: rows[0]});
     } else {
@@ -655,7 +655,7 @@ let remindersController = {
     // Get the id of the reminder to update
     let reminderToUpdate = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToUpdate, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToUpdate, user.UserID]);
     // If the reminder exists, update it
     if (rows.length > 0) {
       let reminder = rows[0];

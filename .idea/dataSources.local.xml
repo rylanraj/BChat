@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="dataSourceStorageLocal" created-in="WS-241.15989.105">
+  <component name="dataSourceStorageLocal" created-in="WS-233.14808.24">
     <data-source name="bchat_users@localhost" uuid="52324a5f-1e44-4b81-8a14-afdd4eb18357">
       <database-info product="MySQL" version="8.0.31" jdbc-version="4.2" driver-name="MySQL Connector/J" driver-version="mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c)" dbms="MYSQL" exact-version="8.0.31" exact-driver-version="8.2">
         <extra-name-characters>#@</extra-name-characters>
@@ -24,6 +24,7 @@
       <database-info product="MySQL" version="8.0.30" jdbc-version="4.2" driver-name="MySQL Connector/J" driver-version="mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c)" dbms="MYSQL" exact-version="8.0.30" exact-driver-version="8.2">
         <extra-name-characters>#@</extra-name-characters>
         <identifier-quote-string>&quot;</identifier-quote-string>
+        <jdbc-catalog-is-schema>true</jdbc-catalog-is-schema>
       </database-info>
       <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
       <secret-storage>master_key</secret-storage>
@@ -34,7 +35,7 @@
         </introspection-scope>
       </schema-mapping>
       <ssl-config use-ide-store="true" use-java-store="true" use-system-store="true">
-        <ca-cert>C:\Users\rylan\Desktop\Coding Projects\Agile-Project\ca-certificate.crt</ca-cert>
+        <ca-cert>C:\Users\rylan\OneDrive - School District No. 36 (Surrey)\Desktop\Coding Projects\Agile-Project\ca-certificate.crt</ca-cert>
         <enabled>true</enabled>
         <mode>REQUIRE</mode>
       </ssl-config>

@@ -175,6 +175,7 @@ let postsController = {
       }
 
       // Save post-details to the database
+      pool.query("SET time_zone = ?;",['America/Los_Angeles']);
       pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 

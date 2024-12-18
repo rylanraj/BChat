@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="@BCHAT">
-  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.53">
+  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.52">
     <root id="1">
       <DefaultCasing>exact</DefaultCasing>
       <DefaultEngine>InnoDB</DefaultEngine>
@@ -1121,24 +1121,24 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </table>
     <column id="312" parent="302" name="ChangeGitHubEmailRequestID">
       <AutoIncrement>1</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="313" parent="302" name="BCITEmail">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="314" parent="302" name="NewGitHubEmail">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="315" parent="302" name="Token">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <index id="316" parent="302" name="PRIMARY">
       <ColNames>ChangeGitHubEmailRequestID</ColNames>
@@ -1152,26 +1152,26 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="318" parent="303" name="MessageID">
       <AutoIncrement>66</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="319" parent="303" name="Inbox_ID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="320" parent="303" name="SenderID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="321" parent="303" name="Message">
+      <DasType>varchar(500)|0s</DasType>
       <Position>4</Position>
-      <StoredType>varchar(500)|0s</StoredType>
     </column>
     <column id="322" parent="303" name="DateSent">
+      <DasType>datetime|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StoredType>datetime|0s</StoredType>
     </column>
     <foreign-key id="323" parent="303" name="CHAT_ibfk_1">
       <ColNames>Inbox_ID</ColNames>
@@ -1203,30 +1203,30 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="329" parent="304" name="CommentID">
       <AutoIncrement>34</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="330" parent="304" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="331" parent="304" name="PostID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="332" parent="304" name="ParentCommentID">
+      <DasType>int|0s</DasType>
       <Position>4</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="333" parent="304" name="Content">
+      <DasType>varchar(2500)|0s</DasType>
       <Position>5</Position>
-      <StoredType>varchar(2500)|0s</StoredType>
     </column>
     <column id="334" parent="304" name="TimePosted">
+      <DasType>datetime|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
-      <StoredType>datetime|0s</StoredType>
     </column>
     <foreign-key id="335" parent="304" name="COMMENT_ibfk_1">
       <ColNames>UserID</ColNames>
@@ -1258,21 +1258,21 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="341" parent="305" name="FriendID">
       <AutoIncrement>25</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="342" parent="305" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="343" parent="305" name="FriendUserID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="344" parent="305" name="FriendAccepted">
+      <DasType>tinyint(1)|0s</DasType>
       <Position>4</Position>
-      <StoredType>tinyint(1)|0s</StoredType>
     </column>
     <foreign-key id="345" parent="305" name="FRIEND_ibfk_1">
       <ColNames>UserID</ColNames>
@@ -1304,27 +1304,27 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="351" parent="306" name="InboxID">
       <AutoIncrement>21</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="352" parent="306" name="Last_Message">
+      <DasType>varchar(200)|0s</DasType>
       <Position>2</Position>
-      <StoredType>varchar(200)|0s</StoredType>
     </column>
     <column id="353" parent="306" name="Last_UserID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="354" parent="306" name="User1_ID">
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="355" parent="306" name="User2_ID">
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <foreign-key id="356" parent="306" name="INBOX_ibfk_1">
       <ColNames>Last_UserID</ColNames>
@@ -1365,36 +1365,36 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="364" parent="307" name="PostID">
       <AutoIncrement>30</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="365" parent="307" name="Title">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="366" parent="307" name="Description">
+      <DasType>varchar(2500)|0s</DasType>
       <Position>3</Position>
-      <StoredType>varchar(2500)|0s</StoredType>
     </column>
     <column id="367" parent="307" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>4</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="368" parent="307" name="Picture">
+      <DasType>varchar(200)|0s</DasType>
       <Position>5</Position>
-      <StoredType>varchar(200)|0s</StoredType>
     </column>
     <column id="369" parent="307" name="Likes">
+      <DasType>int|0s</DasType>
       <DefaultExpression>0</DefaultExpression>
       <Position>6</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="370" parent="307" name="TimePosted">
+      <DasType>datetime|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
-      <StoredType>datetime|0s</StoredType>
     </column>
     <foreign-key id="371" parent="307" name="POST_ibfk_1">
       <ColNames>UserID</ColNames>
@@ -1417,17 +1417,17 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="375" parent="308" name="CommentID">
       <AutoIncrement>46</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="376" parent="308" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="377" parent="308" name="PostID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <foreign-key id="378" parent="308" name="POST_LIKE_ibfk_1">
       <ColNames>UserID</ColNames>
@@ -1459,21 +1459,21 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="384" parent="309" name="ReportID">
       <AutoIncrement>15</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="385" parent="309" name="PostID">
+      <DasType>int|0s</DasType>
       <Position>2</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="386" parent="309" name="ReporterID">
+      <DasType>int|0s</DasType>
       <Position>3</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="387" parent="309" name="Status">
+      <DasType>tinyint(1)|0s</DasType>
       <Position>4</Position>
-      <StoredType>tinyint(1)|0s</StoredType>
     </column>
     <foreign-key id="388" parent="309" name="POST_REPORT_ibfk_1">
       <ColNames>PostID</ColNames>
@@ -1505,36 +1505,36 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="394" parent="310" name="ReminderID">
       <AutoIncrement>4</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="395" parent="310" name="Title">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="396" parent="310" name="Description">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="397" parent="310" name="Completed">
+      <DasType>tinyint(1)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StoredType>tinyint(1)|0s</StoredType>
     </column>
     <column id="398" parent="310" name="Keyword">
+      <DasType>varchar(100)|0s</DasType>
       <Position>5</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="399" parent="310" name="Banner">
+      <DasType>varchar(300)|0s</DasType>
       <Position>6</Position>
-      <StoredType>varchar(300)|0s</StoredType>
     </column>
     <column id="400" parent="310" name="UserID">
+      <DasType>int|0s</DasType>
       <Position>7</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <foreign-key id="401" parent="310" name="REMINDER_ibfk_1">
       <ColNames>UserID</ColNames>
@@ -1557,61 +1557,61 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     </key>
     <column id="405" parent="311" name="UserID">
       <AutoIncrement>22</AutoIncrement>
+      <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>int|0s</StoredType>
     </column>
     <column id="406" parent="311" name="UserName">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="407" parent="311" name="Email">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="408" parent="311" name="GitHubEmail">
+      <DasType>varchar(100)|0s</DasType>
       <Position>4</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="409" parent="311" name="Password">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="410" parent="311" name="Role">
+      <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="411" parent="311" name="StudentSet">
+      <DasType>char(1)|0s</DasType>
       <Position>7</Position>
-      <StoredType>char(1)|0s</StoredType>
     </column>
     <column id="412" parent="311" name="Program">
+      <DasType>varchar(100)|0s</DasType>
       <Position>8</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="413" parent="311" name="DateJoined">
+      <DasType>date|0s</DasType>
       <Position>9</Position>
-      <StoredType>date|0s</StoredType>
     </column>
     <column id="414" parent="311" name="ProfilePicture">
+      <DasType>varchar(200)|0s</DasType>
       <Position>10</Position>
-      <StoredType>varchar(200)|0s</StoredType>
     </column>
     <column id="415" parent="311" name="UserNickName">
+      <DasType>varchar(100)|0s</DasType>
       <Position>11</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <column id="416" parent="311" name="Confirmed">
+      <DasType>tinyint(1)|0s</DasType>
       <Position>12</Position>
-      <StoredType>tinyint(1)|0s</StoredType>
     </column>
     <column id="417" parent="311" name="ConfirmationToken">
+      <DasType>varchar(100)|0s</DasType>
       <Position>13</Position>
-      <StoredType>varchar(100)|0s</StoredType>
     </column>
     <index id="418" parent="311" name="PRIMARY">
       <ColNames>UserID</ColNames>

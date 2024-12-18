@@ -5,16 +5,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  ssl: {
-    ca: fs.readFileSync('./ca-certificate.crt')
-  }
-}).promise();
+const {pool} = require('../db');
 
 async function keywordToImage(keyword, res) {
   try {
@@ -175,7 +166,9 @@ let postsController = {
       }
 
       // Save post-details to the database
-      await pool.query("SET time_zone = ?;",['America/Los_Angeles']);
+
+      // Line below used in production only
+      //await pool.query("SET time_zone = ?;",['America/Los_Angeles']);
       await pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 

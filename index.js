@@ -9,17 +9,10 @@ const {authController} = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
 const fs = require('fs');
-const mysql = require("mysql2");
 const flash = require('connect-flash');
 require('dotenv').config()
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-}).promise();
+const {pool} = require('./db');
 
 const socketIO = require('socket.io');
 const http = require('http');

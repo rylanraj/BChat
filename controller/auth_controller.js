@@ -7,6 +7,8 @@ const saltRounds = 10;
 
 // Import crypto for generating confirmation tokens
 const crypto = require('crypto');
+// Use a host variable to store the host name
+const host = 'http://localhost:3001';
 
 // Setup MySQL connection from ..env
 const mysql = require('mysql2');
@@ -21,17 +23,7 @@ let transporter = nodemailer.createTransport({
 });
 const fs = require('fs');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  ssl: {
-    ca: fs.readFileSync('./ca-certificate.crt')
-  },
-  waitForConnections: true,
-}).promise();
+const {pool} = require('../db');
 
 let authController = {
   login: (req, res) => {
@@ -68,13 +60,6 @@ let authController = {
         return res.render("auth/register", { error: "Password must be at least 8 characters long", isAuthenticated: req.isAuthenticated() });
       }
 
-      // If the password does not end with bcit.ca, return an error
-      if (!email.endsWith("@my.bcit.ca")) {
-        return res.render("auth/register", { error: "Please use your myBCIT email", isAuthenticated:
-              req.isAuthenticated()
-        });
-      }
-
       // Hash the password before inserting into the database
       const hashedPassword = await hashPassword(password);
 
@@ -97,7 +82,7 @@ let authController = {
         from: 'bchatbcit@gmail.com',
         to: email,
         subject: 'Account Confirmation',
-        text: `Hello, ${username}! Please confirm your account by clicking the following link: https://bchat.social/confirm/${confirmationToken}`
+        text: `Hello, ${username}! Please confirm your account by clicking the following link: ${host}/confirm/${confirmationToken}`
       };
 
       await transporter.sendMail(mailOptions, function (error, info) {
@@ -179,13 +164,6 @@ let authController = {
     const BCITemail = req.body.BCITEmail;
     const password = req.body.Password;
 
-    // If the BCIT does not end with bcit.ca, return an error
-    if (!BCITemail.endsWith("@my.bcit.ca")) {
-      return res.render("auth/confirm_email", { error: "Please use your myBCIT email", isAuthenticated:
-            req.isAuthenticated() });
-    }
-
-
     // Before checking the GitHub email, check if their is a local account with the BCIT email
     const [user] = await pool.query("SELECT * FROM bchat_users.USER WHERE Email = ?;", [BCITemail]);
     // If this user exists, send a request to their email to update their GitHub email
@@ -202,7 +180,7 @@ let authController = {
         from: 'bchatbcit@gmail.com',
         to: BCITemail,
         subject: 'Update GitHub Email Request',
-        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: https://bchat.social/confirm_github/${token} (Ignore this email if you did not make this request)`
+        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: ${host}/confirm_github/${token} (Ignore this email if you did not make this request)`
       };
 
       await transporter.sendMail(mailOptions, function (error, info) {
@@ -294,7 +272,7 @@ async function sendConfirmationEmail(githubEmail, BCITemail, user, req, res){
     from: 'bchatbcit@gmail.com',
     to: BCITemail,
     subject: 'Account Confirmation',
-    text: `Hello, ${user[0].UserName}! Please confirm your account by clicking the following link: https://bchat.social/confirm/${confirmationToken}`
+    text: `Hello, ${user[0].UserName}! Please confirm your account by clicking the following link: http://localhost:3001/confirm/${confirmationToken}`
   };
 
   await transporter.sendMail(mailOptions, function (error, info) {

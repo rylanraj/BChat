@@ -357,7 +357,8 @@ let chatController = {
     await pool.query("UPDATE INBOX SET Last_Message = ?, Last_UserID = ? WHERE InboxID = ?;", [message, userID, inboxID]);
   },
   chatGet: async (inboxID) => {
-    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+  // Ensure deterministic ascending order for incremental updates
+  let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ? ORDER BY MessageID ASC;", [inboxID]);
     return rows;
   },
   chatDelete: async (MessageID) => {

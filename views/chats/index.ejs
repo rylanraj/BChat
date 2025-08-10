@@ -172,12 +172,14 @@
     window.location.href = '/chat/'+otherInboxID;
   }
 
+  const pendingQueue = []; // track pending temp IDs in order
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (input.value) {
       const tempText = input.value; // capture text before clearing
       const tempId = 'temp-' + Date.now();
       appendOptimistic(tempId, tempText);
+      pendingQueue.push({ tempId, text: tempText });
       const body = { message: tempText };
       input.value='';
       try {
@@ -186,7 +188,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
-        await fetchMessages(true); // refresh to replace temp bubble
+        // Don't full refresh; next incremental poll will reconcile
+        await fetchMessages(false, true);
       } catch (e) {
         console.error('Send failed', e);
         markFailed(tempId);
@@ -195,137 +198,47 @@
   });
 
   let lastMessageId = null;
-  async function fetchMessages(forceFull=false){
+  async function fetchMessages(initial=false, reconcile=false){
     try {
-      const url = lastMessageId && !forceFull ? `/api/chat/${inboxID}/messages?sinceId=${lastMessageId}` : `/api/chat/${inboxID}/messages`;
+      const url = lastMessageId && !initial ? `/api/chat/${inboxID}/messages?sinceId=${lastMessageId}` : `/api/chat/${inboxID}/messages`;
       const res = await fetch(url);
       if(!res.ok) return;
       const data = await res.json();
-      const newMessages = data.messages || [];
-      if (newMessages.length === 0 && !forceFull) return; // nothing new
-      let allMessages;
-      if (forceFull || !lastMessageId) {
-        allMessages = newMessages; // we requested full list
-        messages.innerHTML='';
-      } else {
-        // append mode: we first need existing messages DOM? For simplicity refetch full when new messages exist
-        allMessages = await (await fetch(`/api/chat/${inboxID}/messages`)).json();
-        allMessages = allMessages.messages;
-        messages.innerHTML='';
+      const fetched = data.messages || [];
+      if (initial) {
+        messages.innerHTML = '';
+        fetched.forEach(appendMessage);
+      } else if (fetched.length>0) {
+        fetched.forEach(m => {
+          if (m.SenderID == userID) {
+            if (upgradePendingBubble(m)) {
+              // upgraded existing optimistic bubble -> nothing else
+            } else {
+              appendMessage(m);
+            }
+          } else {
+            appendMessage(m);
+          }
+        });
       }
-      if (allMessages.length>0) {
-        lastMessageId = allMessages[allMessages.length-1].MessageID;
-        document.getElementById('latest'+inboxID).innerHTML = allMessages[allMessages.length-1].Message;
+      if (fetched.length>0) {
+        lastMessageId = fetched[fetched.length-1].MessageID;
+        document.getElementById('latest'+inboxID).innerHTML = fetched[fetched.length-1].Message;
+        scrollToBottom();
+      } else if (reconcile) {
+        // If reconcile requested but no new messages returned, maybe full refresh needed for failures
       }
-      allMessages.forEach(chat => {
-      if (userID==chat.SenderID) {
-        if(isURL(chat.Message)){
-          messages.innerHTML+=`<div class="area send">
-            <div class="delete">
-              <a onclick="deleteMessage(${chat.MessageID})">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                </svg>
-              </a>
-              <div id="popup${chat.MessageID}" class="popup">
-                <div class="popup-content">
-                  <p>Are you sure you want to delete this message?</p>
-                  <button onclick="Delete(${chat.MessageID})">Yes</button>
-                  <button onclick="Close(${chat.MessageID})">No</button>
-                </div>
-              </div>
-            </div>
-            <div class="area send bubble">
-                <a href=${chat.Message} target="_blank">
-                    <li class="url">${chat.Message}</li>
-                </a>
-            </div>
-          </div>`;
-        }
-        else if(containsLongWord(chat.Message)){
-          messages.innerHTML+=`<div class="area send">
-            <div class="delete">
-              <a onclick="deleteMessage(${chat.MessageID})">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                </svg>
-              </a>
-              <div id="popup${chat.MessageID}" class="popup">
-                <div class="popup-content">
-                  <p>Are you sure you want to delete this message?</p>
-                  <button onclick="Delete(${chat.MessageID})">Yes</button>
-                  <button onclick="Close(${chat.MessageID})">No</button>
-                </div>
-              </div>
-            </div>
-            <div class="area send bubble">
-                  <li class="longWord">${chat.Message}</li>
-            </div>
-          </div>`;
-        }
-        else{
-          // This should be the default case
-          messages.innerHTML+=`<div class="area send">
-            <div class="delete">
-              <a onclick="deleteMessage(${chat.MessageID})">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                </svg>
-              </a>
-              <div id="popup${chat.MessageID}" class="popup">
-                <div class="popup-content">
-                  <p>Are you sure you want to delete this message?</p>
-                  <button onclick="Delete(${chat.MessageID})">Yes</button>
-                  <button onclick="Close(${chat.MessageID})">No</button>
-                </div>
-              </div>
-            </div>
-            <div class="area send bubble">
-              <li >${chat.Message}</li>
-            </div>
-          </div>`;
-        }
-      }else {
-        if (isURL(chat.Message)) {
-          messages.innerHTML+=`<div class="area recep" >
-            <div class="area recep bubble">
-                <a href=${chat.Message} target="_blank">
-                    <li class="url">${chat.Message}</li>
-                </a>
-            </div>
-          </div>`;
-        }
-        else if (containsLongWord(chat.Message)) {
-          messages.innerHTML+=`<div class="area recep" >
-            <div class="area recep bubble">
-              <li class="longWord">${chat.Message}</li>
-            </div>
-          </div>`;
-        }
-
-        else {
-          messages.innerHTML+=`<div class="area recep" >
-            <div class="area recep bubble">
-              <li >${chat.Message}</li>
-            </div>
-          </div>`;
-        }
-
-      }
-      // Scroll to bottom after each render
-      const chatDisplay = document.querySelector('.chat_display');
-      chatDisplay.scrollTop = chatDisplay.scrollHeight;
-    });
     } catch(e){ console.error('Fetch messages failed', e); }
+  }
+  function scrollToBottom(){
+    const chatDisplay = document.querySelector('.chat_display');
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
 
   // Initial full load
-  fetchMessages(true);
+  fetchMessages(true, false);
   // Poll every 3 seconds
-  setInterval(fetchMessages, 3000);
+  setInterval(() => fetchMessages(false,false), 3000);
   // Utility: sanitize html
   function escapeHtml(str){
     return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
@@ -345,9 +258,61 @@
     } else {
       content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
     }
-    messages.innerHTML += `<div class="area send pending" id="${tempId}"><div class="area send bubble">${content}</div></div>`;
+    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}</div></div>`;
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  }
+  function appendMessage(chat){
+    const isSender = userID==chat.SenderID;
+    const msg = chat.Message;
+    const id = chat.MessageID;
+    const urlClass = isURL(msg) ? 'url' : containsLongWord(msg) ? 'longWord' : '';
+    // Dedup: if already rendered (including upgraded pending) skip
+    if (document.getElementById('msg-' + id)) return;
+    if (isSender){
+      let content;
+      if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
+      else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
+      else content = `<li>${msg}</li>`;
+      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}</div></div>`;
+    } else {
+      let content;
+      if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
+      else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
+      else content = `<li>${msg}</li>`;
+      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}</div></div>`;
+    }
+  }
+  function upgradePendingBubble(message){
+    // find a pending bubble with matching text (first match)
+    const pendingEls = Array.from(document.querySelectorAll('.pending[data-text]'));
+    const target = pendingEls.find(el => decodeURIComponent(el.getAttribute('data-text')) === message.Message);
+    if (!target) return false;
+    target.classList.remove('pending');
+    target.removeAttribute('data-text');
+    // Add delete control + assign popup id
+    const bubble = target.querySelector('.bubble');
+    if (bubble) {
+      // Wrap bubble with delete control if not present
+      if (!target.querySelector('.delete')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'delete';
+        wrapper.innerHTML = `<a onclick=\"deleteMessage(${message.MessageID})\">${trashIcon()}</a><div id=\"popup${message.MessageID}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${message.MessageID})\">Yes</button><button onclick=\"Close(${message.MessageID})\">No</button></div></div>`;
+        target.insertBefore(wrapper, bubble);
+      } else {
+        // update existing delete anchor with real id if it was missing
+      }
+    }
+    // Replace temp id with real for potential future operations
+    target.id = 'msg-' + message.MessageID;
+    // Remove its entry from pendingQueue
+    const idx = pendingQueue.findIndex(p => p.text === message.Message);
+    if (idx !== -1) pendingQueue.splice(idx,1);
+    return true;
+  }
+  function trashIcon(){
+    return `
+    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-trash\" viewBox=\"0 0 16 16\">\n      <path d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z\"/>\n      <path d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z\"/>\n    </svg>`;
   }
   function markFailed(tempId){
     const el = document.getElementById(tempId);

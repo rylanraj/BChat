@@ -48,7 +48,7 @@ const server=http.createServer(app);
 const io = socketIO(server);
 
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session

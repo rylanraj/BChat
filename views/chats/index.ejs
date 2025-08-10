@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Socket.IO chat</title>
+  <title>Chat</title>
   <style>
     body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
@@ -127,7 +127,7 @@
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   };
-  const socket = io();
+  // Polling-based chat (Socket.IO removed)
   const inboxID = '<%= inboxID %>';
   const userID = '<%= userID %>';
 
@@ -151,12 +151,13 @@
   function deleteMessage(messageID) {
     document.getElementById('popup'+messageID).style.display = 'block';
   }
-  function Delete(messageID) {
-    socket.emit('delete message', {
-      MessageID: messageID,
-      inboxID: inboxID});
-
-    document.getElementById('popup'+messageID).style.display = 'none';
+  async function Delete(messageID) {
+    try {
+      await fetch(`/api/chat/message/${messageID}`, { method: 'DELETE' });
+      document.getElementById('popup'+messageID).style.display = 'none';
+      // Force refresh
+      await fetchMessages(true);
+    } catch (e) { console.error('Delete failed', e); }
   }
   function Close(messageID) {
     document.getElementById('popup'+messageID).style.display = 'none';
@@ -165,26 +166,46 @@
     window.location.href = '/chat/'+otherInboxID;
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (input.value) {
-      socket.emit('chat message', {
-        inboxID: inboxID,
-        userID: userID,
-        message: input.value
-      });
-      input.value = '';
-    }});
+      const body = { message: input.value };
+      try {
+        await fetch(`/api/chat/${inboxID}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        input.value='';
+        await fetchMessages(true);
+      } catch (e) { console.error('Send failed', e); }
+    }
+  });
 
-  socket.on('new message', async (data) => {
-    const chatMessages = data;
-    lastMessage = chatMessages[chatMessages.length-1];
-    document.getElementById('latest'+inboxID).innerHTML = lastMessage.Message;
-
-    messages.innerHTML='';
-
-
-    await chatMessages.forEach(chat => {
+  let lastMessageId = null;
+  async function fetchMessages(forceFull=false){
+    try {
+      const url = lastMessageId && !forceFull ? `/api/chat/${inboxID}/messages?sinceId=${lastMessageId}` : `/api/chat/${inboxID}/messages`;
+      const res = await fetch(url);
+      if(!res.ok) return;
+      const data = await res.json();
+      const newMessages = data.messages || [];
+      if (newMessages.length === 0 && !forceFull) return; // nothing new
+      let allMessages;
+      if (forceFull || !lastMessageId) {
+        allMessages = newMessages; // we requested full list
+        messages.innerHTML='';
+      } else {
+        // append mode: we first need existing messages DOM? For simplicity refetch full when new messages exist
+        allMessages = await (await fetch(`/api/chat/${inboxID}/messages`)).json();
+        allMessages = allMessages.messages;
+        messages.innerHTML='';
+      }
+      if (allMessages.length>0) {
+        lastMessageId = allMessages[allMessages.length-1].MessageID;
+        document.getElementById('latest'+inboxID).innerHTML = allMessages[allMessages.length-1].Message;
+      }
+      allMessages.forEach(chat => {
       if (userID==chat.SenderID) {
         if(isURL(chat.Message)){
           messages.innerHTML+=`<div class="area send">
@@ -282,13 +303,17 @@
         }
 
       }
-      // Scroll to the bottom of the chat
-        const chatDisplay = document.querySelector('.chat_display');
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
-
+      // Scroll to bottom after each render
+      const chatDisplay = document.querySelector('.chat_display');
+      chatDisplay.scrollTop = chatDisplay.scrollHeight;
     });
+    } catch(e){ console.error('Fetch messages failed', e); }
+  }
 
-  });
+  // Initial full load
+  fetchMessages(true);
+  // Poll every 3 seconds
+  setInterval(fetchMessages, 3000);
   let closeButton = document.getElementById('closeButton');
   closeButton.addEventListener('click', () => {
     window.location.href = '/';

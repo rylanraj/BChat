@@ -42,10 +42,7 @@ const sessionStore = new MySQLStore({
     ssl: ca ? { ca } : undefined
 });
 
-const socketIO = require('socket.io');
-const http = require('http');
-const server=http.createServer(app);
-const io = socketIO(server);
+// Socket.IO removed for Vercel serverless compatibility. Using polling REST endpoints instead.
 
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -71,6 +68,7 @@ app.use(
 app.use(flash());
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json()); // For JSON bodies (chat API)
 
 app.use(ejsLayouts);
 
@@ -226,26 +224,66 @@ app.get("/admin/remove/:postID", isAdmin, authController.removePost);
 
 
 
-io.on('connection', (socket) => {
-  socket.on('chat message', async (data) => {
-    let {inboxID, userID, message} = data;
-    
-    await interactionController.chatController.chatUpdate(inboxID, userID, message);
+// Polling chat REST API
+// Get messages (optionally only those after a given last message id)
+app.get('/api/chat/:id/messages', ensureAuthenticated, async (req, res) => {
+    try {
+        const inboxID = req.params.id;
+        const sinceId = req.query.sinceId ? parseInt(req.query.sinceId, 10) : null;
+    // Authorization: ensure user is participant in inbox
+    const [inboxRows] = await pool.query('SELECT * FROM INBOX WHERE InboxID = ? AND (User1_ID = ? OR User2_ID = ?)', [inboxID, req.user.UserID, req.user.UserID]);
+    if (inboxRows.length === 0) return res.status(403).json({ error: 'Forbidden' });
+        let messages = await interactionController.chatController.chatGet(inboxID);
+        if (sinceId) {
+            messages = messages.filter(m => m.MessageID > sinceId);
+        }
+        res.json({ messages });
+    } catch (e) {
+        console.error('Error fetching messages', e);
+        res.status(500).json({ error: 'Failed to fetch messages' });
+    }
+});
 
-    const chatMessages = await interactionController.chatController.chatGet(inboxID);
-    
-    await io.emit('new message', chatMessages)
-  });
-  socket.on('delete message', async (data) => {
-    let {MessageID, inboxID} = data;
-    
-    await interactionController.chatController.chatDelete(MessageID);
-    
-    const chatMessages = await interactionController.chatController.chatGet(inboxID);
-  
-    await io.emit('new message', chatMessages)
+// Post a new message
+app.post('/api/chat/:id/messages', ensureAuthenticated, async (req, res) => {
+    try {
+        const inboxID = req.params.id;
+        const userID = req.user.UserID;
+        const { message } = req.body;
+        if (!message || typeof message !== 'string' || message.length === 0) {
+            return res.status(400).json({ error: 'Message required' });
+        }
+    // Authorization check
+    const [inboxRows] = await pool.query('SELECT * FROM INBOX WHERE InboxID = ? AND (User1_ID = ? OR User2_ID = ?)', [inboxID, userID, userID]);
+    if (inboxRows.length === 0) return res.status(403).json({ error: 'Forbidden' });
+        await interactionController.chatController.chatUpdate(inboxID, userID, message);
+        // Return the updated last message list (could optimize later)
+        const messages = await interactionController.chatController.chatGet(inboxID);
+        res.status(201).json({ messages });
+    } catch (e) {
+        console.error('Error posting message', e);
+        res.status(500).json({ error: 'Failed to post message' });
+    }
+});
 
-  });
+// Delete a message
+app.delete('/api/chat/message/:messageID', ensureAuthenticated, async (req, res) => {
+    try {
+        const messageID = req.params.messageID;
+        // Only allow delete if user owns the message or is in inbox
+        const [rows] = await pool.query('SELECT * FROM CHAT WHERE MessageID = ?', [messageID]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Not found' });
+        const msg = rows[0];
+        const [inboxRows] = await pool.query('SELECT * FROM INBOX WHERE InboxID = ? AND (User1_ID = ? OR User2_ID = ?)', [msg.Inbox_ID, req.user.UserID, req.user.UserID]);
+        if (inboxRows.length === 0 || msg.SenderID !== req.user.UserID) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        await interactionController.chatController.chatDelete(messageID);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error deleting message', e);
+        res.status(500).json({ error: 'Failed to delete message' });
+    }
 });
 
 

@@ -16,6 +16,9 @@
   .pending:after { content: '⏳'; font-size: 0.7rem; position: absolute; top: -6px; right: -6px; }
   .failed { opacity: 0.75; background: #f8d7da !important; position: relative; }
   .failed:after { content: '⚠'; font-size: 0.75rem; position: absolute; top: -6px; right: -6px; }
+  .timestamp { font-size: 0.65rem; color: #888; margin-top: 2px; white-space: nowrap; }
+  .area.send .timestamp { text-align: right; }
+  .area.recep .timestamp { text-align: left; }
 
 
   </style>
@@ -94,6 +97,7 @@
                 <% } else { %>
                     <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
+                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
               </div>
             </div>
 
@@ -109,6 +113,7 @@
                 <% } else { %>
                   <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
+                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
               </div>
             </div>
           <% } %>
@@ -258,7 +263,7 @@
     } else {
       content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
     }
-    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}</div></div>`;
+  messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}<div class="timestamp">sending...</div></div></div>`;
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
@@ -269,18 +274,19 @@
     const urlClass = isURL(msg) ? 'url' : containsLongWord(msg) ? 'longWord' : '';
     // Dedup: if already rendered (including upgraded pending) skip
     if (document.getElementById('msg-' + id)) return;
+    const ts = formatTimestamp(chat.DateSent);
     if (isSender){
       let content;
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}</div></div>`;
+      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
     } else {
       let content;
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}</div></div>`;
+      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
     }
   }
   function upgradePendingBubble(message){
@@ -290,7 +296,7 @@
     if (!target) return false;
     target.classList.remove('pending');
     target.removeAttribute('data-text');
-    // Add delete control + assign popup id
+    // Add delete control + assign popup id + timestamp
     const bubble = target.querySelector('.bubble');
     if (bubble) {
       // Wrap bubble with delete control if not present
@@ -302,6 +308,10 @@
       } else {
         // update existing delete anchor with real id if it was missing
       }
+      // Replace sending... timestamp
+      const tsEl = bubble.querySelector('.timestamp');
+      if (tsEl) tsEl.textContent = formatTimestamp(message.DateSent);
+      else bubble.innerHTML += `<div class=\"timestamp\">${formatTimestamp(message.DateSent)}</div>`;
     }
     // Replace temp id with real for potential future operations
     target.id = 'msg-' + message.MessageID;
@@ -320,6 +330,14 @@
       el.classList.remove('pending');
       el.classList.add('failed');
     }
+  }
+  function formatTimestamp(raw){
+    if(!raw) return '';
+    try {
+      const d = new Date(raw);
+      // Format as e.g. 10:34 AM | Aug 9
+      return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ' | ' + d.toLocaleDateString([], {month:'short', day:'numeric'});
+    } catch { return ''; }
   }
   let closeButton = document.getElementById('closeButton');
   closeButton.addEventListener('click', () => {

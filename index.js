@@ -12,35 +12,10 @@ const mysql = require("mysql2");
 const fs = require('fs');
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session')(session);
+const {pool} = require('./db');
 require('dotenv').config()
 
-// Load SSL certificate
-let ca;
-try {
-    const fs = require('fs');
-    ca = fs.readFileSync(path.join(__dirname, 'ca.pem'));
-} catch (err) {
-    console.warn('Warning: ca.pem not found or could not be read. SSL may not be enabled for MySQL connection.');
-}
-
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    ssl: ca ? { ca } : undefined
-}).promise();
-
-// MySQL session store for serverless
-const sessionStore = new MySQLStore({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    ssl: ca ? { ca } : undefined
-});
+const sessionStore = new MySQLStore({}, pool);
 
 // Socket.IO removed for Vercel serverless compatibility. Using polling REST endpoints instead.
 

@@ -7,12 +7,6 @@ const saltRounds = 10;
 
 // Import crypto for generating confirmation tokens
 const crypto = require('crypto');
-// Use a host variable to store the host name
-const host = 'http://localhost:3001';
-
-// Setup MySQL connection from ..env
-const mysql = require('mysql2');
-require('dotenv').config();
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -21,7 +15,6 @@ let transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   }
 });
-const fs = require('fs');
 
 const {pool} = require('../db');
 

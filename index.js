@@ -1,6 +1,7 @@
 const passport = require("./middleware/passport")
 const express = require("express");
 const session = require("express-session");
+const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
@@ -13,6 +14,7 @@ const mysql = require("mysql2");
 const flash = require('connect-flash');
 require('dotenv').config()
 
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -20,6 +22,19 @@ const pool = mysql.createPool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME
 }).promise();
+
+// MySQL session store for serverless
+const fs = require('fs');
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    ssl: {
+        ca: fs.readFileSync(path.join(__dirname, 'ca.pem'))
+    }
+});
 
 const socketIO = require('socket.io');
 const http = require('http');
@@ -31,41 +46,45 @@ app.use(express.static("public"));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session
+
 app.use(
-  session({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  })
+    session({
+        secret: "secret",
+        resave: false,
+        saveUninitialized: false,
+        store: sessionStore, // Use MySQL session store
+        cookie: {
+            httpOnly: true,
+            secure: false,
+            maxAge: 24 * 60 * 60 * 1000,
+        },
+    })
 );
+
+// Flash messages (must come after session)
+app.use(flash());
 
 app.use(express.urlencoded({ extended: false }));
 
 app.use(ejsLayouts);
 
 app.use((req, res, next) => {
-  // Path to the logo
-  res.locals.logo = '/images/logo.png';
-  next();
+    // Path to the logo
+    res.locals.logo = '/images/logo.png';
+    next();
 });
 
 // Initializes passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middleware to pass user data to all routes
+// Middleware to pass user data and flash messages to all routes
 app.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
+        res.locals.user = req.user;
+        res.locals.success_msg = req.flash('success_msg');
+        res.locals.error_msg = req.flash('error_msg');
+        next();
 });
-
-// Flash messages
-app.use(flash());
 
 app.set("view engine", "ejs");
 
@@ -120,10 +139,11 @@ app.get('/confirm/:token', async (req, res) => {
         if (users.length > 0) {
             // If a user with the token exists, mark them as confirmed
             await pool.query("UPDATE bchat_users.user SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
-
-            res.send('Your account has been confirmed!');
+            req.flash('success_msg', 'Your account has been confirmed!');
+            res.redirect('/login');
         } else {
-            res.send('Invalid confirmation token.');
+            req.flash('error_msg', 'Invalid confirmation token.');
+            res.redirect('/login');
         }
     } catch (error) {
         console.error("Error confirming user:", error);
@@ -222,8 +242,6 @@ io.on('connection', (socket) => {
 });
 
 
-server.listen(3001, function () {
-  console.log(
-    "Server running. Visit: http://localhost:3001/ in your browser 🚀"
-  );
-});
+
+// For Vercel serverless deployment, export the app (Socket.IO will not work in serverless)
+module.exports = app;

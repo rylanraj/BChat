@@ -9,7 +9,13 @@
     #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); position: absolute; bottom: 0; }
     #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
     #input:focus { outline: none; }
-    #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff;display: flex; justify-content: center; align-items: center;}
+  #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff;display: flex; justify-content: center; align-items: center;}
+
+  /* Optimistic UI states */
+  .pending { opacity: 0.55; position: relative; }
+  .pending:after { content: '⏳'; font-size: 0.7rem; position: absolute; top: -6px; right: -6px; }
+  .failed { opacity: 0.75; background: #f8d7da !important; position: relative; }
+  .failed:after { content: '⚠'; font-size: 0.75rem; position: absolute; top: -6px; right: -6px; }
 
 
   </style>
@@ -169,16 +175,22 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (input.value) {
-      const body = { message: input.value };
+      const tempText = input.value; // capture text before clearing
+      const tempId = 'temp-' + Date.now();
+      appendOptimistic(tempId, tempText);
+      const body = { message: tempText };
+      input.value='';
       try {
         await fetch(`/api/chat/${inboxID}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
-        input.value='';
-        await fetchMessages(true);
-      } catch (e) { console.error('Send failed', e); }
+        await fetchMessages(true); // refresh to replace temp bubble
+      } catch (e) {
+        console.error('Send failed', e);
+        markFailed(tempId);
+      }
     }
   });
 
@@ -314,6 +326,36 @@
   fetchMessages(true);
   // Poll every 3 seconds
   setInterval(fetchMessages, 3000);
+  // Utility: sanitize html
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  }
+  function classifyMessage(msg){
+    if(isURL(msg)) return 'url';
+    if(containsLongWord(msg)) return 'longWord';
+    return 'individualMessage';
+  }
+  function appendOptimistic(tempId, text){
+    const cls = classifyMessage(text);
+    let content;
+    if(cls==='url') {
+      content = `<a href="${escapeHtml(text)}" target="_blank"><li class="url">${escapeHtml(text)}</li></a>`;
+    } else if(cls==='longWord') {
+      content = `<li class="longWord">${escapeHtml(text)}</li>`;
+    } else {
+      content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
+    }
+    messages.innerHTML += `<div class="area send pending" id="${tempId}"><div class="area send bubble">${content}</div></div>`;
+    const chatDisplay = document.querySelector('.chat_display');
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  }
+  function markFailed(tempId){
+    const el = document.getElementById(tempId);
+    if(el){
+      el.classList.remove('pending');
+      el.classList.add('failed');
+    }
+  }
   let closeButton = document.getElementById('closeButton');
   closeButton.addEventListener('click', () => {
     window.location.href = '/';

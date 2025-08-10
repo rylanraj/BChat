@@ -54,7 +54,7 @@ let authController = {
         }
   
       // Check if user with the email already exists
-      const user = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
+      const user = await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);
       if (user[0].length > 0) {
         return res.render("auth/register", { error: "User with this email already exists", isAuthenticated:
               req.isAuthenticated() });
@@ -84,24 +84,30 @@ let authController = {
       const formattedDate = `${year}-${month}-${day}`;
   
       // Insert the user into the database with the current date as DateJoined
-      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined, ProfilePicture, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [name, email,
+      await pool.query("INSERT INTO USER (UserName, Email, Password, Role, UserNickName, DateJoined, ProfilePicture, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [name, email,
         hashedPassword, "user", username, formattedDate,"../images/default.jpg", 0, confirmationToken]);
       
       // Send a confirmation email
+
+      // Dynamically build the confirmation URL based on the request
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const confirmUrl = `${protocol}://${host}/confirm/${confirmationToken}`;
       let mailOptions = {
         from: 'bchatbcit@gmail.com',
         to: email,
         subject: 'Account Confirmation',
-        text: `Hello, ${username}! Please confirm your account by clicking the following link: http://localhost:3001/confirm/${confirmationToken}`
+        text: `Hello, ${username}! Please confirm your account by clicking the following link: ${confirmUrl}`
       };
 
-      await transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully:', info.response);
+        req.flash('success_msg', 'Registration successful! Please check your email for confirmation.');
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        req.flash('error_msg', 'Registration successful, but failed to send confirmation email. Please contact support.');
+      }
       
       // Redirect to login page upon successful registration
       res.redirect("/login");
@@ -182,7 +188,7 @@ let authController = {
 
 
     // Before checking the GitHub email, check if their is a local account with the BCIT email
-    const [user] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [BCITemail]);
+    const [user] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [BCITemail]);
     // If this user exists, send a request to their email to update their GitHub email
     if (user.length > 0 && user[0].GitHubEmail !== user[0].Email) {
       // Generate a token
@@ -190,7 +196,7 @@ let authController = {
 
       // Insert the request into the database
       await pool.query
-      ("INSERT INTO bchat_users.change_github_email_request(BCITEmail, NewGitHubEmail, Token) VALUES(?, ?, ?);", [BCITemail, githubEmail, token]);
+      ("INSERT INTO CHANGE_GITHUB_EMAIL_REQUEST(BCITEmail, NewGitHubEmail, Token) VALUES(?, ?, ?);", [BCITemail, githubEmail, token]);
 
       // Send the email to the BCIT email
       let mailOptions = {
@@ -218,7 +224,7 @@ let authController = {
                 req.isAuthenticated() });
         }
         const hashedPassword = await hashPassword(password);
-        await pool.query("UPDATE bchat_users.user SET Password = ? WHERE Email = ?;", [hashedPassword, BCITemail]);
+        await pool.query("UPDATE USER SET Password = ? WHERE Email = ?;", [hashedPassword, BCITemail]);
       }
       // Now send a confirmation email, and redirect them to the login page
       await sendConfirmationEmail(githubEmail, BCITemail, user, req, res);
@@ -228,15 +234,15 @@ let authController = {
         return res.render("auth/confirm_email", { error: "Password must be at least 8 characters long", isAuthenticated:
               req.isAuthenticated() });
       }
-      const [user] = await pool.query("SELECT * FROM bchat_users.user WHERE GitHubEmail = ?;", [githubEmail]);
+      const [user] = await pool.query("SELECT * FROM USER WHERE GitHubEmail = ?;", [githubEmail]);
         // If this user exists, update their BCIT email
         if (user.length > 0) {
-          await pool.query("UPDATE bchat_users.user SET Email = ? WHERE GitHubEmail = ?;", [BCITemail, githubEmail]);
+          await pool.query("UPDATE USER SET Email = ? WHERE GitHubEmail = ?;", [BCITemail, githubEmail]);
           // Also update their Confirmation to false since they need to confirm their new email
-          await pool.query("UPDATE bchat_users.user SET Confirmed = 0 WHERE GitHubEmail = ?;", [githubEmail]);
+          await pool.query("UPDATE USER SET Confirmed = 0 WHERE GitHubEmail = ?;", [githubEmail]);
           // Set the password
           const hashedPassword = await hashPassword(password);
-          await pool.query("UPDATE bchat_users.user SET Password = ? WHERE GitHubEmail = ?;", [hashedPassword, githubEmail]);
+          await pool.query("UPDATE USER SET Password = ? WHERE GitHubEmail = ?;", [hashedPassword, githubEmail]);
           // Now generate a new confirmation token and send the email
           await sendConfirmationEmail(githubEmail, BCITemail, user, req, res);
         }
@@ -249,16 +255,16 @@ let authController = {
   confirmGitHubEmail: async (req, res) => {
     const token = req.params.token;
     try {
-      const [request] = await pool.query("SELECT * FROM bchat_users.change_github_email_request WHERE Token = ?;", [token]);
+      const [request] = await pool.query("SELECT * FROM CHANGE_GITHUB_EMAIL_REQUEST WHERE Token = ?;", [token]);
       if (request.length > 0) {
         const BCITEmail = request[0].BCITEmail;
         const NewGitHubEmail = request[0].NewGitHubEmail;
-        await pool.query("UPDATE bchat_users.user SET GitHubEmail = ? WHERE Email = ?;", [NewGitHubEmail, BCITEmail]);
+        await pool.query("UPDATE USER SET GitHubEmail = ? WHERE Email = ?;", [NewGitHubEmail, BCITEmail]);
 
 
         // Delete any other users with the same GitHub email
-        await pool.query("DELETE FROM bchat_users.user WHERE GitHubEmail = ? AND Email != ?;", [NewGitHubEmail, BCITEmail]);
-        await pool.query("DELETE FROM bchat_users.change_github_email_request WHERE Token = ?;", [token]);
+        await pool.query("DELETE FROM USER WHERE GitHubEmail = ? AND Email != ?;", [NewGitHubEmail, BCITEmail]);
+        await pool.query("DELETE FROM CHANGE_GITHUB_EMAIL_REQUEST WHERE Token = ?;", [token]);
         res.send('Your GitHub email has been updated!');
       } else {
         res.send('Invalid confirmation token.');
@@ -283,7 +289,7 @@ async function hashPassword(password) {
 // Function to save code
 async function sendConfirmationEmail(githubEmail, BCITemail, user, req, res){
   const confirmationToken = crypto.randomBytes(20).toString('hex');
-  await pool.query("UPDATE bchat_users.user SET ConfirmationToken = ? WHERE GitHubEmail = ?;", [confirmationToken, githubEmail]);
+  await pool.query("UPDATE USER SET ConfirmationToken = ? WHERE GitHubEmail = ?;", [confirmationToken, githubEmail]);
   // Send the email to the new BCIT email
   let mailOptions = {
     from: 'bchatbcit@gmail.com',

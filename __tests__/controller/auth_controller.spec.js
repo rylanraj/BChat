@@ -119,7 +119,7 @@ describe('authController', () => {
             };
             const res = { render: jest.fn() };
             await authController.registerSubmit(req, res);
-            expect(mysql.query).toHaveBeenCalledWith('SELECT * FROM bchat_users.user WHERE Email = ?;', [req.body.email]);
+            expect(mysql.query).toHaveBeenCalledWith('SELECT * FROM USER WHERE Email = ?;', [req.body.email]);
         });
         it('should reload the page with an error if the email is already taken', async () => {
             const req = {

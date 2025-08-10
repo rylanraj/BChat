@@ -1,7 +1,6 @@
 const passport = require("./middleware/passport")
 const express = require("express");
 const session = require("express-session");
-const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
@@ -9,31 +8,38 @@ const interactionController = require("./controller/interaction_controller");
 const {authController} = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
-const fs = require('fs');
+// ...existing code...
 const mysql = require("mysql2");
 const flash = require('connect-flash');
+const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config()
 
+// Load SSL certificate
+let ca;
+try {
+    const fs = require('fs');
+    ca = fs.readFileSync(path.join(__dirname, 'ca.pem'));
+} catch (err) {
+    console.warn('Warning: ca.pem not found or could not be read. SSL may not be enabled for MySQL connection.');
+}
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    ssl: ca ? { ca } : undefined
 }).promise();
 
 // MySQL session store for serverless
-const fs = require('fs');
 const sessionStore = new MySQLStore({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    ssl: {
-        ca: fs.readFileSync(path.join(__dirname, 'ca.pem'))
-    }
+    ssl: ca ? { ca } : undefined
 });
 
 const socketIO = require('socket.io');
@@ -95,7 +101,7 @@ app.post('/like/:postId', interactionController.mainFeedController.likePost);
 app.post('/report/:postId', interactionController.mainFeedController.reportPost);
 
 app.get("/post/new", ensureAuthenticated, interactionController.postsController.new);
-app.post("/post/new", ensureAuthenticated, interactionController.postsController.new);
+app.post("/post/new", ensureAuthenticated, interactionController.postsController.create);
 app.get("/reminders", ensureAuthenticated, interactionController.remindersController.list);
 app.get("/reminder/new", ensureAuthenticated, interactionController.remindersController.new);
 app.get("/reminder/:id", ensureAuthenticated, interactionController.remindersController.listOne);
@@ -134,11 +140,11 @@ app.get('/confirm/:token', async (req, res) => {
 
     try {
         // Validate the token against the database
-        const [users] = await pool.query("SELECT * FROM bchat_users.user WHERE ConfirmationToken = ?;", [token]);
+        const [users] = await pool.query("SELECT * FROM USER WHERE ConfirmationToken = ?;", [token]);
 
         if (users.length > 0) {
             // If a user with the token exists, mark them as confirmed
-            await pool.query("UPDATE bchat_users.user SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
+            await pool.query("UPDATE USER SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);
             req.flash('success_msg', 'Your account has been confirmed!');
             res.redirect('/login');
         } else {

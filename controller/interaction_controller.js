@@ -1,15 +1,38 @@
 // Setup MySQL connection from .env
 const mysql = require('mysql2');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const path = require('path');
 const {data} = require("express-session/session/cookie");
 require('dotenv').config();
+
+// Load SSL certificate
+let ca;
+try {
+    const fs = require('fs');
+    ca = fs.readFileSync(path.join(__dirname, '..', 'ca.pem')); // Go up one directory from controller folder
+} catch (err) {
+    console.warn('Warning: ca.pem not found or could not be read. SSL may not be enabled for MySQL connection.');
+}
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  ssl: ca ? { ca } : undefined
 }).promise();
+
+// MySQL session store for serverless
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    ssl: ca ? { ca } : undefined
+});
 
 async function keywordToImage(keyword, res) {
   try {
@@ -170,7 +193,7 @@ let postsController = {
       }
 
       // Save post-details to the database
-      pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
+      await pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 
       // Redirect to their profile so they can see their post

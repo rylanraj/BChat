@@ -585,11 +585,11 @@ app.get('/confirm/:token', <span class="fstat-no" title="function not covered" >
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    try {</span>
         // Validate the token against the database
-        const [users] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE ConfirmationToken = ?;", [token]);</span>
+        const [users] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE ConfirmationToken = ?;", [token]);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (users.length &gt; 0) {</span>
             // If a user with the token exists, mark them as confirmed
-<span class="cstat-no" title="statement not covered" >            await pool.query("UPDATE bchat_users.user SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);</span>
+<span class="cstat-no" title="statement not covered" >            await pool.query("UPDATE USER SET Confirmed = 1 WHERE ConfirmationToken = ?;", [token]);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            res.send('Your account has been confirmed!');</span>
         } else {

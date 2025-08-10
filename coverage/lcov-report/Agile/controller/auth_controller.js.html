@@ -685,7 +685,7 @@ let authController = {
         }
   
       // Check if user with the email already exists
-      const user = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);</span>
+      const user = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);</span>
 <span class="cstat-no" title="statement not covered" >      if (user[0].length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >        return res.render("auth/register", { error: "User with this email already exists", isAuthenticated:</span>
               req.isAuthenticated() });
@@ -715,7 +715,7 @@ let authController = {
       const formattedDate = <span class="cstat-no" title="statement not covered" >`${year}-${month}-${day}`;</span>
   
       // Insert the user into the database with the current date as DateJoined
-<span class="cstat-no" title="statement not covered" >      await pool.query("INSERT INTO bchat_users.user (UserName, Email, Password, Role, UserNickName, DateJoined, ProfilePicture, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [name, email,</span>
+<span class="cstat-no" title="statement not covered" >      await pool.query("INSERT INTO USER (UserName, Email, Password, Role, UserNickName, DateJoined, ProfilePicture, Confirmed, ConfirmationToken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [name, email,</span>
         hashedPassword, "user", username, formattedDate,"../images/default.jpg", 0, confirmationToken]);
       
       // Send a confirmation email
@@ -788,7 +788,7 @@ let authController = {
 &nbsp;
 &nbsp;
     // Before checking the GitHub email, check if their is a local account with the BCIT email
-    const [user] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [BCITemail]);</span>
+    const [user] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE Email = ?;", [BCITemail]);</span>
     // If this user exists, send a request to their email to update their GitHub email
 <span class="cstat-no" title="statement not covered" >    if (user.length &gt; 0 &amp;&amp; user[0].GitHubEmail !== user[0].Email) {</span>
       // Generate a token
@@ -796,7 +796,7 @@ let authController = {
 &nbsp;
       // Insert the request into the database
 <span class="cstat-no" title="statement not covered" >      await pool.query</span>
-      ("INSERT INTO bchat_users.change_github_email_request(BCITEmail, NewGitHubEmail, Token) VALUES(?, ?, ?);", [BCITemail, githubEmail, token]);
+      ("INSERT INTO CHANGE_GITHUB_EMAIL_REQUEST(BCITEmail, NewGitHubEmail, Token) VALUES(?, ?, ?);", [BCITemail, githubEmail, token]);
 &nbsp;
       // Send the email to the BCIT email
       let mailOptions = <span class="cstat-no" title="statement not covered" >{</span>
@@ -824,7 +824,7 @@ let authController = {
                 req.isAuthenticated() });
         }
         const hashedPassword = <span class="cstat-no" title="statement not covered" >await hashPassword(password);</span>
-<span class="cstat-no" title="statement not covered" >        await pool.query("UPDATE bchat_users.user SET Password = ? WHERE Email = ?;", [hashedPassword, BCITemail]);</span>
+<span class="cstat-no" title="statement not covered" >        await pool.query("UPDATE USER SET Password = ? WHERE Email = ?;", [hashedPassword, BCITemail]);</span>
       }
       // Now send a confirmation email, and redirect them to the login page
 <span class="cstat-no" title="statement not covered" >      await sendConfirmationEmail(githubEmail, BCITemail, user, req, res);</span>
@@ -834,15 +834,15 @@ let authController = {
 <span class="cstat-no" title="statement not covered" >        return res.render("auth/confirm_email", { error: "Password must be at least 8 characters long", isAuthenticated:</span>
               req.isAuthenticated() });
       }
-      const [user] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE GitHubEmail = ?;", [githubEmail]);</span>
+      const [user] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE GitHubEmail = ?;", [githubEmail]);</span>
         // If this user exists, update their BCIT email
 <span class="cstat-no" title="statement not covered" >        if (user.length &gt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE bchat_users.user SET Email = ? WHERE GitHubEmail = ?;", [BCITemail, githubEmail]);</span>
+<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE USER SET Email = ? WHERE GitHubEmail = ?;", [BCITemail, githubEmail]);</span>
           // Also update their Confirmation to false since they need to confirm their new email
-<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE bchat_users.user SET Confirmed = 0 WHERE GitHubEmail = ?;", [githubEmail]);</span>
+<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE USER SET Confirmed = 0 WHERE GitHubEmail = ?;", [githubEmail]);</span>
           // Set the password
           const hashedPassword = <span class="cstat-no" title="statement not covered" >await hashPassword(password);</span>
-<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE bchat_users.user SET Password = ? WHERE GitHubEmail = ?;", [hashedPassword, githubEmail]);</span>
+<span class="cstat-no" title="statement not covered" >          await pool.query("UPDATE USER SET Password = ? WHERE GitHubEmail = ?;", [hashedPassword, githubEmail]);</span>
           // Now generate a new confirmation token and send the email
 <span class="cstat-no" title="statement not covered" >          await sendConfirmationEmail(githubEmail, BCITemail, user, req, res);</span>
         }
@@ -855,16 +855,16 @@ let authController = {
   confirmGitHubEmail: <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
     const token = <span class="cstat-no" title="statement not covered" >req.params.token;</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-      const [request] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.change_github_email_request WHERE Token = ?;", [token]);</span>
+      const [request] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM CHANGE_GITHUB_EMAIL_REQUEST WHERE Token = ?;", [token]);</span>
 <span class="cstat-no" title="statement not covered" >      if (request.length &gt; 0) {</span>
         const BCITEmail = <span class="cstat-no" title="statement not covered" >request[0].BCITEmail;</span>
         const NewGitHubEmail = <span class="cstat-no" title="statement not covered" >request[0].NewGitHubEmail;</span>
-<span class="cstat-no" title="statement not covered" >        await pool.query("UPDATE bchat_users.user SET GitHubEmail = ? WHERE Email = ?;", [NewGitHubEmail, BCITEmail]);</span>
+<span class="cstat-no" title="statement not covered" >        await pool.query("UPDATE USER SET GitHubEmail = ? WHERE Email = ?;", [NewGitHubEmail, BCITEmail]);</span>
 &nbsp;
 &nbsp;
         // Delete any other users with the same GitHub email
-<span class="cstat-no" title="statement not covered" >        await pool.query("DELETE FROM bchat_users.user WHERE GitHubEmail = ? AND Email != ?;", [NewGitHubEmail, BCITEmail]);</span>
-<span class="cstat-no" title="statement not covered" >        await pool.query("DELETE FROM bchat_users.change_github_email_request WHERE Token = ?;", [token]);</span>
+<span class="cstat-no" title="statement not covered" >        await pool.query("DELETE FROM USER WHERE GitHubEmail = ? AND Email != ?;", [NewGitHubEmail, BCITEmail]);</span>
+<span class="cstat-no" title="statement not covered" >        await pool.query("DELETE FROM CHANGE_GITHUB_EMAIL_REQUEST WHERE Token = ?;", [token]);</span>
 <span class="cstat-no" title="statement not covered" >        res.send('Your GitHub email has been updated!');</span>
       } else {
 <span class="cstat-no" title="statement not covered" >        res.send('Invalid confirmation token.');</span>
@@ -889,7 +889,7 @@ async function hashPassword(password) {
 // Function to save code
 async function <span class="fstat-no" title="function not covered" >sendConfirmationEmail(</span>githubEmail, BCITemail, user, req, res){
   const confirmationToken = <span class="cstat-no" title="statement not covered" >crypto.randomBytes(20).toString('hex');</span>
-<span class="cstat-no" title="statement not covered" >  await pool.query("UPDATE bchat_users.user SET ConfirmationToken = ? WHERE GitHubEmail = ?;", [confirmationToken, githubEmail]);</span>
+<span class="cstat-no" title="statement not covered" >  await pool.query("UPDATE USER SET ConfirmationToken = ? WHERE GitHubEmail = ?;", [confirmationToken, githubEmail]);</span>
   // Send the email to the new BCIT email
   let mailOptions = <span class="cstat-no" title="statement not covered" >{</span>
     from: 'bchatbcit@gmail.com',

@@ -318,7 +318,7 @@ const localLogin = new LocalStrategy(
     },
     async (req, email, password, done) =&gt; {
         try {
-            const [rows, fields] = await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [email]);
+            const [rows, fields] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);
             const user = rows[0];
             if (user) {
                 const match = await bcrypt.compare(password, user.Password);
@@ -372,7 +372,7 @@ passport.deserializeUser(<span class="fstat-no" title="function not covered" >as
 });
 &nbsp;
 const findOrCreate = <span class="fstat-no" title="function not covered" >as</span>ync (githubProfile, callback) =&gt; {
-    const [rows] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE GitHubEmail = ?;", [githubProfile._json.email]);</span>
+    const [rows] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE GitHubEmail = ?;", [githubProfile._json.email]);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (rows.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >        callback(null, rows[0]);</span>
@@ -384,9 +384,9 @@ const findOrCreate = <span class="fstat-no" title="function not covered" >as</sp
         const day = <span class="cstat-no" title="statement not covered" >String(currentDate.getDate()).padStart(2, '0');</span>
         const formattedDate = <span class="cstat-no" title="statement not covered" >`${year}-${month}-${day}`;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await pool.query("INSERT INTO bchat_users.user (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",</span>
+<span class="cstat-no" title="statement not covered" >        await pool.query("INSERT INTO USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",</span>
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
-        const [newRows] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM bchat_users.user WHERE Email = ?;", [githubProfile._json.email]);</span>
+        const [newRows] = <span class="cstat-no" title="statement not covered" >await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);</span>
 <span class="cstat-no" title="statement not covered" >        callback(null, newRows[0]);</span>
     }
 }

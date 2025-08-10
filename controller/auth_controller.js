@@ -7,8 +7,10 @@ const saltRounds = 10;
 
 // Import crypto for generating confirmation tokens
 const crypto = require('crypto');
+// Use a host variable to store the host name
+const host = 'http://localhost:3001';
 
-// Setup MySQL connection from .env
+// Setup MySQL connection from ..env
 const mysql = require('mysql2');
 require('dotenv').config();
 
@@ -19,14 +21,9 @@ let transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   }
 });
+const fs = require('fs');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME
-}).promise();
+const {pool} = require('../db');
 
 let authController = {
   login: (req, res) => {
@@ -54,7 +51,9 @@ let authController = {
         }
   
       // Check if user with the email already exists
+
       const user = await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);
+
       if (user[0].length > 0) {
         return res.render("auth/register", { error: "User with this email already exists", isAuthenticated:
               req.isAuthenticated() });
@@ -173,13 +172,6 @@ let authController = {
     const BCITemail = req.body.BCITEmail;
     const password = req.body.Password;
 
-    // If the BCIT does not end with bcit.ca, return an error
-    if (!BCITemail.endsWith("@my.bcit.ca")) {
-      return res.render("auth/confirm_email", { error: "Please use your myBCIT email", isAuthenticated:
-            req.isAuthenticated() });
-    }
-
-
     // Before checking the GitHub email, check if their is a local account with the BCIT email
     const [user] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [BCITemail]);
     // If this user exists, send a request to their email to update their GitHub email
@@ -196,7 +188,7 @@ let authController = {
         from: 'bchatbcit@gmail.com',
         to: BCITemail,
         subject: 'Update GitHub Email Request',
-        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: http://localhost:3001/confirm_github/${token} (Ignore this email if you did not make this request)`
+        text: `Hello, ${user[0].UserName}! Please confirm your request to update your GitHub email to by clicking the following link: ${host}/confirm_github/${token} (Ignore this email if you did not make this request)`
       };
 
       await transporter.sendMail(mailOptions, function (error, info) {

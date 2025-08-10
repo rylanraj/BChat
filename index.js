@@ -8,8 +8,8 @@ const interactionController = require("./controller/interaction_controller");
 const {authController} = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
-// ...existing code...
 const mysql = require("mysql2");
+const fs = require('fs');
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config()

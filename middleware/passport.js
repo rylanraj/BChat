@@ -17,12 +17,15 @@ const saltRounds = 10;
 const mysql = require('mysql2');
 require('dotenv').config();
 
+const fs = require('fs');
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    waitForConnections: true,
 }).promise();
 
 const localLogin = new LocalStrategy(
@@ -63,11 +66,13 @@ const githubLogin = new GithubStrategy({
         clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: GITHUB_CALLBACK_URL
     },
-    function(accessToken, refreshToken, profile, done) {
-        // console.log("Passport.js profile: ", profile);
-        const userModelOutput = findOrCreate(profile, function (err, user) {
-            return done(err, user);
-        })
+function(req, accessToken, refreshToken, profile, done) {
+            findOrCreate(profile, function (err, user) {
+                if (err) {
+                    return done(err);
+                }
+                return done(null, user);
+            });
 
     }
 
@@ -98,7 +103,7 @@ const findOrCreate = async (githubProfile, callback) => {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-
+      
         await pool.query("INSERT INTO USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
             [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
         const [newRows] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);

@@ -455,13 +455,21 @@ let profilesController = {
     console.log(newStudentSet)
     // Access the uploaded profile picture
     const profilePicture = req.file;
-
-    // Save the file path to the database
-    let filePath = profilePicture ? profilePicture.path : null;
-
-    // Replace backslashes with forward slashes
-    if (filePath) {
-      filePath = filePath.replace(/\\/g, '/');
+    let filePath = null;
+    if (profilePicture) {
+      try {
+        // Use buffer upload for B2
+        const { uploadBufferToB2 } = require('../upload-file');
+        const b2Result = await uploadBufferToB2(
+          profilePicture.buffer,
+          profilePicture.originalname,
+          { prefix: 'uploads', makePublic: true }
+        );
+        filePath = b2Result.url;
+        console.log('[B2] Upload success', b2Result);
+      } catch (err) {
+        console.error('[B2] Upload error', err);
+      }
     }
 
     // Update the user with the new fields only if the "Set" field is not empty

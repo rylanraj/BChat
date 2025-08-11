@@ -19,7 +19,8 @@ function formatDate(timeString) {
 %>
 <div class="post">
     <div class="user-info">
-        <img class="user-info-img" src="<%= "/" + creator.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+    <% const creatorProfileSrc = creator.ProfilePicture && /^https?:/i.test(creator.ProfilePicture) ? creator.ProfilePicture : ('/' + (creator.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+    <img class="user-info-img" src="<%= creatorProfileSrc %>" alt="user_profile_picture" width="50" height="50">
         <div class="text-user-info">
             <p class="post-info" id="post-username">
                 <%= creator.UserName %>
@@ -63,7 +64,8 @@ function formatDate(timeString) {
     </div>
     <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
     <% if (post.Picture) { %>
-        <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+        <% const postPicSrc = /^https?:/i.test(post.Picture) ? post.Picture : ('/' + post.Picture.replace(/^\/+/,'')); %>
+        <img class="post-img" src="<%= postPicSrc %>" alt="post_picture" width="400" height="200">
     <% } %>
     <div class="like-section" style="text-align: left; margin-left: 70px;">
 
@@ -87,7 +89,8 @@ function formatDate(timeString) {
         <% parent_comments.forEach(function(comment) { %>
             <div class="comment">
                 <div style="display: flex;">
-                <img class="user-info-img" src="<%= "/" + comment.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <% const commentProfileSrc = comment.ProfilePicture && /^https?:/i.test(comment.ProfilePicture) ? comment.ProfilePicture : ('/' + (comment.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                <img class="user-info-img" src="<%= commentProfileSrc %>" alt="user_profile_picture" width="50" height="50">
                 <div class="user-info">
                     <p id="post" class="post-info">
                         <%= comment.UserName %> <br>

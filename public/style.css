@@ -768,8 +768,28 @@ footer.footer {
 input.form-control{
   background-color: #d5dcdc !important;
   border-radius: 0.75rem !important;
-  width: 16.8125rem !important;
-  height: 2.0625rem !important;
+  width: 100% !important;         /* Full width in its container */
+  max-width: 26rem;               /* Allow larger size on wider screens */
+  min-height: 2.75rem;            /* Better tap target */
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
+  font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+}
+
+/* Optional: tighten on very small phones */
+@media (max-width: 360px){
+  input.form-control{
+    font-size: 0.95rem;
+  }
+}
+
+/* Desktop refinement */
+@media (min-width: 768px){
+  input.form-control{
+    max-width: 16.8125rem;
+    min-height: 2.0625rem;
+    font-size: 1rem;
+  }
 }
 .picInput{
   height: 3.0625rem !important;
@@ -1085,4 +1105,32 @@ button#general-comment-cancel:hover {
 .post div {
   margin-left: 0 !important; 
 }
+.sign-up-button {
+  background:#003C71;
+  color:#fff;
+  border:none;
+  border-radius:0.75rem;
+  font-weight:600;
+  font-size:clamp(0.95rem, 3.5vw, 1rem);          /* Grows on small screens, capped on desktop */
+  padding:clamp(0.65rem, 3vw, 0.8rem) clamp(1.1rem, 7vw, 1.4rem); /* Larger tap target on mobile, slimmer on desktop */
+  line-height:1.2;
+  cursor:pointer;
+  transition:background .25s, transform .1s;
+}
 
+.sign-up-button:hover,
+.sign-up-button:focus {
+  background:#0056b3;
+  outline:none;
+}
+
+.sign-up-button:active {
+  transform:scale(.97);
+}
+
+/* Optional: tighten further on very wide desktops */
+@media (min-width:1400px){
+  .sign-up-button{
+    padding:0.6rem 1.2rem;
+  }
+}

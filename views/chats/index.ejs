@@ -16,11 +16,12 @@
   .pending:after { content: '⏳'; font-size: 0.7rem; position: absolute; top: -6px; right: -6px; }
   .failed { opacity: 0.75; background: #f8d7da !important; position: relative; }
   .failed:after { content: '⚠'; font-size: 0.75rem; position: absolute; top: -6px; right: -6px; }
-  /* Solution 1: Show timestamps on hover/tap only */
+  /* Solution 1: Show timestamps on hover/tap only - positioned below bubbles */
   .timestamp { 
     font-size: 0.65rem; 
     color: #888; 
-    margin-top: 2px; 
+    margin-top: 4px;
+    margin-bottom: 8px;
     white-space: nowrap; 
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -131,8 +132,8 @@
                 <% } else { %>
                     <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
-                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
               </div>
+              <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
             </div>
 
           <% } else { %>
@@ -147,8 +148,8 @@
                 <% } else { %>
                   <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
-                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
               </div>
+              <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
             </div>
           <% } %>
         <% }) %>
@@ -298,7 +299,7 @@
       content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
     }
     
-    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}<div class="timestamp">sending...</div></div></div>`;
+    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}</div><div class="timestamp">sending...</div></div>`;
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
@@ -315,13 +316,13 @@
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
+      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}</div><div class=\"timestamp\">${ts}</div></div>`;
     } else {
       let content;
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
+      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}</div><div class=\"timestamp\">${ts}</div></div>`;
     }
   }
   function upgradePendingBubble(message){
@@ -343,10 +344,10 @@
       } else {
         // update existing delete anchor with real id if it was missing
       }
-      // Replace sending... timestamp
-      const tsEl = bubble.querySelector('.timestamp');
+      // Replace sending... timestamp (now outside bubble)
+      const tsEl = target.querySelector('.timestamp');
       if (tsEl) tsEl.textContent = formatTimestamp(message.DateSent);
-      else bubble.innerHTML += `<div class=\"timestamp\">${formatTimestamp(message.DateSent)}</div>`;
+      else target.innerHTML += `<div class=\"timestamp\">${formatTimestamp(message.DateSent)}</div>`;
     }
     // Replace temp id with real for potential future operations
     target.id = 'msg-' + message.MessageID;

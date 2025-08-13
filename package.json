@@ -16,7 +16,6 @@
   "license": "ISC",
   "homepage": "http",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.864.0",
     "backblaze-b2": "^1.7.1",
     "bcrypt": "^5.1.1",
     "bootstrap-icons": "^1.11.3",

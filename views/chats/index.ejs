@@ -16,9 +16,41 @@
   .pending:after { content: '⏳'; font-size: 0.7rem; position: absolute; top: -6px; right: -6px; }
   .failed { opacity: 0.75; background: #f8d7da !important; position: relative; }
   .failed:after { content: '⚠'; font-size: 0.75rem; position: absolute; top: -6px; right: -6px; }
-  .timestamp { font-size: 0.65rem; color: #888; margin-top: 2px; white-space: nowrap; }
+  /* Solution 1: Show timestamps on hover/tap only */
+  .timestamp { 
+    font-size: 0.65rem; 
+    color: #888; 
+    margin-top: 2px; 
+    white-space: nowrap; 
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
   .area.send .timestamp { text-align: right; }
   .area.recep .timestamp { text-align: left; }
+  
+  /* Show timestamp on message hover */
+  .area:hover .timestamp { 
+    opacity: 1; 
+  }
+  
+  /* Always show timestamp for pending/failed states */
+  .pending .timestamp,
+  .failed .timestamp { 
+    opacity: 1; 
+  }
+  
+  /* Add subtle hover effect to message bubbles */
+  .area.send.bubble:hover,
+  .area.recep.bubble:hover {
+    transform: scale(1.01);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Mobile tap functionality - show timestamp on tap */
+  .area.show-timestamp .timestamp {
+    opacity: 1;
+  }
 
   </style>
 </head>
@@ -31,7 +63,8 @@
         <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
           <div class="chat_message">
 
-            <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+            <% const chatProfileSrc = user.profilePicture && /^https?:/i.test(user.profilePicture) ? user.profilePicture : ('/' + (user.profilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+            <img src="<%= chatProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
 
             <div class="message_content">
               <h1><%= user.otherUserName %></h1>
@@ -264,7 +297,8 @@
     } else {
       content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
     }
-  messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}<div class="timestamp">sending...</div></div></div>`;
+    
+    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}<div class="timestamp">sending...</div></div></div>`;
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
@@ -343,6 +377,23 @@
   let closeButton = document.getElementById('closeButton');
   closeButton.addEventListener('click', () => {
     window.location.href = '/';
+  });
+
+  // Mobile tap functionality for showing timestamps
+  document.addEventListener('click', (e) => {
+    const bubble = e.target.closest('.bubble');
+    if (bubble && !e.target.closest('.delete')) {
+      const area = bubble.closest('.area');
+      if (area) {
+        // Toggle timestamp visibility on mobile/touch devices
+        area.classList.toggle('show-timestamp');
+        
+        // Remove the class after 3 seconds on mobile
+        setTimeout(() => {
+          area.classList.remove('show-timestamp');
+        }, 3000);
+      }
+    }
   });
 </script>
 </body>

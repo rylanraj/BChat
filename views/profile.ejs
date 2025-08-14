@@ -15,8 +15,11 @@
                 <label for="profilePicture">
                     <% if (otherUser.ProfilePicture === null) { %>
                         <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="/images/default.jpg" alt="missing_profile_picture">
-                    <% } else { %>
-                        <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture">
+                    <% } else { 
+                        const rawPP = otherUser.ProfilePicture; 
+                        const profileSrc = /^https?:/i.test(rawPP) ? rawPP : ('/' + rawPP.replace(/^\/+/,''));
+                    %>
+                        <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%= profileSrc %>" alt="profile_picture">
                     <% } %>
                 </label>
                 
@@ -101,7 +104,8 @@
                     <% const userData = userDataMap[post.UserID]; %>
                     <div class="user-info">
                         <a href=<%="/profile/" + post.UserID%>>
-                            <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                            <% const _pp = userData.profilePicture; const _ppSrc = _pp ? (/^https?:/i.test(_pp) ? _pp : ('/' + _pp.replace(/^\/+/,''))) : '/images/default.jpg'; %>
+                            <img class="user-info-img" src="<%= _ppSrc %>" alt="user_profile_picture" width="50" height="50">
                         </a>
                         <div class="text-user-info">
                             <p class="post-info" id="post-username">
@@ -178,7 +182,10 @@
                     </a>
                     <% if (post.Picture) { %>
                     <a href=<%="/post/" + post.PostID%>>
-                        <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+                        <% const _postPic = post.Picture; const _postPicSrc = _postPic ? (/^https?:/i.test(_postPic) ? _postPic : ('/' + _postPic.replace(/^\/+/,''))) : null; %>
+                        <% if (_postPicSrc) { %>
+                        <img class="post-img" src="<%= _postPicSrc %>" alt="post_picture" width="400" height="200">
+                        <% } %>
                     </a>
                     <% } %>
                     <div class="like-section" style="text-align: left; margin-left: 70px;">
@@ -218,8 +225,11 @@
             <label for="profilePicture">
                 <% if (otherUser.ProfilePicture === null) { %>
                     <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="/images/default.jpg" alt="missing_profile_picture">
-                <% } else { %>
-                    <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%="/" + otherUser.ProfilePicture %>" alt="profile_picture">
+                <% } else { 
+                    const rawPP = otherUser.ProfilePicture;
+                    const profileSrc = /^https?:/i.test(rawPP) ? rawPP : ('/' + rawPP.replace(/^\/+/,''));
+                %>
+                    <img style="width: 11vw; height: 11vw; border-radius: 50%; object-fit: cover;  border-style: solid;background-color: #d3dcdc; border-color: #d3dcdc;" src="<%= profileSrc %>" alt="profile_picture">
                 <% } %>
             </label>
             
@@ -264,7 +274,9 @@
             </div>
         </div>
         <div>
-            <a href="/chat/check/<%= otherUser.UserID %>">Send a message</a>
+        <div class="extend" style="justify-content: center;">
+           <a href="/chat/check/<%= otherUser.UserID %>"><button>Send a message</button></a>
+        </div>
         </div>
     </div>
     
@@ -295,7 +307,8 @@
                 <div class="post">
                   <% const userData = userDataMap[post.UserID]; %>
                   <div class="user-info">
-                    <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                    <% const _pp = userData && userData.profilePicture; const _ppSrc = _pp ? (/^https?:/i.test(_pp) ? _pp : ('/' + _pp.replace(/^\/+/,''))) : '/images/default.jpg'; %>
+                    <img class="user-info-img" src="<%= _ppSrc %>" alt="user_profile_picture" width="50" height="50">
                       <div class="text-user-info">
                           <p class="post-info" id="post-username">
                               <%= userData.username %>

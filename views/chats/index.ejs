@@ -6,8 +6,8 @@
   <style>
     body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-    #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); position: absolute; bottom: 0; }
-    #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+    #form {height: 2em !important; border-radius: 12px; background: rgba(0, 0, 0, 0.15); padding: 0.25rem; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); position: absolute; bottom: 0; }
+    #input { font-size: 20px; border: none; padding: 0 1rem; flex-grow: 1; border-radius: 12px; margin: 0.25rem; }
     #input:focus { outline: none; }
   #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff;display: flex; justify-content: center; align-items: center;}
 
@@ -16,10 +16,103 @@
   .pending:after { content: '⏳'; font-size: 0.7rem; position: absolute; top: -6px; right: -6px; }
   .failed { opacity: 0.75; background: #f8d7da !important; position: relative; }
   .failed:after { content: '⚠'; font-size: 0.75rem; position: absolute; top: -6px; right: -6px; }
-  .timestamp { font-size: 0.65rem; color: #888; margin-top: 2px; white-space: nowrap; }
+  /* Solution 1: Show timestamps on hover/tap only - positioned below bubbles */
+  .timestamp { 
+    font-size: 0.65rem; 
+    color: #888; 
+    margin-top: 4px;
+    margin-bottom: 8px;
+    white-space: nowrap; 
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
   .area.send .timestamp { text-align: right; }
   .area.recep .timestamp { text-align: left; }
+  
+  /* Ensure message areas stack vertically (bubble above, timestamp below) */
+  .area.send,
+  .area.recep {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Maintain proper alignment for send messages */
+  .area.send {
+    align-items: flex-end;
+  }
+  
+  /* Maintain proper alignment for received messages */
+  .area.recep {
+    align-items: flex-start;
+  }
+  
+  /* Position delete button properly within the vertical layout */
+  .delete {
+    align-self: flex-end; /* Always align delete to the right for sent messages */
+    margin-bottom: 2px; /* Small gap between delete and bubble */
+  }
+  
+  /* Context menu styles */
+  .context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+    min-width: 120px;
+  }
+  .context-menu:hover{
+    color: #f8d7da;
+  }
+  .context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.1s;
+  }
 
+  
+  .context-menu-item.delete {
+    color: #dc3545;
+  }
+  .context-menu-item svg {
+    margin-right: 8px;
+    width: 14px;
+    height: 14px;
+  }
+  #contextMenu:hover{
+    background-color: #f8d7da;
+  }
+  
+  /* Show timestamp on message hover */
+  .area:hover .timestamp { 
+    opacity: 1; 
+  }
+  
+  /* Always show timestamp for pending/failed states */
+  .pending .timestamp,
+  .failed .timestamp { 
+    opacity: 1; 
+  }
+  
+  /* Add subtle hover effect to message bubbles */
+  .area.send.bubble:hover,
+  .area.recep.bubble:hover {
+    transform: scale(1.01);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Mobile tap functionality - show timestamp on tap */
+  .area.show-timestamp .timestamp {
+    opacity: 1;
+  }
 
   </style>
 </head>
@@ -32,14 +125,17 @@
         <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
           <div class="chat_message">
 
-            <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+            <% const chatProfileSrc = user.profilePicture && /^https?:/i.test(user.profilePicture) ? user.profilePicture : ('/' + (user.profilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+            <img src="<%= chatProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
 
             <div class="message_content">
               <h1><%= user.otherUserName %></h1>
               <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
+              
             </div>
           </div>
         </div>
+        <hr style="color:black !important; height: 2px;">
       <% }) %>
 
 
@@ -48,9 +144,9 @@
   </div>
 </div>
 <div class="user_feed_section">
-  <div class="section_name">
+  <div class="section_name" style="width: 100%;">
     <div class="chat-upper">
-      <h2><%= otherUserName %></h2>
+      <h2 style="margin-right: auto !important; margin-bottom: auto !important;"><%= otherUserName %></h2>
       <button id="closeButton">X</button>
     </div>
     <%
@@ -72,22 +168,7 @@
         <% chatMessages.forEach(chat => { %>
           <% if (userID==chat.SenderID) { %>
             <div class="area send">
-              <div class="delete">
-                <a onclick="deleteMessage('<%= chat.MessageID %>')">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                  </svg>
-                </a>
-                <div id="popup<%= chat.MessageID %>" class="popup">
-                  <div class="popup-content">
-                    <p>Are you sure you want to delete this message?</p>
-                    <button onclick="Delete('<%= chat.MessageID %>')">Yes</button>
-                    <button onclick="Close('<%= chat.MessageID %>')">No</button>
-                  </div>
-                </div>
-              </div>
-              <div class="area send bubble">
+              <div class="area send bubble" data-message-id="<%= chat.MessageID %>">
                 <% if(isURL(chat.Message)){ %>
                   <a href="<%= chat.Message %>" target="_blank">
                     <li class="url"><%= chat.Message %></li>
@@ -97,7 +178,15 @@
                 <% } else { %>
                     <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
-                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
+              </div>
+              <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
+              <!-- Hidden popup for delete confirmation -->
+              <div id="popup<%= chat.MessageID %>" class="popup">
+                <div class="popup-content">
+                  <p>Are you sure you want to delete this message?</p>
+                  <button onclick="Delete('<%= chat.MessageID %>')">Yes</button>
+                  <button onclick="Close('<%= chat.MessageID %>')">No</button>
+                </div>
               </div>
             </div>
 
@@ -113,16 +202,16 @@
                 <% } else { %>
                   <li class="individualMessage"><%= chat.Message %></li>
                 <% } %>
-                <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
               </div>
+              <div class="timestamp"><%= new Date(chat.DateSent).toLocaleString() %></div>
             </div>
           <% } %>
         <% }) %>
       </ul>
     </div>
 
-    <form id="form" action="">
-      <input id="input" autocomplete="off" maxlength="500"/><button>
+    <form  id="form" action="">
+      <input id="input" autocomplete="off" spellcheck="true" maxlength="500"/><button>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
         </svg>
@@ -130,6 +219,14 @@
     </form>
   </div>
 </div>
+
+<!-- Custom context menu -->
+<div id="contextMenu" class="context-menu">
+  <div class="context-menu-item delete" onclick="confirmDeleteMessage()">
+    Delete Message
+  </div>
+</div>
+
 <script>
   window.onload = function() {
     // ... existing code ...
@@ -145,6 +242,8 @@
   const form = document.getElementById('form');
   const messages = document.getElementById('discussion');
   const display = document.getElementById('display');
+  const contextMenu = document.getElementById('contextMenu');
+  let currentMessageId = null;
 
   function isURL(str) {
     return str.startsWith('https');
@@ -161,6 +260,35 @@
 
   function deleteMessage(messageID) {
     document.getElementById('popup'+messageID).style.display = 'block';
+  }
+  
+  function confirmDeleteMessage() {
+    if (currentMessageId) {
+      document.getElementById('popup' + currentMessageId).style.display = 'block';
+      hideContextMenu();
+    }
+  }
+  
+  function showContextMenu(e, messageId) {
+    e.preventDefault();
+    currentMessageId = messageId;
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = e.pageX + 'px';
+    contextMenu.style.top = e.pageY + 'px';
+    
+    // Adjust position if menu would go off screen
+    const rect = contextMenu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) {
+      contextMenu.style.left = (e.pageX - rect.width) + 'px';
+    }
+    if (rect.bottom > window.innerHeight) {
+      contextMenu.style.top = (e.pageY - rect.height) + 'px';
+    }
+  }
+  
+  function hideContextMenu() {
+    contextMenu.style.display = 'none';
+    currentMessageId = null;
   }
   async function Delete(messageID) {
     try {
@@ -263,7 +391,8 @@
     } else {
       content = `<li class="individualMessage">${escapeHtml(text)}</li>`;
     }
-  messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}<div class="timestamp">sending...</div></div></div>`;
+    
+    messages.innerHTML += `<div class="area send pending" id="${tempId}" data-text="${encodeURIComponent(text)}"><div class="area send bubble">${content}</div><div class="timestamp">sending...</div></div>`;
     const chatDisplay = document.querySelector('.chat_display');
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
@@ -280,13 +409,15 @@
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"delete\"><a onclick=\"deleteMessage(${id})\">${trashIcon()}</a><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div><div class=\"area send bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
+      
+      // Create the message HTML - note: no need to manually add event listeners now
+      messages.innerHTML += `<div class=\"area send\" id=\"msg-${id}\"><div class=\"area send bubble\" data-message-id=\"${id}\">${content}</div><div class=\"timestamp\">${ts}</div><div id=\"popup${id}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${id})\">Yes</button><button onclick=\"Close(${id})\">No</button></div></div></div>`;
     } else {
       let content;
       if (isURL(msg)) content = `<a href=${msg} target="_blank"><li class="url">${msg}</li></a>`;
       else if (containsLongWord(msg)) content = `<li class="longWord">${msg}</li>`;
       else content = `<li>${msg}</li>`;
-      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}<div class=\"timestamp\">${ts}</div></div></div>`;
+      messages.innerHTML += `<div class=\"area recep\" id=\"msg-${id}\"><div class=\"area recep bubble\">${content}</div><div class=\"timestamp\">${ts}</div></div>`;
     }
   }
   function upgradePendingBubble(message){
@@ -296,33 +427,28 @@
     if (!target) return false;
     target.classList.remove('pending');
     target.removeAttribute('data-text');
-    // Add delete control + assign popup id + timestamp
+    
+    // Add data-message-id to the bubble and right-click functionality
     const bubble = target.querySelector('.bubble');
     if (bubble) {
-      // Wrap bubble with delete control if not present
-      if (!target.querySelector('.delete')) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'delete';
-        wrapper.innerHTML = `<a onclick=\"deleteMessage(${message.MessageID})\">${trashIcon()}</a><div id=\"popup${message.MessageID}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${message.MessageID})\">Yes</button><button onclick=\"Close(${message.MessageID})\">No</button></div></div>`;
-        target.insertBefore(wrapper, bubble);
-      } else {
-        // update existing delete anchor with real id if it was missing
-      }
-      // Replace sending... timestamp
-      const tsEl = bubble.querySelector('.timestamp');
+      bubble.setAttribute('data-message-id', message.MessageID);
+      bubble.addEventListener('contextmenu', (e) => showContextMenu(e, message.MessageID));
+      
+      // Replace sending... timestamp (now outside bubble)
+      const tsEl = target.querySelector('.timestamp');
       if (tsEl) tsEl.textContent = formatTimestamp(message.DateSent);
-      else bubble.innerHTML += `<div class=\"timestamp\">${formatTimestamp(message.DateSent)}</div>`;
+      else target.innerHTML += `<div class=\"timestamp\">${formatTimestamp(message.DateSent)}</div>`;
+      
+      // Add popup for delete confirmation
+      target.innerHTML += `<div id=\"popup${message.MessageID}\" class=\"popup\"><div class=\"popup-content\"><p>Are you sure you want to delete this message?</p><button onclick=\"Delete(${message.MessageID})\">Yes</button><button onclick=\"Close(${message.MessageID})\">No</button></div></div>`;
     }
+    
     // Replace temp id with real for potential future operations
     target.id = 'msg-' + message.MessageID;
     // Remove its entry from pendingQueue
     const idx = pendingQueue.findIndex(p => p.text === message.Message);
     if (idx !== -1) pendingQueue.splice(idx,1);
     return true;
-  }
-  function trashIcon(){
-    return `
-    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-trash\" viewBox=\"0 0 16 16\">\n      <path d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z\"/>\n      <path d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z\"/>\n    </svg>`;
   }
   function markFailed(tempId){
     const el = document.getElementById(tempId);
@@ -342,6 +468,47 @@
   let closeButton = document.getElementById('closeButton');
   closeButton.addEventListener('click', () => {
     window.location.href = '/';
+  });
+
+  // Mobile tap functionality for showing timestamps
+  document.addEventListener('click', (e) => {
+    const bubble = e.target.closest('.bubble');
+    if (bubble && !e.target.closest('.delete')) {
+      const area = bubble.closest('.area');
+      if (area) {
+        // Toggle timestamp visibility on mobile/touch devices
+        area.classList.toggle('show-timestamp');
+        
+        // Remove the class after 3 seconds on mobile
+        setTimeout(() => {
+          area.classList.remove('show-timestamp');
+        }, 3000);
+      }
+    }
+    
+    // Hide context menu when clicking elsewhere
+    if (!e.target.closest('.context-menu')) {
+      hideContextMenu();
+    }
+  });
+  
+  // Prevent context menu on non-sender messages and hide custom menu
+  document.addEventListener('contextmenu', (e) => {
+    const bubble = e.target.closest('.bubble');
+    if (bubble) {
+      // Check if this is a sent message bubble with data-message-id
+      const messageId = bubble.getAttribute('data-message-id');
+      if (messageId && bubble.closest('.area.send')) {
+        // This is a sent message - show our custom context menu
+        showContextMenu(e, messageId);
+        return;
+      } else {
+        // This is a received message or message without ID, prevent context menu
+        e.preventDefault();
+      }
+    }
+    // Hide context menu if clicking elsewhere
+    hideContextMenu();
   });
 </script>
 </body>

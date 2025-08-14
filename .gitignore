@@ -6,3 +6,5 @@ notes.js
 tests.sql
 .vercel
 ca.pem
+ca-certificate.crt
+

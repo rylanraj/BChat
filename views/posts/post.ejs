@@ -19,7 +19,8 @@ function formatDate(timeString) {
 %>
 <div class="post">
     <div class="user-info">
-        <img class="user-info-img" src="<%= "/" + creator.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+    <% const creatorProfileSrc = creator.ProfilePicture && /^https?:/i.test(creator.ProfilePicture) ? creator.ProfilePicture : ('/' + (creator.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+    <img class="user-info-img" src="<%= creatorProfileSrc %>" alt="user_profile_picture" width="50" height="50">
         <div class="text-user-info">
             <p class="post-info" id="post-username">
                 <%= creator.UserName %>
@@ -43,11 +44,11 @@ function formatDate(timeString) {
                     <% if (post.UserID !== user.UserID) { %>
                         <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                         <a onclick="report('<%= post.PostID %>')">Report</a>
-                        <a href="#">Message Creator</a>
+                        <a href="/chat/check/<%= post.UserID %>">Message Creator</a>
                     <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                         <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
                         <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
-                        <a href="#">Delete</a>
+                        <a href="#" onclick="deletePost('<%= post.PostID %>')">Delete</a>
                     <% } %>
                 </div>
             </div>
@@ -63,7 +64,8 @@ function formatDate(timeString) {
     </div>
     <div style="text-align: left; margin-left: 70px;"><h3><%= post.Title %> </h3><p id="post"><%= post.Description %></p></div>
     <% if (post.Picture) { %>
-        <img class="post-img" src="<%= "/" + post.Picture %>" alt="post_picture" width="400" height="200">
+        <% const postPicSrc = /^https?:/i.test(post.Picture) ? post.Picture : ('/' + post.Picture.replace(/^\/+/,'')); %>
+        <img class="post-img" src="<%= postPicSrc %>" alt="post_picture" width="400" height="200">
     <% } %>
     <div class="like-section" style="text-align: left; margin-left: 70px;">
 
@@ -86,12 +88,15 @@ function formatDate(timeString) {
     <div class="comments">
         <% parent_comments.forEach(function(comment) { %>
             <div class="comment">
-                <img class="user-info-img" src="<%= "/" + comment.ProfilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <div style="display: flex;">
+                <% const commentProfileSrc = comment.ProfilePicture && /^https?:/i.test(comment.ProfilePicture) ? comment.ProfilePicture : ('/' + (comment.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                <img class="user-info-img" src="<%= commentProfileSrc %>" alt="user_profile_picture" width="50" height="50">
                 <div class="user-info">
                     <p id="post" class="post-info">
                         <%= comment.UserName %> <br>
                         <%= formatDate(comment.TimePosted) %>
                     </p>
+                </div>
                 </div>
                 <p id="post"><%= comment.Content %></p>
             </div>
@@ -102,6 +107,25 @@ function formatDate(timeString) {
 
     </footer>
 <script>
+    async function deletePost(postId) {
+        try {
+            const response = await fetch(`/post/delete/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                // If the server responds with a success status, redirect to the desired page
+                window.location.href = '/';
+            } else {
+                console.error('Failed to delete post');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     function copyLink(postId) {
         // Prevent the default action of the <a> tag
         event.preventDefault();

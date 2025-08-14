@@ -427,12 +427,15 @@ footer.footer {
 }
 
 #closeButton {
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
   position: relative;
-  background-color: #000000;
+  background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 20px;
   line-height: 2.63rem;
   top: -0.2rem;
 
@@ -441,7 +444,7 @@ footer.footer {
   outline: none;
 }
 #closeButton:hover {
-  background-color: #000000;
+  background-color: #0056b3;
 }
 .section_name{
  
@@ -633,25 +636,27 @@ footer.footer {
     word-break: break-all;
 }
 .area.send.bubble {
+  font-size: 20px;
   align-items: end;
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
 	max-width: 100%;
   text-align: end;
-  background-color: #0069ff;
+  background-color:#602aa9;
   color: white;
   text-align: end;
 }
 
 .area.recep.bubble {
+  font-size: 20px;
   align-self: flex-start;
 	border-radius: 1em;
 	padding: 0.50em 0.75em;
 	margin: 0.0625em;
 	max-width: 100%;
   text-align: start;
-  background-color:  rgb(206, 206, 206);
+  background-color:  #d3dcdc;
 	color: black;
 }
 
@@ -700,16 +705,7 @@ footer.footer {
   background-color: #6c757d;
 }
 
-.popup-content button:last-of-type:hover {
-  background-color: #5a6268;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-  max-width: 400px; /* Max width */
-  border-radius: 10px; /* Rounded corners */
-  text-align: center; /* Center text */
-}
+
 .close-btn {
   color: #aaa;
   float: right;
@@ -772,8 +768,28 @@ footer.footer {
 input.form-control{
   background-color: #d5dcdc !important;
   border-radius: 0.75rem !important;
-  width: 16.8125rem !important;
-  height: 2.0625rem !important;
+  width: 100% !important;         /* Full width in its container */
+  max-width: 26rem;               /* Allow larger size on wider screens */
+  min-height: 2.75rem;            /* Better tap target */
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
+  font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+}
+
+/* Optional: tighten on very small phones */
+@media (max-width: 360px){
+  input.form-control{
+    font-size: 0.95rem;
+  }
+}
+
+/* Desktop refinement */
+@media (min-width: 768px){
+  input.form-control{
+    max-width: 16.8125rem;
+    min-height: 2.0625rem;
+    font-size: 1rem;
+  }
 }
 .picInput{
   height: 3.0625rem !important;
@@ -1044,4 +1060,77 @@ a.post-link{
 to compensate for no h2 bottom margin */
 .container .form-group:first-child {
   padding-top: 5px;
+}
+.bcit-pic-input{ 
+  font-size: 20px;
+  
+  width: fit-content;
+}
+.bcit-pic-input:hover label{
+  
+  cursor: pointer;
+  background-color:#0056b3!important;
+}
+
+button#sbmt:hover{
+  background-color:#0056b3!important;
+}
+button#general-comment-submit, button#general-comment-cancel {
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button#general-comment-submit {
+  background-color: #007bff;
+}
+
+button#general-comment-cancel {
+  background-color: #6c757d;
+}
+
+button#general-comment-submit:hover {
+  background-color: #0056b3;
+}
+
+button#general-comment-cancel:hover {
+  background-color: #5a6268;
+}
+
+.post div {
+  margin-left: 0 !important; 
+}
+.sign-up-button {
+  background:#003C71;
+  color:#fff;
+  border:none;
+  border-radius:0.75rem;
+  font-weight:600;
+  font-size:clamp(0.95rem, 3.5vw, 1rem);          /* Grows on small screens, capped on desktop */
+  padding:clamp(0.65rem, 3vw, 0.8rem) clamp(1.1rem, 7vw, 1.4rem); /* Larger tap target on mobile, slimmer on desktop */
+  line-height:1.2;
+  cursor:pointer;
+  transition:background .25s, transform .1s;
+}
+
+.sign-up-button:hover,
+.sign-up-button:focus {
+  background:#0056b3;
+  outline:none;
+}
+
+.sign-up-button:active {
+  transform:scale(.97);
+}
+
+/* Optional: tighten further on very wide desktops */
+@media (min-width:1400px){
+  .sign-up-button{
+    padding:0.6rem 1.2rem;
+  }
 }

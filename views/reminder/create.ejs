@@ -2,16 +2,17 @@
   <form action="/reminder" method="POST">
     <div class="form-group">
       <label for="title">Title</label>
-      <input type="text" class="form-control" id="titleInput" placeholder="Title" name="title" maxlength="100">
+      <input style="width: 100% !important; height: 5em !important; border-radius: 12px !important;" type="text" class="form-control" id="titleInput" placeholder="Title" name="title" maxlength="100">
     </div>
     <div class="form-group">
       <label for="description">Description</label>
-      <textarea class="form-control" id="descriptionInput" rows="3" placeholder="Description" name="description" maxlength="100"></textarea>
+      <textarea style="min-height: 20em !important; border-radius: 12px !important; background-color: #d5dcdc;" class="form-control" id="descriptionInput" rows="3" placeholder="Description" name="description" maxlength="100"></textarea>
     </div>
     <div class="form-group">
       <label for="keyword">Keyword</label>
-      <textarea class="form-control" id="keywordInput" rows="3" placeholder="Keyword" name="keyword" maxlength="100"></textarea>
+      <textarea style="min-height: 3em !important; border-radius: 12px !important; background-color: #d5dcdc;" class="form-control" id="keywordInput" rows="3" placeholder="Keyword" name="keyword" maxlength="100"></textarea>
     </div>
-    <button type="submit" class="btn btn-default">Submit</button>
+    <hr style="color:black !important; height: 2px;">
+    <button type="submit" class="btn btn-default" id="sbmt" style="background-color: #007bff;">Submit</button>
   </form>
 </div>

@@ -17,12 +17,15 @@ const saltRounds = 10;
 const mysql = require('mysql2');
 require('dotenv').config();
 
+const fs = require('fs');
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    waitForConnections: true,
 }).promise();
 
 const localLogin = new LocalStrategy(
@@ -36,6 +39,11 @@ const localLogin = new LocalStrategy(
             const [rows, fields] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);
             const user = rows[0];
             if (user) {
+                // Check if this is an OAuth user (no password set)
+                if (user.Password === null) {
+                    return done(null, false, req.flash('error', 'This account uses GitHub login. Please use the GitHub login button.'));
+                }
+                
                 const match = await bcrypt.compare(password, user.Password);
                 const activated = user.Confirmed;
 
@@ -63,11 +71,13 @@ const githubLogin = new GithubStrategy({
         clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: GITHUB_CALLBACK_URL
     },
-    function(accessToken, refreshToken, profile, done) {
-        // console.log("Passport.js profile: ", profile);
-        const userModelOutput = findOrCreate(profile, function (err, user) {
-            return done(err, user);
-        })
+function(req, accessToken, refreshToken, profile, done) {
+            findOrCreate(profile, function (err, user) {
+                if (err) {
+                    return done(err);
+                }
+                return done(null, user);
+            });
 
     }
 
@@ -87,7 +97,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const findOrCreate = async (githubProfile, callback) => {
-    const [rows] = await pool.query("SELECT * FROM USER WHERE GitHubEmail = ?;", [githubProfile._json.email]);
+    const [rows] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);
 
     if (rows.length > 0) {
         callback(null, rows[0]);
@@ -98,9 +108,9 @@ const findOrCreate = async (githubProfile, callback) => {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month because month is zero-based
         const day = String(currentDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-
+      
         await pool.query("INSERT INTO USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
-            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
+            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, null, 'user', githubProfile.username, formattedDate, "images/default.jpg"]);
         const [newRows] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);
         callback(null, newRows[0]);
     }

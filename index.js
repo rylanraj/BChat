@@ -8,45 +8,18 @@ const interactionController = require("./controller/interaction_controller");
 const {authController} = require("./controller/auth_controller");
 const { forwardAuthenticated, ensureAuthenticated, isAdmin } = require("./middleware/checkAuth");
 const multer = require('multer');
-// ...existing code...
-const mysql = require("mysql2");
 const flash = require('connect-flash');
 const MySQLStore = require('express-mysql-session')(session);
+const {pool} = require('./db');
 require('dotenv').config()
 
-// Load SSL certificate
-let ca;
-try {
-    const fs = require('fs');
-    ca = fs.readFileSync(path.join(__dirname, 'ca.pem'));
-} catch (err) {
-    console.warn('Warning: ca.pem not found or could not be read. SSL may not be enabled for MySQL connection.');
-}
-
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    ssl: ca ? { ca } : undefined
-}).promise();
-
-// MySQL session store for serverless
-const sessionStore = new MySQLStore({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    ssl: ca ? { ca } : undefined
-});
+const sessionStore = new MySQLStore({}, pool);
 
 // Socket.IO removed for Vercel serverless compatibility. Using polling REST endpoints instead.
 
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Adds session
 
@@ -167,7 +140,49 @@ app.post('/acceptFriend/:id', ensureAuthenticated, interactionController.friends
 app.get("/chat/:id", ensureAuthenticated, interactionController.chatController.chat);
 app.get("/chat/check/:id", ensureAuthenticated, interactionController.chatController.chatCheck)
 
-// Multer configuration
+const { uploadBufferToB2 } = require('./upload-file');
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Middleware to push file buffer to B2 and mimic diskStorage fields
+async function b2Middleware(req, res, next) {
+    if (!req.file) return next();
+
+    // Verify required env vars only when needed
+    const requiredVars = ['B2_KEY_ID', 'B2_APP_KEY', 'B2_BUCKET_ID', 'B2_BUCKET_NAME'];
+    const missing = requiredVars.filter(v => !process.env[v]);
+    if (missing.length) {
+        console.error('[B2] Missing env vars:', missing.join(', '));
+        return res.status(500).send('File upload failed');
+    }
+
+    try {
+        const originalName = req.file.originalname || 'file';
+        console.log('[B2] Upload start', { field: req.file.fieldname, originalName, size: req.file.size });
+
+        const result = await uploadBufferToB2(req.file.buffer, originalName, {
+            prefix: 'uploads', // acts like "folder"
+            makePublic: true
+        });
+
+        // Mimic Multer diskStorage style fields for existing controller logic
+        req.file.filename = result.fileName;
+        req.file.destination = 'b2://' + process.env.B2_BUCKET_NAME + '/uploads';
+        req.file.path = result.url; // now a public URL instead of local path
+        req.file.size = result.size;
+        req.file.location = result.url; // alias some libs expect
+
+        console.log('[B2] Upload success', { fileName: result.fileName, url: result.url });
+        next();
+    } catch (e) {
+        console.error('[B2] Upload failed');
+        if (e && e.response && e.response.data) {
+            console.error('[B2] Response data:', e.response.data);
+        }
+        console.error(e);
+        return res.status(500).send('File upload failed');
+    }
+}
+/* // Multer configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         fs.mkdir('uploads/', { recursive: true }, (err) => {});
@@ -176,16 +191,26 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname); // Unique filename
     }
-});
+}); */
 
-const upload = multer({ storage: storage });
 
-app.post("/profile/:id", ensureAuthenticated, upload.single('profilePicture'), interactionController.profilesController.update);
+app.post("/profile/:id", ensureAuthenticated, 
+    upload.single('profilePicture'),
+    b2Middleware, 
+    interactionController.profilesController.update
+);
 
 // Define route for handling file uploads
-app.post('/upload', ensureAuthenticated, upload.single('photo'), interactionController.postsController.create);
+app.post('/upload', ensureAuthenticated, 
+    upload.single('photo'), 
+    b2Middleware, 
+    interactionController.postsController.create);
+
 // For editing posts
-app.post('/post/edit/:id', ensureAuthenticated, upload.single('photo'), interactionController.postsController.editSubmit);
+app.post('/post/edit/:id', ensureAuthenticated, 
+    upload.single('photo'), 
+    b2Middleware, 
+    interactionController.postsController.editSubmit);
 
 // Github login
 app.get('/github',

@@ -1,4 +1,4 @@
-// Setup MySQL connection from .env
+// Setup MySQL connection from ..env
 const mysql = require('mysql2');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
@@ -23,6 +23,7 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   ssl: ca ? { ca } : undefined
 }).promise();
+
 
 // MySQL session store for serverless
 const sessionStore = new MySQLStore({
@@ -72,7 +73,7 @@ async function fetchOtherUsers(user) {
 const fetchPosts = async () => {
   try {
       // Get a database connection from the pool and execute the query
-      const [rows, fields] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
+      const [rows] = await pool.query("SELECT * FROM POST ORDER BY TimePosted");
       // You may need to fetch additional data related to each post, such as user information
       return rows;
   } catch (error) {
@@ -193,6 +194,8 @@ let postsController = {
       }
 
       // Save post-details to the database
+      // Line below used in production only
+      await pool.query("SET time_zone = ?;",['America/Los_Angeles']);
       await pool.query("INSERT INTO POST (Title, Description, UserID, Picture, TimePosted) VALUES (?,?,?,?,NOW());",
           [title, description, req.user.UserID, filePath]);
 
@@ -304,11 +307,11 @@ let chatController = {
 
     let inboxID = req.params.id;
 
-    let [inboxs, fields_3] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+    let [inboxs] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
 
     const otherUser = await Promise.all(inboxs.map( async row => {
       if (row.User1_ID == user) {
-        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User2_ID]);
+        let [pp] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User2_ID]);
         let data={
           otherUserID: row.User2_ID,
           otherUserName: pp[0].UserName,
@@ -318,7 +321,7 @@ let chatController = {
         }
         return data;
       } else {
-        let [pp, fields] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User1_ID]);
+        let [pp] = await pool.query("SELECT UserName, ProfilePicture FROM USER WHERE UserID = ?", [row.User1_ID]);
         let data={
           otherUserID: row.User1_ID,
           otherUserName: pp[0].UserName,
@@ -331,8 +334,8 @@ let chatController = {
     }));
 
 
-    let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
-    let [rows, fields] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
+    let [rows_2] = await pool.query("SELECT * FROM INBOX WHERE InboxID = ?;", [inboxID]);
+    let [rows] = await pool.query("SELECT * FROM CHAT WHERE Inbox_ID = ?;", [inboxID]);
     let otherUserID;
     if (rows_2.length > 0) {
       otherUserID = rows_2[0].User1_ID == user ? rows_2[0].User2_ID : rows_2[0].User1_ID;
@@ -341,7 +344,7 @@ let chatController = {
       console.error("Error: No chat found with that ID.");
       return res.redirect("/")
     }
-    const [userName, fields_4] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
+    const [userName] = await pool.query("SELECT UserName FROM USER WHERE UserID = ?", [otherUserID]);
 
     if (rows_2.length == 0 || (rows_2[0].User1_ID != user && rows_2[0].User2_ID != user)) {
       res.redirect("/friends");
@@ -367,7 +370,7 @@ let chatController = {
   chatCheck: async (req, res) => {
     let user = req.user.UserID;
     let otherUserID = req.params.id;
-    let [rows, fields] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+    let [rows] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
 
     if (rows.length > 0) {
       let inboxID = rows[0].InboxID;
@@ -375,7 +378,7 @@ let chatController = {
     } else {
       await pool.query("INSERT INTO INBOX (Last_Message, Last_UserID, User1_ID, User2_ID) VALUES (null, null, ?, ?);", [user, otherUserID]);
 
-      let [rows_2, fields_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
+      let [rows_2] = await pool.query("SELECT * FROM INBOX WHERE User1_ID IN (?,?) AND User2_ID IN (?,?)", [user, otherUserID, user, otherUserID]);
 
       let inboxID = rows_2[0].InboxID;
 
@@ -452,13 +455,21 @@ let profilesController = {
     console.log(newStudentSet)
     // Access the uploaded profile picture
     const profilePicture = req.file;
-
-    // Save the file path to the database
-    let filePath = profilePicture ? profilePicture.path : null;
-
-    // Replace backslashes with forward slashes
-    if (filePath) {
-      filePath = filePath.replace(/\\/g, '/');
+    let filePath = null;
+    if (profilePicture) {
+      try {
+        // Use buffer upload for B2
+        const { uploadBufferToB2 } = require('../upload-file');
+        const b2Result = await uploadBufferToB2(
+          profilePicture.buffer,
+          profilePicture.originalname,
+          { prefix: 'uploads', makePublic: true }
+        );
+        filePath = b2Result.url;
+        console.log('[B2] Upload success', b2Result);
+      } catch (err) {
+        console.error('[B2] Upload error', err);
+      }
     }
 
     // Update the user with the new fields only if the "Set" field is not empty
@@ -545,9 +556,14 @@ let friendsController = {
       const [friendRequest] = await pool.query("SELECT * FROM USER WHERE UserID = ?", [receivedFriendRequests[i].UserID]);
       receivedFriendRequests[i].User = friendRequest[0];
     }
+    const [existingFriendRequests] = await pool.query("SELECT * FROM FRIEND WHERE UserID = ?", [req.user.UserID]);
 
+    // This query will return all friend requests that the user has received
+    const [existingFriendRequests_2] = await pool.query("SELECT * FROM FRIEND WHERE FriendUserID = ?", [req.user.UserID]);
     const user = req.user.UserID;
       const [inboxes] = await pool.query("SELECT * FROM INBOX WHERE User1_ID = ? OR User2_ID = ?", [user, user]);
+
+    const [allUsers] = await pool.query("SELECT * FROM USER WHERE UserID != ?", [user]);
 
     const otherUsers = await Promise.all(inboxes.map(async row => {
       const otherUserId = (row.User1_ID === user) ? row.User2_ID : row.User1_ID;
@@ -561,13 +577,14 @@ let friendsController = {
       };
     }));
 
-    res.render("friends/index", {friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers});
+    res.render("friends/index", {allUsers:allUsers ,friends: friends, receivedFriendRequests: receivedFriendRequests, friends_2: friends_2, otherUsers: otherUsers,existingFriendRequests: existingFriendRequests,
+      existingFriendRequests_2: existingFriendRequests_2});
   },
   displayResults: async (req, res) => {
     const searchQuery = req.query.query;
     // This query will return all users that match the search query except the user who is currently logged in
     const [results] = await pool.query
-    ("SELECT * FROM User WHERE UserNickName LIKE ? AND UserID != ?", [`%${searchQuery}%`, req.user.UserID]);
+    ("SELECT * FROM USER WHERE UserNickName LIKE ? AND UserID != ?", [`%${searchQuery}%`, req.user.UserID]);
 
     // This query will return all friend requests that the user has sent
     const [existingFriendRequests] = await pool.query("SELECT * FROM FRIEND WHERE UserID = ?", [req.user.UserID]);
@@ -613,7 +630,7 @@ let remindersController = {
   list: async (req, res) => {
     let user = req.user
     try{
-      const [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE UserID = ?;", [user.UserID]);
+      const [rows] = await pool.query("SELECT * FROM REMINDER WHERE UserID = ?;", [user.UserID]);
       res.render("reminder/index", {
         reminders: rows, user: user
       });
@@ -629,7 +646,7 @@ let remindersController = {
   listOne: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
     if (rows.length > 0) {
       res.render("reminder/single-reminder", {reminderItem: rows[0]});
     } else {
@@ -655,7 +672,7 @@ let remindersController = {
   edit: async (req, res) => {
     let reminderToFind = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToFind, user.UserID]);
     if (rows.length > 0) {
       res.render("reminder/edit", {reminderItem: rows[0]});
     } else {
@@ -667,7 +684,7 @@ let remindersController = {
     // Get the id of the reminder to update
     let reminderToUpdate = req.params.id;
     let user = req.user
-    let [rows, fields] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToUpdate, user.UserID]);
+    let [rows] = await pool.query("SELECT * FROM REMINDER WHERE ReminderID = ? AND UserID = ?;", [reminderToUpdate, user.UserID]);
     // If the reminder exists, update it
     if (rows.length > 0) {
       let reminder = rows[0];

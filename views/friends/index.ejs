@@ -5,13 +5,15 @@
             <% otherUsers.forEach(user => { %>
                 <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
                     <div class="chat_message">
-                        <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <% const userProfileSrc = user.profilePicture && /^https?:/i.test(user.profilePicture) ? user.profilePicture : ('/' + (user.profilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                        <img src="<%= userProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
                         <div class="message_content">
                             <h1><%= user.otherUserName %></h1>
                             <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
                         </div>
                     </div>
                 </div>
+                <hr style="color:black !important; height: 2px;">
             <% }) %>
         </div>
     </div>
@@ -60,7 +62,8 @@
             <% friends.forEach(function(friend) { %>
                 <div class="friend_list">
                     <div class="chat_message">
-                        <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <% const friendProfileSrc = friend.Friend.ProfilePicture && /^https?:/i.test(friend.Friend.ProfilePicture) ? friend.Friend.ProfilePicture : ('/' + (friend.Friend.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                        <img src="<%= friendProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
                         <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserName %>  (<%= friend.Friend.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
@@ -71,7 +74,8 @@
             <% friends_2.forEach(function(friend) { %>
                 <div class="friend_list">
                     <div class="chat_message">
-                        <img src="<%= "/" + friend.Friend.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <% const friend2ProfileSrc = friend.Friend.ProfilePicture && /^https?:/i.test(friend.Friend.ProfilePicture) ? friend.Friend.ProfilePicture : ('/' + (friend.Friend.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                        <img src="<%= friend2ProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
                         <h3><a href=<%="/profile/" + friend.Friend.UserID%>><%= friend.Friend.UserName %>  (<%= friend.Friend.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
@@ -84,7 +88,8 @@
             <% receivedFriendRequests.forEach(function(friendRequest) { %>
                 <div class="friend_list">
                     <div class="chat_message">
-                        <img src="<%= "/" + friendRequest.User.ProfilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+                        <% const requestProfileSrc = friendRequest.User.ProfilePicture && /^https?:/i.test(friendRequest.User.ProfilePicture) ? friendRequest.User.ProfilePicture : ('/' + (friendRequest.User.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                        <img src="<%= requestProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
                         <h3><a href=<%="/profile/" + friendRequest.User.UserID%>><%= friendRequest.User.UserName %>  (<%= friendRequest.User.UserNickName %>)</a></h3>
                     </div>
                     <div class="extend">
@@ -96,6 +101,26 @@
             <% }); %>
         </div>
         <div class="friend_display" id="add" style="display: none;">
+                <% allUsers.forEach(function(user) { %>
+                    <div class="friend_list">
+                        <div class="chat_message" style="margin-top: 10px;">
+                            <% const allUserProfileSrc = user.ProfilePicture && /^https?:/i.test(user.ProfilePicture) ? user.ProfilePicture : ('/' + (user.ProfilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+                            <img src="<%= allUserProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
+                            <h3><a href=<%="/profile/" + user.UserID%>><%= user.UserName %>  (<%=user.UserNickName%>)</a></h3>
+                        </div>
+                        <div class="extend">
+                            <% if (!existingFriendRequests.some(request => request.FriendUserID === user.UserID) && !existingFriendRequests_2.some(request => request.UserID === user.UserID)) { %>
+                                <a href=<%="/addFriend/" + user.UserID%> class="add-friend">
+                                    Add Friend
+                                </a>
+                            <% } else { %>
+                                <p>You have already sent a friend request to this User or you are already friends with them.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                <% }); %>
+            </div>
         </div>
     </div>
 </div>

@@ -6,13 +6,16 @@
         <% otherUsers.forEach(user => { %>
           <div class="inbox" onclick="Inbox('<%= user.inboxID %>')">
             <div class="chat_message">
-              <img src="<%= "/" + user.profilePicture %>" alt="pp" width="50" height="50" class="profile_picture">
+              <% const userProfileSrc = user.profilePicture && /^https?:/i.test(user.profilePicture) ? user.profilePicture : ('/' + (user.profilePicture || 'images/default.jpg').replace(/^\/+/,'')); %>
+              <img src="<%= userProfileSrc %>" alt="pp" width="50" height="50" class="profile_picture">
               <div class="message_content">
                 <h1><%= user.otherUserName %></h1>
                 <p id="latest<%= user.inboxID %>"><%= user.lastMessage %></p>
+                
               </div>
             </div>
           </div>
+          <hr style="color:black !important; height: 2px;">
         <% }) %>
       </div>
     </div>
@@ -46,7 +49,8 @@
               <% const userData = userDataMap[post.UserID]; %>
               <div class="user-info">
                   <a href=<%="/profile/" + post.UserID%>>
-                <img class="user-info-img" src="<%= "/" + userData.profilePicture %>" alt="user_profile_picture" width="50" height="50">
+                <% const postProfileSrc = userData && userData.profilePicture && /^https?:/i.test(userData.profilePicture) ? userData.profilePicture : ('/' + ((userData && userData.profilePicture) || 'images/default.jpg').replace(/^\/+/,'')); %>
+                <img class="user-info-img" src="<%= postProfileSrc %>" alt="user_profile_picture" width="50" height="50">
                   </a>
                   <div class="text-user-info">
                       <p class="post-info" id="post-username">
@@ -72,7 +76,7 @@
                             <% if (post.UserID !== user.UserID) { %>
                                 <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
                                 <a onclick="report('<%= post.PostID %>')">Report</a>
-                                <a href="#">Message Creator</a>
+                                <a href="/chat/check/<%= post.UserID %>">Message Creator</a>
                             <% } else if (post.UserID === user.UserID || user.role === "admin") { %>
                                 <a href=<%="/post/edit/" + post.PostID%>>Edit</a>
                                 <a href="#" onclick="copyLink('<%= post.PostID %>')">Copy Link</a>
@@ -155,8 +159,10 @@
         event.preventDefault();
 
         // Construct the URL of the post
+        console.log(postId);
+        console.log(window.location.origin);
         const postUrl = window.location.origin + '/post/' + postId;
-
+        console.log(postUrl);
         // Copy the URL to the clipboard
         navigator.clipboard.writeText(postUrl)
             .then(() => {

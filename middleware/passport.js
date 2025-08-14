@@ -39,6 +39,11 @@ const localLogin = new LocalStrategy(
             const [rows, fields] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [email]);
             const user = rows[0];
             if (user) {
+                // Check if this is an OAuth user (no password set)
+                if (user.Password === null) {
+                    return done(null, false, req.flash('error', 'This account uses GitHub login. Please use the GitHub login button.'));
+                }
+                
                 const match = await bcrypt.compare(password, user.Password);
                 const activated = user.Confirmed;
 
@@ -92,7 +97,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const findOrCreate = async (githubProfile, callback) => {
-    const [rows] = await pool.query("SELECT * FROM USER WHERE GitHubEmail = ?;", [githubProfile._json.email]);
+    const [rows] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);
 
     if (rows.length > 0) {
         callback(null, rows[0]);
@@ -105,7 +110,7 @@ const findOrCreate = async (githubProfile, callback) => {
         const formattedDate = `${year}-${month}-${day}`;
       
         await pool.query("INSERT INTO USER (UserName, Email, GitHubEmail, Password, Role, UserNickName, DateJoined, ProfilePicture) VALUES (?,?,?,?,?,?,?,?);",
-            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, "tempPassword", 'user', githubProfile.username, formattedDate, "../images/default.jpg"]);
+            [githubProfile.username, githubProfile._json.email, githubProfile._json.email, null, 'user', githubProfile.username, formattedDate, "images/default.jpg"]);
         const [newRows] = await pool.query("SELECT * FROM USER WHERE Email = ?;", [githubProfile._json.email]);
         callback(null, newRows[0]);
     }

@@ -1,5 +1,10 @@
 <div class="report_feed_section">
-    <div style="position: fixed; width: 59.3%;" class="section_name">
+    <div style=              <% if (post.Picture) { %>
+                <a href=<%="/post/" + post.PostID%>>
+                    <% const adminPostPicSrc = /^https?:/i.test(post.Picture) ? post.Picture : ('/' + post.Picture.replace(/^\/+/,'')); %>
+                    <img class="post-img" src="<%= adminPostPicSrc %>" alt="post_picture" width="400" height="200">
+                </a>
+              <% } %>tion: fixed; width: 59.3%;" class="section_name">
         <h2>Report Feed</h2>
     </div>
     <div style="margin-top: 50px;">

@@ -3,7 +3,7 @@
 
 BChat is an exclusive social media platform for BCIT Computing Students, I am a contributer of the original repository, and this fork was simply made so I could pin it with it's intended name.
 
-A live instance is available at: https://bchat.rylanraj.com
+A live publically accessible instance is available at: https://bchat.rylanraj.com
 
 Features:
 
